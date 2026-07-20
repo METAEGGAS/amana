@@ -23,26 +23,24 @@
     --nav-active:#f04a2a;
   }
   *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;}
-  html,body{height:100%;}
+  html,body{height:100%;width:100%;}
   body{
     font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
     background:
       radial-gradient(ellipse at 50% 40%, #6b4a12 0%, #3a2708 35%, #1a1004 65%, #0a0603 100%);
     min-height:100vh;
-    display:flex;
-    align-items:center;
-    justify-content:center;
-    padding:20px;
+    width:100vw;
     overflow-x:hidden;
   }
 
   .screen{
     position:relative;
-    width:360px;
-    height:740px;
+    width:100vw;
+    min-height:100vh;
     border-radius:0;
     overflow:hidden;
     background:#fff;
+    padding-bottom:60px;
   }
 
   /* Background hero image area (shopping cart with dark overlay) */
@@ -73,30 +71,14 @@
     justify-content:center;
     opacity:.55;
     z-index:1;
+    height:330px;
   }
   .cart-shadow svg{width:280px;height:auto;filter:blur(.3px);}
-
-  /* Status Bar */
-  .status-bar{
-    position:relative;
-    z-index:5;
-    height:26px;
-    padding:6px 18px 0;
-    display:flex;
-    align-items:center;
-    justify-content:space-between;
-    color:#fff;
-    font-size:13px;
-    font-weight:600;
-  }
-  .status-bar .time{font-variant-numeric:tabular-nums;letter-spacing:.2px;}
-  .status-icons{display:flex;gap:5px;align-items:center;}
-  .status-icons svg{display:block;}
 
   /* Top bar HOME + gift code */
   .top-bar{
     position:relative;z-index:5;
-    padding:14px 18px 0;
+    padding:18px 18px 0;
     display:flex;
     align-items:center;
     justify-content:center;
@@ -110,7 +92,7 @@
   .gift-btn{
     position:absolute;
     right:14px;
-    top:8px;
+    top:12px;
     display:flex;
     align-items:center;
     gap:6px;
@@ -158,6 +140,8 @@
     grid-template-columns:repeat(4,1fr);
     gap:6px;
     padding:16px 12px 10px;
+    max-width:600px;
+    margin:0 auto;
   }
   .qa{
     display:flex;flex-direction:column;align-items:center;gap:6px;color:#fff;
@@ -170,7 +154,9 @@
   /* Content scroll area */
   .content{
     position:relative;z-index:4;
-    padding:6px 12px 70px;
+    padding:6px 12px 20px;
+    max-width:600px;
+    margin:0 auto;
   }
 
   /* Balance card */
@@ -340,9 +326,9 @@
 
   /* Floating avatar */
   .float-avatar{
-    position:absolute;
+    position:fixed;
     right:14px;
-    bottom:90px;
+    bottom:80px;
     width:44px;height:44px;border-radius:50%;
     background:#ffb800;
     border:2px solid #fff;
@@ -355,7 +341,7 @@
 
   /* Bottom nav */
   .bottom-nav{
-    position:absolute;
+    position:fixed;
     left:0;right:0;bottom:0;
     height:60px;
     background:#fff;
@@ -387,30 +373,6 @@
           <circle cx="75" cy="130" r="10" stroke="#e6b96a" stroke-width="3" fill="none" opacity=".7"/>
           <circle cx="150" cy="130" r="10" stroke="#e6b96a" stroke-width="3" fill="none" opacity=".7"/>
         </svg>
-      </div>
-
-      <!-- Status bar -->
-      <div class="status-bar">
-        <div class="time">12:19</div>
-        <div class="status-icons">
-          <!-- Vibrate -->
-          <svg width="12" height="12" viewBox="0 0 24 24" fill="white"><path d="M7 4h10v16H7z" opacity=".9"/></svg>
-          <!-- Wifi -->
-          <svg width="14" height="12" viewBox="0 0 24 24" fill="white"><path d="M12 21l3.5-4.5c-2-1.5-5-1.5-7 0L12 21zm-7-8c4-4 10-4 14 0l2-2c-5-5-13-5-18 0l2 2zm3.5 3.5c2-2 5-2 7 0l2-2c-3-3-8-3-11 0l2 2z"/></svg>
-          <!-- Signal 1 -->
-          <svg width="14" height="12" viewBox="0 0 24 24" fill="white"><path d="M2 20h3v-6H2v6zm5 0h3V10H7v10zm5 0h3V4h-3v16z" opacity=".9"/></svg>
-          <!-- Signal 2 -->
-          <svg width="14" height="12" viewBox="0 0 24 24" fill="white"><path d="M2 20h3v-6H2v6zm5 0h3V10H7v10zm5 0h3V4h-3v16z" opacity=".9"/></svg>
-          <!-- Battery -->
-          <div style="display:flex;align-items:center;gap:2px;">
-            <span style="color:#fff;font-size:10px;font-weight:600;">73%</span>
-            <svg width="20" height="12" viewBox="0 0 24 12" fill="none">
-              <rect x="1" y="1" width="20" height="10" rx="2" stroke="white" stroke-width="1"/>
-              <rect x="22" y="4" width="2" height="4" fill="white"/>
-              <rect x="3" y="3" width="12" height="6" fill="#ffcc22"/>
-            </svg>
-          </div>
-        </div>
       </div>
 
       <!-- Top bar -->
