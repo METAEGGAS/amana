@@ -1,1 +1,738 @@
-<!DOCTYPE html><html lang="ar" dir="rtl"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=no,viewport-fit=cover"><meta name="theme-color" content="#ffffff"><meta name="msapplication-navbutton-color" content="#ffffff"><meta name="apple-mobile-web-app-status-bar-style" content="default"><title>amana</title><style>*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}html,body{background:#fff;color:#fff;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","Helvetica Neue",Arial,sans-serif;min-height:100vh;overflow-x:hidden;direction:rtl}body::after{content:'';position:fixed;left:0;right:0;bottom:0;height:env(safe-area-inset-bottom);background:#fff;z-index:200;pointer-events:none}.app{max-width:480px;margin:0 auto;background:#0d1129;min-height:100vh;padding-bottom:70px;position:relative;direction:rtl}.header{display:flex;align-items:center;justify-content:space-between;padding:14px 16px;background:#0d1129;flex-direction:row-reverse}.header-left{display:flex;align-items:center;gap:8px;flex-direction:row-reverse}.logo{width:38px;height:38px;display:flex;align-items:center;justify-content:center}.logo img{width:100%;height:100%;object-fit:contain}.logo-text{font-size:20px;font-weight:bold;letter-spacing:1px}.header-right{display:flex;align-items:center;gap:14px;flex-direction:row-reverse}.header-icon{width:24px;height:24px;color:#7b8bb0;cursor:pointer}.banner{margin:8px 14px 18px;border-radius:14px;overflow:hidden;position:relative;height:175px;background:#1e2a5e}.banner-slide{position:absolute;inset:0;background-size:cover;background-position:center;opacity:0;transition:opacity 1s ease-in-out}.banner-slide.active{opacity:1}.grid{display:grid;grid-template-columns:repeat(4,1fr);gap:18px 8px;padding:6px 16px 18px;direction:ltr}.grid-item{display:flex;flex-direction:column;align-items:center;gap:8px;cursor:pointer}.grid-item img{width:56px;height:56px;object-fit:contain}.grid-item span{font-size:13px;color:#c8cee0;text-align:center}.marquee{display:flex;align-items:center;gap:10px;background:transparent;padding:10px 16px;border-top:1px solid rgba(255,255,255,.04);flex-direction:row}.marquee-icon{width:22px;height:22px;flex-shrink:0;color:#7b8bb0}.marquee-content{flex:1;overflow:hidden;white-space:nowrap;font-size:13px;color:#c8cee0;direction:rtl}.marquee-text{display:inline-block;animation:scroll-rtl 22s linear infinite}@keyframes scroll-rtl{0%{transform:translateX(-100%)}100%{transform:translateX(100%)}}.ticker{display:grid;grid-template-columns:repeat(3,1fr);padding:12px 16px 18px;gap:8px;direction:rtl}.ticker-item{text-align:right}.ticker-head{display:flex;align-items:center;justify-content:flex-start;gap:6px;font-size:13px;color:#c8cee0;margin-bottom:4px;flex-direction:row}.ticker-head .pct{font-size:12px}.ticker-head .pct.up{color:#2ecc71}.ticker-head .pct.down{color:#e74c3c}.ticker-price{font-size:20px;font-weight:700;color:#fff;transition:color .3s}.ticker-price.flash-up{color:#2ecc71}.ticker-price.flash-down{color:#e74c3c}.feature-cards{display:grid;grid-template-columns:1fr 1fr;gap:12px;padding:4px 16px 18px;direction:rtl}.feature-card{position:relative;border-radius:12px;padding:16px 14px;overflow:hidden;min-height:84px;background-size:cover;background-position:center;background-repeat:no-repeat;display:flex;flex-direction:column;align-items:flex-end;justify-content:flex-end;text-align:right}.feature-card.quant{background-image:url('https://aix5aa.pexu.wang/assets/ueIjGn90GfDfp09VW3.png')}.feature-card.invite{background-image:url('https://aix5aa.pexu.wang/assets/toHPVd0BXJBTgYKbNS.png')}.feature-card h3{font-size:15px;font-weight:700;color:#fff;margin-bottom:6px;position:relative;z-index:2;text-align:right}.feature-card p{font-size:12px;color:#e0e6f5;position:relative;z-index:2;text-align:right}.avatar-drag{position:absolute;width:44px;height:44px;border-radius:50%;background:url('https://cdn-icons-png.flaticon.com/128/10015/10015677.png') center/cover no-repeat;cursor:grab;touch-action:none;z-index:999;right:0;top:50%;transform:translateY(-50%);user-select:none;-webkit-user-drag:none}.avatar-drag.dragging{cursor:grabbing}.tabs{display:flex;justify-content:space-around;padding:6px 16px 0;border-bottom:1px solid rgba(255,255,255,.06);flex-direction:row}.tab{padding:12px 4px;font-size:15px;color:#7b8bb0;font-weight:500;position:relative;cursor:pointer}.tab.active{color:#1ec8dc}.tab.active::after{content:'';position:absolute;bottom:-1px;left:20%;right:20%;height:2px;background:#1ec8dc;border-radius:2px}.table-head{display:grid;grid-template-columns:1fr 2fr 1fr;padding:12px 16px;font-size:12px;color:#7b8bb0;text-align:center;direction:rtl}.table-head span:first-child{text-align:right}.table-head span:last-child{text-align:left}.coin-list{padding:0 16px;direction:ltr}.coin-row{display:grid;grid-template-columns:1fr 1fr 1fr;align-items:center;padding:14px 0;border-bottom:1px solid rgba(255,255,255,.05)}.coin-info{display:flex;align-items:center;gap:10px}.coin-info img{width:32px;height:32px;object-fit:contain}.coin-name{font-size:15px;font-weight:600;color:#fff}.coin-name .pair{color:#7b8bb0;font-size:12px;font-weight:400}.coin-price{text-align:center;font-size:15px;font-weight:600;color:#fff;transition:color .3s}.coin-price.flash-up{color:#2ecc71}.coin-price.flash-down{color:#e74c3c}.coin-pct{justify-self:end;min-width:82px;padding:8px 0;border-radius:6px;text-align:center;font-size:13px;font-weight:600;color:#fff}.up{background:#2ecc71}.down{background:#e74c3c}.bottom-nav{position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:100%;max-width:480px;background:#000;border-top:1px solid rgba(255,255,255,.06);display:grid;grid-template-columns:repeat(4,1fr);padding:4px 0;z-index:100;direction:rtl}.nav-item{display:flex;flex-direction:column;align-items:center;gap:2px;color:#7b8bb0;font-size:11px;cursor:pointer}.nav-item img{width:22px;height:22px;object-fit:contain;transition:filter .2s}.nav-item.active{color:#1ec8dc}.nav-item.active img{filter:brightness(0) saturate(100%) invert(64%) sepia(89%) saturate(1573%) hue-rotate(151deg) brightness(94%) contrast(88%)}.green{color:#2ecc71}#invite-card{position:relative}</style></head><body><div class="app" id="app"><div class="header"><div class="header-left"><div class="logo"><img src="https://i.ibb.co/Rpmn80vp/IMG.png" alt="amana"></div><div class="logo-text">amana</div></div><div class="header-right"><svg class="header-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg><svg class="header-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg></div></div><div class="banner"><div class="banner-slide active" style="background-image:url('https://i.ibb.co/Zz11VVPh/file-00000000622c81fdbbf11dfa295b5a8b.png')"></div><div class="banner-slide" style="background-image:url('https://i.ibb.co/yn6kP9YB/file-0000000048e881fd93ed03b9e13a6c24.png')"></div><div class="banner-slide" style="background-image:url('https://api.pexu.wang/upload/img/6a5a153ccc74.webp')"></div></div><div class="grid"><div class="grid-item"><img src="https://aix5aa.pexu.wang/assets/d2vtuNlCYvf2sgTIoS.png" alt="تعبئة رصيد"><span>تعبئة رصيد</span></div><div class="grid-item"><img src="https://aix5aa.pexu.wang/assets/9DIzDCj1CqCzErJe6F.png" alt="ينسحب"><span>ينسحب</span></div><div class="grid-item"><img src="https://aix5aa.pexu.wang/assets/VEz3vMLW9VDtJZfn1f.png" alt="يساعد"><span>يساعد</span></div><div class="grid-item"><img src="https://aix5aa.pexu.wang/assets/NZixi1tcmc5Qm11FiF.png" alt="فريق"><span>فريق</span></div><div class="grid-item"><img src="https://aix5aa.pexu.wang/assets/wQHy5OrwYIDGTUQ_qq.png" alt="تحميل التطبيق"><span>تحميل التطبيق</span></div><div class="grid-item"><img src="https://aix5aa.pexu.wang/assets/jIGiLRzeJkDpjgxKey.png" alt="نشاط"><span>نشاط</span></div><div class="grid-item"><img src="https://aix5aa.pexu.wang/assets/qY0Rhvg3l6CPhCWm7m.png" alt="تعاون الوكيل"><span>تعاون الوكيل</span></div><div class="grid-item"><img src="https://aix5aa.pexu.wang/assets/NZixi1tcmc5Qm11FiF.png" alt="ادعو أصدقاء" style="filter:hue-rotate(200deg)"><span>ادعو أصدقاء</span></div></div><div class="marquee"><svg class="marquee-icon" viewBox="0 0 24 24" fill="currentColor"><path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02zM14 3.23v2.06c2.89.86 5 3.54 5 6.71s-2.11 5.85-5 6.71v2.06c4.01-.91 7-4.49 7-8.77s-2.99-7.86-7-8.77z"/></svg><div class="marquee-content"><span class="marquee-text">التي يتحملها المستخدمون، أنشأت المنصة خطة حوافز "سفير الترويج" لتشجيع المزيد من المستخدمين على الانضمام</span></div></div><div class="ticker" id="ticker"><div class="ticker-item" data-sym="BTC/USDT" data-p="64498.2" data-pct="0.62"><div class="ticker-head"><span>BTC/USDT</span><span class="pct up">0.62%</span></div><div class="ticker-price">64498.2</div></div><div class="ticker-item" data-sym="TRX/USDT" data-p="0.32722" data-pct="1.08"><div class="ticker-head"><span>TRX/USDT</span><span class="pct up">1.08%</span></div><div class="ticker-price">0.32722</div></div><div class="ticker-item" data-sym="ETH/USDT" data-p="1872.43" data-pct="1.66"><div class="ticker-head"><span>ETH/USDT</span><span class="pct up">1.66%</span></div><div class="ticker-price">1872.43</div></div></div><div class="feature-cards"><div class="feature-card quant"><h3>التداول الكمي</h3><p>دخل فعّال ومستقر</p></div><div class="feature-card invite" id="invite-card"><h3>ادعو أصدقاء</h3><p>كسب الدخل</p></div></div><div class="tabs"><div class="tab">BINANCE</div><div class="tab active">OKX</div><div class="tab">HUOBI</div><div class="tab">COINBASE</div></div><div class="table-head"><span>عملة</span><span>أحدث السعر ($)</span><span>24 ساعة صعود وهبوط</span></div><div class="coin-list" id="coinList"><div class="coin-row" data-p="64564" data-pct="0.68"><div class="coin-info"><img src="https://s2.coinmarketcap.com/static/img/coins/64x64/1.png" alt="BTC"><div class="coin-name">BTC<span class="pair">/USD</span></div></div><div class="coin-price">64564</div><div class="coin-pct up">+ 0.68%</div></div><div class="coin-row" data-p="1870.76" data-pct="1.42"><div class="coin-info"><img src="https://s2.coinmarketcap.com/static/img/coins/64x64/1027.png" alt="ETH"><div class="coin-name">ETH<span class="pair">/USD</span></div></div><div class="coin-price">1870.76</div><div class="coin-pct up">+ 1.42%</div></div><div class="coin-row" data-p="570.3" data-pct="-0.02"><div class="coin-info"><img src="https://s2.coinmarketcap.com/static/img/coins/64x64/1839.png" alt="BNB"><div class="coin-name">BNB<span class="pair">/USD</span></div></div><div class="coin-price">570.3</div><div class="coin-pct down">-0.02%</div></div><div class="coin-row" data-p="1.098" data-pct="0.97"><div class="coin-info"><img src="https://s2.coinmarketcap.com/static/img/coins/64x64/52.png" alt="XRP"><div class="coin-name">XRP<span class="pair">/USD</span></div></div><div class="coin-price">1.098</div><div class="coin-pct up">+ 0.97%</div></div><div class="coin-row" data-p="0.1663" data-pct="1.09"><div class="coin-info"><img src="https://s2.coinmarketcap.com/static/img/coins/64x64/2010.png" alt="ADA"><div class="coin-name">ADA<span class="pair">/USD</span></div></div><div class="coin-price">0.1663</div><div class="coin-pct up">+ 1.09%</div></div><div class="coin-row" data-p="76.2" data-pct="1.61"><div class="coin-info"><img src="https://s2.coinmarketcap.com/static/img/coins/64x64/5426.png" alt="SOL"><div class="coin-name">SOL<span class="pair">/USD</span></div></div><div class="coin-price">76.2</div><div class="coin-pct up">+ 1.61%</div></div><div class="coin-row" data-p="0.07246" data-pct="0.33"><div class="coin-info"><img src="https://s2.coinmarketcap.com/static/img/coins/64x64/74.png" alt="DOGE"><div class="coin-name">DOGE<span class="pair">/USD</span></div></div><div class="coin-price">0.07246</div><div class="coin-pct up">+ 0.33%</div></div><div class="coin-row" data-p="0.8244" data-pct="-1.03"><div class="coin-info"><img src="https://s2.coinmarketcap.com/static/img/coins/64x64/6636.png" alt="DOT"><div class="coin-name">DOT<span class="pair">/USD</span></div></div><div class="coin-price">0.8244</div><div class="coin-pct down">-1.03%</div></div><div class="coin-row" data-p="47.28" data-pct="1.94"><div class="coin-info"><img src="https://s2.coinmarketcap.com/static/img/coins/64x64/2.png" alt="LTC"><div class="coin-name">LTC<span class="pair">/USD</span></div></div><div class="coin-price">47.28</div><div class="coin-pct up">+ 1.94%</div></div><div class="coin-row" data-p="0.3272" data-pct="1.08"><div class="coin-info"><img src="https://s2.coinmarketcap.com/static/img/coins/64x64/1958.png" alt="TRX"><div class="coin-name">TRX<span class="pair">/USD</span></div></div><div class="coin-price">0.3272</div><div class="coin-pct up">+ 1.08%</div></div><div class="coin-row" data-p="0.00001824" data-pct="2.15"><div class="coin-info"><img src="https://s2.coinmarketcap.com/static/img/coins/64x64/28192.png" alt="SHIB"><div class="coin-name">SHIB<span class="pair">/USD</span></div></div><div class="coin-price">0.00001824</div><div class="coin-pct up">+ 2.15%</div></div><div class="coin-row" data-p="24.17" data-pct="-0.45"><div class="coin-info"><img src="https://s2.coinmarketcap.com/static/img/coins/64x64/5805.png" alt="AVAX"><div class="coin-name">AVAX<span class="pair">/USD</span></div></div><div class="coin-price">24.17</div><div class="coin-pct down">-0.45%</div></div></div><div class="avatar-drag" id="dragAvatar"></div></div><div class="bottom-nav"><div class="nav-item"><img src="https://i.ibb.co/zV9r37Wg/IMG.png" alt="أنا"><span>أنا</span></div><div class="nav-item"><img src="https://i.ibb.co/2mbZtBw/IMG.png" alt="خدمة"><span>خدمة</span></div><div class="nav-item"><img src="https://i.ibb.co/RkFj6HXV/IMG.png" alt="تحديد الكمية"><span>تحديد الكمية</span></div><div class="nav-item active"><img src="https://i.ibb.co/Dg79FMtD/IMG.png" alt="بيت"><span>الرئيسية</span></div></div><script>let s=document.querySelectorAll('.banner-slide'),i=0;setInterval(()=>{s[i].classList.remove('active');i=(i+1)%s.length;s[i].classList.add('active')},3500);document.querySelectorAll('.nav-item').forEach(n=>n.addEventListener('click',()=>{document.querySelectorAll('.nav-item').forEach(x=>x.classList.remove('active'));n.classList.add('active')}));function fmt(v,o){if(o<0.001)return v.toFixed(8);if(o<0.01)return v.toFixed(5);if(o<1)return v.toFixed(4);if(o<10)return v.toFixed(3);if(o<1000)return v.toFixed(2);return v.toFixed(1)}function updPrice(el,cur,orig){let ch=(Math.random()-0.5)*orig*0.002,nv=cur+ch;if(Math.abs(nv-orig)/orig>0.03)nv=orig+(Math.random()-0.5)*orig*0.01;let pe=el.querySelector('.coin-price')||el.querySelector('.ticker-price'),up=nv>cur;pe.textContent=fmt(nv,orig);pe.classList.remove('flash-up','flash-down');pe.classList.add(up?'flash-up':'flash-down');setTimeout(()=>pe.classList.remove('flash-up','flash-down'),400);return nv}let tickState=[...document.querySelectorAll('.ticker-item')].map(t=>({el:t,cur:parseFloat(t.dataset.p),orig:parseFloat(t.dataset.p)}));let coinState=[...document.querySelectorAll('.coin-row')].map(r=>({el:r,cur:parseFloat(r.dataset.p),orig:parseFloat(r.dataset.p)}));setInterval(()=>{tickState.forEach(s=>{s.cur=updPrice(s.el,s.cur,s.orig)})},2000);setInterval(()=>{let idx=Math.floor(Math.random()*coinState.length),s=coinState[idx];s.cur=updPrice(s.el,s.cur,s.orig)},900);(function(){const a=document.getElementById('dragAvatar'),p=document.getElementById('app');let dx=0,dy=0,dr=false;const NAV_H=70;function pos(e){const t=e.touches?e.touches[0]:e,r=p.getBoundingClientRect();let x=t.clientX-r.left-dx,y=t.clientY-r.top-dy;x=Math.max(0,Math.min(x,r.width-a.offsetWidth));y=Math.max(0,Math.min(y,window.innerHeight-a.offsetHeight-NAV_H-r.top));a.style.left=x+'px';a.style.top=y+'px';a.style.right='auto';a.style.transform='none'}function start(e){dr=true;a.classList.add('dragging');const t=e.touches?e.touches[0]:e,r=a.getBoundingClientRect();dx=t.clientX-r.left;dy=t.clientY-r.top;e.preventDefault()}function move(e){if(!dr)return;pos(e);e.preventDefault()}function end(){dr=false;a.classList.remove('dragging')}a.addEventListener('mousedown',start);document.addEventListener('mousemove',move);document.addEventListener('mouseup',end);a.addEventListener('touchstart',start,{passive:false});document.addEventListener('touchmove',move,{passive:false});document.addEventListener('touchend',end)})();</script></body></html>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+<title>HOME</title>
+<style>
+  :root{
+    --page-bg-top:#000000;
+    --page-bg-mid:#1a1206;
+    --card-white:#ffffff;
+    --yellow:#ffcc22;
+    --yellow-2:#ffb800;
+    --orange:#ff7a00;
+    --text-dark:#222222;
+    --text-muted:#8a8a8a;
+    --text-red:#e53935;
+    --divider:#ececec;
+    --lilac:#efe6f6;
+    --lilac-2:#f3ecf8;
+    --grey-btn:#c9c9c9;
+    --nav-inactive:#b7b7b7;
+    --nav-active:#f04a2a;
+  }
+  *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;}
+  html,body{height:100%;}
+  body{
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    background:
+      radial-gradient(ellipse at 50% 40%, #6b4a12 0%, #3a2708 35%, #1a1004 65%, #0a0603 100%);
+    min-height:100vh;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    padding:20px;
+    overflow-x:hidden;
+  }
+
+  /* Phone frame */
+  .phone{
+    width:360px;
+    height:740px;
+    background:#000;
+    border-radius:44px;
+    padding:10px;
+    position:relative;
+    box-shadow:
+      0 0 0 2px #2a2a2a,
+      0 0 0 3px #3a3a3a,
+      0 30px 60px rgba(0,0,0,.6),
+      inset 0 0 0 1px #101010;
+  }
+  .phone::before,.phone::after{
+    content:"";
+    position:absolute;
+    left:-3px;
+    width:3px;
+    background:#1a1a1a;
+    border-radius:2px;
+  }
+  .phone::before{top:110px;height:34px;}
+  .phone::after{top:160px;height:56px;}
+  .phone .side-right{
+    position:absolute;right:-3px;top:140px;width:3px;height:80px;background:#1a1a1a;border-radius:2px;
+  }
+
+  .screen{
+    position:relative;
+    width:100%;
+    height:100%;
+    border-radius:36px;
+    overflow:hidden;
+    background:#fff;
+  }
+
+  /* Background hero image area (shopping cart with dark overlay) */
+  .hero-bg{
+    position:absolute;
+    inset:0 0 auto 0;
+    height:330px;
+    background:
+      linear-gradient(180deg, rgba(0,0,0,.55) 0%, rgba(0,0,0,.45) 40%, rgba(0,0,0,.35) 70%, rgba(255,255,255,0) 100%),
+      radial-gradient(ellipse at 50% 30%, #7a5a2a 0%, #4a3312 40%, #221609 80%);
+    z-index:0;
+  }
+  .hero-bg::after{
+    content:"";
+    position:absolute;
+    inset:0;
+    background-image:
+      radial-gradient(circle at 30% 60%, rgba(255,180,60,.15), transparent 40%),
+      radial-gradient(circle at 70% 40%, rgba(255,200,90,.1), transparent 45%);
+    mix-blend-mode:screen;
+  }
+  /* Shopping cart silhouette (SVG) */
+  .cart-shadow{
+    position:absolute;
+    inset:0;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    opacity:.55;
+    z-index:1;
+  }
+  .cart-shadow svg{width:280px;height:auto;filter:blur(.3px);}
+
+  /* Status Bar */
+  .status-bar{
+    position:relative;
+    z-index:5;
+    height:26px;
+    padding:6px 18px 0;
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    color:#fff;
+    font-size:13px;
+    font-weight:600;
+  }
+  .status-bar .time{font-variant-numeric:tabular-nums;letter-spacing:.2px;}
+  .notch{
+    position:absolute;
+    top:6px;left:50%;transform:translateX(-50%);
+    width:96px;height:22px;background:#000;border-radius:14px;
+    z-index:6;
+  }
+  .status-icons{display:flex;gap:5px;align-items:center;}
+  .status-icons svg{display:block;}
+
+  /* Top bar HOME + gift code */
+  .top-bar{
+    position:relative;z-index:5;
+    padding:14px 18px 0;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+  }
+  .home-title{
+    color:#fff;
+    font-size:17px;
+    font-weight:700;
+    letter-spacing:1px;
+  }
+  .gift-btn{
+    position:absolute;
+    right:14px;
+    top:8px;
+    display:flex;
+    align-items:center;
+    gap:6px;
+    background:linear-gradient(180deg,#ffe25a 0%,#ffb800 100%);
+    border-radius:20px;
+    padding:4px 6px 4px 10px;
+    box-shadow:0 2px 6px rgba(0,0,0,.25);
+  }
+  .gift-btn .gift-ic{
+    width:16px;height:16px;background:#e53935;border-radius:3px;position:relative;display:inline-block;
+  }
+  .gift-btn .gift-ic::before{
+    content:"";position:absolute;left:50%;top:0;bottom:0;width:2px;background:#fff;transform:translateX(-50%);
+  }
+  .gift-btn .gift-ic::after{
+    content:"";position:absolute;top:50%;left:0;right:0;height:2px;background:#fff;transform:translateY(-50%);
+  }
+  .gift-btn .label{
+    color:#3a2a00;font-size:12px;font-weight:700;
+  }
+  .gift-btn .go{
+    background:#ff7a00;color:#fff;font-size:11px;font-weight:800;
+    padding:2px 8px;border-radius:12px;letter-spacing:.5px;
+  }
+
+  /* Announcement */
+  .announcement{
+    position:relative;z-index:5;
+    margin:14px 14px 0;
+    background:rgba(0,0,0,.35);
+    backdrop-filter:blur(6px);
+    -webkit-backdrop-filter:blur(6px);
+    border-radius:26px;
+    padding:12px 18px;
+    color:#fff;
+    font-size:13px;
+    line-height:1.35;
+    text-align:center;
+  }
+
+  /* Quick actions */
+  .quick-actions{
+    position:relative;z-index:5;
+    display:grid;
+    grid-template-columns:repeat(4,1fr);
+    gap:6px;
+    padding:16px 12px 10px;
+  }
+  .qa{
+    display:flex;flex-direction:column;align-items:center;gap:6px;color:#fff;
+  }
+  .qa .ic{
+    width:34px;height:34px;display:flex;align-items:center;justify-content:center;
+  }
+  .qa .txt{font-size:13px;font-weight:500;}
+
+  /* Content scroll area */
+  .content{
+    position:relative;z-index:4;
+    padding:6px 12px 70px;
+  }
+
+  /* Balance card */
+  .balance-card{
+    background:#fff;
+    border-radius:14px;
+    box-shadow:0 6px 16px rgba(0,0,0,.08);
+    padding:14px 16px;
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    position:relative;
+    margin-top:2px;
+  }
+  .balance-card::before{
+    content:"";
+    position:absolute;
+    top:14px;bottom:14px;left:50%;width:1px;background:#eee;
+  }
+  .balance-item{display:flex;flex-direction:column;align-items:flex-start;padding-left:6px;}
+  .balance-item.right{padding-left:20px;}
+  .balance-item .amount{
+    display:flex;align-items:center;gap:4px;
+    color:var(--orange);
+    font-size:20px;font-weight:700;
+  }
+  .balance-item .amount .q{
+    width:14px;height:14px;border-radius:50%;
+    background:#d9d9d9;color:#fff;font-size:9px;font-weight:700;
+    display:inline-flex;align-items:center;justify-content:center;
+  }
+  .balance-item .label{color:#888;font-size:12px;margin-top:2px;}
+
+  /* Invite rewards card */
+  .invite-card{
+    margin-top:12px;
+    background:#2a2a2a;
+    border-radius:14px;
+    overflow:hidden;
+    box-shadow:0 6px 16px rgba(0,0,0,.1);
+    position:relative;
+  }
+  .invite-top{
+    position:relative;
+    padding:12px 14px 14px;
+    background:linear-gradient(180deg,#2f2f2f 0%,#2a2a2a 100%);
+    color:#fff;
+    min-height:96px;
+  }
+  .invite-top::after{
+    content:"";
+    position:absolute;
+    right:0;top:0;bottom:0;width:130px;
+    background:
+      radial-gradient(circle at 80% 40%, #ffcc44 0%, transparent 45%),
+      radial-gradient(circle at 60% 70%, #e53935 0%, transparent 50%);
+    opacity:.9;
+  }
+  .invite-top .coins{
+    position:absolute;right:10px;top:10px;width:110px;height:76px;z-index:2;
+  }
+  .invite-badge{
+    display:inline-block;
+    background:#ffe25a;
+    color:#222;
+    font-size:12px;font-weight:700;
+    padding:3px 10px;border-radius:6px;
+    position:relative;z-index:2;
+  }
+  .invite-desc{
+    margin-top:10px;
+    font-size:12.5px;line-height:1.4;
+    max-width:210px;
+    position:relative;z-index:2;
+  }
+  .invite-desc .amt{color:#ffcc22;font-weight:700;}
+  .invite-bottom{
+    background:var(--lilac-2);
+    padding:10px 14px;
+    display:flex;align-items:center;justify-content:space-between;
+  }
+  .invite-bottom .left{display:flex;flex-direction:column;}
+  .invite-bottom .left .a{color:var(--text-red);font-size:12.5px;font-weight:600;}
+  .invite-bottom .left .a span{color:#333;}
+  .invite-bottom .left .b{color:#666;font-size:11px;margin-top:1px;}
+  .invite-bottom .mid{display:flex;flex-direction:column;}
+  .invite-bottom .mid .a{color:#333;font-size:13px;font-weight:600;}
+  .invite-bottom .mid .b{color:#666;font-size:11px;margin-top:1px;}
+  .receive-btn{
+    background:var(--grey-btn);
+    color:#fff;
+    font-size:12px;font-weight:600;
+    border:none;
+    padding:6px 14px;
+    border-radius:14px;
+  }
+
+  /* Invite code / link rows */
+  .code-row{
+    margin-top:10px;
+    background:#fff;
+    border-radius:12px;
+    padding:10px 12px;
+    display:flex;align-items:center;gap:10px;
+    box-shadow:0 4px 10px rgba(0,0,0,.05);
+  }
+  .code-row .ic{
+    width:28px;height:28px;border-radius:6px;
+    background:#fff2e6;
+    display:flex;align-items:center;justify-content:center;
+    color:#ff7a00;
+  }
+  .code-row .info{flex:1;min-width:0;}
+  .code-row .info .t{font-size:11px;color:#8a8a8a;}
+  .code-row .info .v{font-size:13px;color:#222;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+  .copy-btn{
+    background:linear-gradient(180deg,#ffe25a 0%,#ffb800 100%);
+    border:none;
+    color:#5a3a00;
+    font-size:11px;font-weight:800;
+    padding:6px 14px;
+    border-radius:14px;
+    letter-spacing:.5px;
+    box-shadow:0 2px 4px rgba(0,0,0,.1);
+  }
+
+  /* Mission Task */
+  .mission-title{
+    margin-top:14px;
+    display:flex;align-items:center;gap:6px;
+    font-size:14px;font-weight:700;color:#222;
+    padding-left:2px;
+  }
+  .mission-title .ic{color:#ff7a00;}
+
+  .mission-card{
+    margin-top:10px;
+    background:linear-gradient(180deg,#fff6d9 0%,#ffe9a8 100%);
+    border-radius:12px;
+    padding:10px 12px 12px;
+    position:relative;
+  }
+  .mission-card .row1{
+    display:flex;align-items:flex-start;gap:10px;
+  }
+  .mission-card .gift-emoji{
+    width:28px;height:28px;flex-shrink:0;
+    display:flex;align-items:center;justify-content:center;
+  }
+  .mission-card .desc{
+    font-size:12px;color:#5a3a00;line-height:1.35;
+  }
+  .mission-card .desc .amt{color:#e53935;font-weight:700;}
+  .mission-card .row2{
+    margin-top:8px;
+    display:flex;align-items:center;justify-content:space-between;
+    border-top:1px dashed rgba(0,0,0,.08);
+    padding-top:6px;
+  }
+  .mission-card .row2 .lbl{color:#5a3a00;font-size:12px;}
+  .mission-card .row2 .val{color:#e53935;font-size:12px;font-weight:600;margin-left:4px;}
+  .mission-card .go-btn{
+    background:var(--grey-btn);
+    color:#fff;font-size:12px;font-weight:700;
+    border:none;
+    padding:4px 14px;border-radius:12px;
+  }
+
+  /* Floating avatar */
+  .float-avatar{
+    position:absolute;
+    right:14px;
+    bottom:90px;
+    width:44px;height:44px;border-radius:50%;
+    background:#ffb800;
+    border:2px solid #fff;
+    box-shadow:0 4px 10px rgba(0,0,0,.25);
+    z-index:8;
+    overflow:hidden;
+    display:flex;align-items:center;justify-content:center;
+  }
+  .float-avatar svg{width:100%;height:100%;}
+
+  /* Bottom nav */
+  .bottom-nav{
+    position:absolute;
+    left:0;right:0;bottom:0;
+    height:60px;
+    background:#fff;
+    display:grid;
+    grid-template-columns:repeat(5,1fr);
+    align-items:center;
+    box-shadow:0 -2px 8px rgba(0,0,0,.06);
+    z-index:9;
+  }
+  .nav-item{
+    display:flex;flex-direction:column;align-items:center;gap:2px;
+    font-size:11px;color:var(--nav-inactive);
+  }
+  .nav-item.active{color:var(--nav-active);}
+  .nav-item .ic{width:22px;height:22px;display:flex;align-items:center;justify-content:center;}
+
+  /* Home indicator */
+  .home-indicator{
+    position:absolute;left:50%;bottom:4px;transform:translateX(-50%);
+    width:110px;height:4px;background:#000;border-radius:3px;opacity:.85;z-index:10;
+  }
+
+  /* Utility */
+  .relative{position:relative;}
+</style>
+</head>
+<body>
+  <div class="phone">
+    <div class="side-right"></div>
+    <div class="screen">
+
+      <!-- Hero background -->
+      <div class="hero-bg"></div>
+      <div class="cart-shadow" aria-hidden="true">
+        <svg viewBox="0 0 200 160" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M20 30 L45 30 L60 100 L165 100 L180 50 L60 50" stroke="#e6b96a" stroke-width="3" fill="none" opacity=".7"/>
+          <circle cx="75" cy="130" r="10" stroke="#e6b96a" stroke-width="3" fill="none" opacity=".7"/>
+          <circle cx="150" cy="130" r="10" stroke="#e6b96a" stroke-width="3" fill="none" opacity=".7"/>
+        </svg>
+      </div>
+
+      <!-- Notch -->
+      <div class="notch"></div>
+
+      <!-- Status bar -->
+      <div class="status-bar">
+        <div class="time">12:19</div>
+        <div class="status-icons">
+          <!-- Vibrate -->
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="white"><path d="M7 4h10v16H7z" opacity=".9"/></svg>
+          <!-- Wifi -->
+          <svg width="14" height="12" viewBox="0 0 24 24" fill="white"><path d="M12 21l3.5-4.5c-2-1.5-5-1.5-7 0L12 21zm-7-8c4-4 10-4 14 0l2-2c-5-5-13-5-18 0l2 2zm3.5 3.5c2-2 5-2 7 0l2-2c-3-3-8-3-11 0l2 2z"/></svg>
+          <!-- Signal 1 -->
+          <svg width="14" height="12" viewBox="0 0 24 24" fill="white"><path d="M2 20h3v-6H2v6zm5 0h3V10H7v10zm5 0h3V4h-3v16z" opacity=".9"/></svg>
+          <!-- Signal 2 -->
+          <svg width="14" height="12" viewBox="0 0 24 24" fill="white"><path d="M2 20h3v-6H2v6zm5 0h3V10H7v10zm5 0h3V4h-3v16z" opacity=".9"/></svg>
+          <!-- Battery -->
+          <div style="display:flex;align-items:center;gap:2px;">
+            <span style="color:#fff;font-size:10px;font-weight:600;">73%</span>
+            <svg width="20" height="12" viewBox="0 0 24 12" fill="none">
+              <rect x="1" y="1" width="20" height="10" rx="2" stroke="white" stroke-width="1"/>
+              <rect x="22" y="4" width="2" height="4" fill="white"/>
+              <rect x="3" y="3" width="12" height="6" fill="#ffcc22"/>
+            </svg>
+          </div>
+        </div>
+      </div>
+
+      <!-- Top bar -->
+      <div class="top-bar">
+        <div class="home-title">HOME</div>
+        <div class="gift-btn" role="button" aria-label="gift code">
+          <span class="gift-ic"></span>
+          <span class="label">gift code</span>
+          <span class="go">GO</span>
+        </div>
+      </div>
+
+      <!-- Announcement -->
+      <div class="announcement">
+        quo, quod reiciendis sed sint totam velit! Blanditiis
+      </div>
+
+      <!-- Quick actions -->
+      <div class="quick-actions">
+        <div class="qa">
+          <div class="ic">
+            <svg width="30" height="30" viewBox="0 0 32 32" fill="none">
+              <path d="M6 18c0-4 4-8 8-8h4c4 0 6 3 6 6" stroke="#fff" stroke-width="2" stroke-linecap="round"/>
+              <path d="M22 12l4 4-4 4" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+              <path d="M14 22c2 2 4 2 6 0" stroke="#fff" stroke-width="2" stroke-linecap="round"/>
+            </svg>
+          </div>
+          <div class="txt">Recharge</div>
+        </div>
+        <div class="qa">
+          <div class="ic">
+            <svg width="26" height="30" viewBox="0 0 24 30" fill="none">
+              <rect x="4" y="4" width="16" height="22" rx="2" stroke="#fff" stroke-width="2"/>
+              <path d="M8 10h8M8 14h8M8 18h5" stroke="#fff" stroke-width="1.5" stroke-linecap="round"/>
+            </svg>
+          </div>
+          <div class="txt">Withdraw</div>
+        </div>
+        <div class="qa">
+          <div class="ic">
+            <svg width="30" height="30" viewBox="0 0 32 32" fill="none">
+              <path d="M4 14L16 6l12 8" stroke="#fff" stroke-width="2" stroke-linejoin="round"/>
+              <path d="M6 14v12h20V14" stroke="#fff" stroke-width="2"/>
+              <path d="M10 26v-8M16 26v-8M22 26v-8" stroke="#fff" stroke-width="2"/>
+              <path d="M4 28h24" stroke="#fff" stroke-width="2" stroke-linecap="round"/>
+            </svg>
+          </div>
+          <div class="txt">Account</div>
+        </div>
+        <div class="qa">
+          <div class="ic">
+            <svg width="26" height="30" viewBox="0 0 26 30" fill="none">
+              <path d="M4 4h14a4 4 0 0 1 4 4v18H8a4 4 0 0 1-4-4V4z" stroke="#fff" stroke-width="2" stroke-linejoin="round"/>
+              <path d="M4 22a4 4 0 0 1 4-4h14" stroke="#fff" stroke-width="2"/>
+              <path d="M9 10h8M9 14h6" stroke="#fff" stroke-width="1.5" stroke-linecap="round"/>
+            </svg>
+          </div>
+          <div class="txt">Guide</div>
+        </div>
+      </div>
+
+      <!-- Content -->
+      <div class="content">
+
+        <!-- Balance card -->
+        <div class="balance-card">
+          <div class="balance-item">
+            <div class="amount">$14,555.00 <span class="q">?</span></div>
+            <div class="label">My balance</div>
+          </div>
+          <div class="balance-item right">
+            <div class="amount">$555.00 <span class="q">?</span></div>
+            <div class="label">Total Income</div>
+          </div>
+        </div>
+
+        <!-- Invite rewards -->
+        <div class="invite-card">
+          <div class="invite-top">
+            <svg class="coins" viewBox="0 0 120 80" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <!-- hand -->
+              <path d="M10 60 Q20 40 40 45 L70 50 Q80 52 82 60 L82 78 L10 78 Z" fill="#f5c9a8"/>
+              <path d="M40 45 Q45 30 55 32 Q58 40 55 48" fill="#f5c9a8"/>
+              <!-- coins -->
+              <circle cx="70" cy="30" r="10" fill="#ffcc22" stroke="#d99a00" stroke-width="1.5"/>
+              <text x="70" y="34" text-anchor="middle" font-size="10" fill="#8a6300" font-weight="700">$</text>
+              <circle cx="90" cy="20" r="8" fill="#ffd94a" stroke="#d99a00" stroke-width="1.5"/>
+              <text x="90" y="24" text-anchor="middle" font-size="9" fill="#8a6300" font-weight="700">$</text>
+              <circle cx="100" cy="45" r="9" fill="#ffcc22" stroke="#d99a00" stroke-width="1.5"/>
+              <text x="100" y="49" text-anchor="middle" font-size="9" fill="#8a6300" font-weight="700">$</text>
+              <circle cx="55" cy="20" r="6" fill="#ffd94a" stroke="#d99a00" stroke-width="1"/>
+            </svg>
+            <div class="invite-badge">Invite rewards</div>
+            <div class="invite-desc">
+              Invite one person to successfully register and receive a reward of <span class="amt">$5.00</span>
+            </div>
+          </div>
+          <div class="invite-bottom">
+            <div class="left">
+              <div class="a">0<span>/8</span></div>
+              <div class="b">Invite people(lv1)</div>
+            </div>
+            <div class="mid">
+              <div class="a">$0.00</div>
+              <div class="b">Cumulative rewards</div>
+            </div>
+            <button class="receive-btn">Receive</button>
+          </div>
+        </div>
+
+        <!-- Invite code -->
+        <div class="code-row">
+          <div class="ic">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
+              <path d="M10 14a5 5 0 0 0 7 0l3-3a5 5 0 0 0-7-7l-1 1" stroke="#ff7a00" stroke-width="2" stroke-linecap="round"/>
+              <path d="M14 10a5 5 0 0 0-7 0l-3 3a5 5 0 0 0 7 7l1-1" stroke="#ff7a00" stroke-width="2" stroke-linecap="round"/>
+            </svg>
+          </div>
+          <div class="info">
+            <div class="t">Invite code</div>
+            <div class="v">3179866378</div>
+          </div>
+          <button class="copy-btn">COPY</button>
+        </div>
+
+        <!-- Invite link -->
+        <div class="code-row">
+          <div class="ic">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
+              <path d="M10 14a5 5 0 0 0 7 0l3-3a5 5 0 0 0-7-7l-1 1" stroke="#ff7a00" stroke-width="2" stroke-linecap="round"/>
+              <path d="M14 10a5 5 0 0 0-7 0l-3 3a5 5 0 0 0 7 7l1-1" stroke="#ff7a00" stroke-width="2" stroke-linecap="round"/>
+            </svg>
+          </div>
+          <div class="info">
+            <div class="t">Invite link</div>
+            <div class="v">https://ye-sundernoweb.pro/gr...</div>
+          </div>
+          <button class="copy-btn">COPY</button>
+        </div>
+
+        <!-- Mission task -->
+        <div class="mission-title">
+          <span class="ic">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
+              <rect x="5" y="4" width="14" height="18" rx="2" stroke="#ff7a00" stroke-width="2"/>
+              <rect x="9" y="2" width="6" height="4" rx="1" fill="#ff7a00"/>
+              <path d="M9 12h6M9 16h4" stroke="#ff7a00" stroke-width="1.5" stroke-linecap="round"/>
+            </svg>
+          </span>
+          Mission Task
+        </div>
+
+        <div class="mission-card">
+          <div class="row1">
+            <div class="gift-emoji">
+              <svg width="28" height="28" viewBox="0 0 32 32" fill="none">
+                <rect x="4" y="12" width="24" height="16" rx="2" fill="#e53935"/>
+                <rect x="4" y="12" width="24" height="4" fill="#c62828"/>
+                <rect x="14" y="12" width="4" height="16" fill="#ffcc22"/>
+                <path d="M10 12c-3-3 0-7 3-4 1 1 3 4 3 4M22 12c3-3 0-7-3-4-1 1-3 4-3 4" stroke="#ffcc22" stroke-width="2" fill="none"/>
+              </svg>
+            </div>
+            <div class="desc">
+              Invite 50 people to recharge and get a reward of <span class="amt">$300.00</span> | Required Deposit Money of <span class="amt">$15,000.00</span>
+            </div>
+          </div>
+          <div class="row2">
+            <div><span class="lbl">Deposit</span><span class="val">$0.00/$15,000.00</span></div>
+            <button class="go-btn">GO</button>
+          </div>
+        </div>
+
+        <div class="mission-card" style="margin-top:8px;">
+          <div class="row1">
+            <div class="gift-emoji">
+              <svg width="28" height="28" viewBox="0 0 32 32" fill="none">
+                <rect x="4" y="12" width="24" height="16" rx="2" fill="#e53935"/>
+                <rect x="4" y="12" width="24" height="4" fill="#c62828"/>
+                <rect x="14" y="12" width="4" height="16" fill="#ffcc22"/>
+                <path d="M10 12c-3-3 0-7 3-4 1 1 3 4 3 4M22 12c3-3 0-7-3-4-1 1-3 4-3 4" stroke="#ffcc22" stroke-width="2" fill="none"/>
+              </svg>
+            </div>
+            <div class="desc">
+              Invite 102 people to recharge and get a reward of <span class="amt">$800.00</span> | Required Deposit Money of
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- Floating avatar -->
+      <div class="float-avatar">
+        <svg viewBox="0 0 44 44" xmlns="http://www.w3.org/2000/svg">
+          <rect width="44" height="44" fill="#ffb800"/>
+          <circle cx="22" cy="17" r="7" fill="#f5c9a8"/>
+          <path d="M6 44c2-9 10-13 16-13s14 4 16 13" fill="#2a3a5c"/>
+          <path d="M15 15c1-5 5-8 10-6s6 6 5 10c-2-2-4-3-8-3s-6 0-7-1z" fill="#3a2a1a"/>
+          <path d="M18 22c1 1 2 1.5 4 1.5s3-.5 4-1.5" stroke="#c99a70" stroke-width="0.8" fill="none"/>
+        </svg>
+      </div>
+
+      <!-- Bottom nav -->
+      <div class="bottom-nav">
+        <div class="nav-item active">
+          <div class="ic">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="#f04a2a">
+              <path d="M12 3l9 8h-3v10h-4v-6h-4v6H6V11H3z"/>
+            </svg>
+          </div>
+          <span>Home</span>
+        </div>
+        <div class="nav-item">
+          <div class="ic">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#b7b7b7" stroke-width="2">
+              <path d="M12 3l8 4v10l-8 4-8-4V7z"/>
+              <path d="M4 7l8 4 8-4M12 11v10"/>
+            </svg>
+          </div>
+          <span>Product</span>
+        </div>
+        <div class="nav-item">
+          <div class="ic">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#b7b7b7" stroke-width="2">
+              <circle cx="12" cy="12" r="8"/>
+              <path d="M12 8v4l3 2"/>
+            </svg>
+          </div>
+          <span>Grabbing</span>
+        </div>
+        <div class="nav-item">
+          <div class="ic">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#b7b7b7" stroke-width="2">
+              <path d="M12 4l2 5 5 .5-4 3.5 1 5-4-2.5-4 2.5 1-5-4-3.5 5-.5z"/>
+            </svg>
+          </div>
+          <span>Team</span>
+        </div>
+        <div class="nav-item">
+          <div class="ic">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#b7b7b7" stroke-width="2">
+              <circle cx="12" cy="9" r="4"/>
+              <path d="M4 21c1-5 5-8 8-8s7 3 8 8"/>
+            </svg>
+          </div>
+          <span>Mine</span>
+        </div>
+      </div>
+
+      <!-- Home indicator -->
+      <div class="home-indicator"></div>
+    </div>
+  </div>
+
+<script>
+  // Copy buttons
+  document.querySelectorAll('.copy-btn').forEach(btn=>{
+    btn.addEventListener('click',()=>{
+      const row=btn.closest('.code-row');
+      const text=row.querySelector('.v').textContent;
+      if(navigator.clipboard){navigator.clipboard.writeText(text).catch(()=>{});}
+      const original=btn.textContent;
+      btn.textContent='OK';
+      setTimeout(()=>btn.textContent=original,1000);
+    });
+  });
+
+  // Gift GO
+  document.querySelector('.gift-btn')?.addEventListener('click',()=>{});
+
+  // Nav switching
+  document.querySelectorAll('.nav-item').forEach(item=>{
+    item.addEventListener('click',()=>{
+      document.querySelectorAll('.nav-item').forEach(i=>i.classList.remove('active'));
+      item.classList.add('active');
+      item.querySelectorAll('svg path, svg circle').forEach(el=>{});
+    });
+  });
+</script>
+</body>
+</html>
