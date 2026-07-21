@@ -6,10 +6,11 @@
 <title>Mining</title>
 <style>
 *{margin:0;padding:0;box-sizing:border-box;font-family:Arial,sans-serif}
-body{background:#fff;display:flex;justify-content:center;padding:20px;min-height:100vh}
-.p{width:100%;max-width:400px;background:#1a1a1a;border-radius:30px;padding:20px;background-image:radial-gradient(circle,#2a2a2a 1px,transparent 1px);background-size:8px 8px}
+html,body{width:100%;min-height:100vh}
+body{background:#fff;display:flex;justify-content:center;padding:15px}
+.p{width:100%;max-width:450px;background:#1a1a1a;border-radius:30px;padding:20px;background-image:radial-gradient(circle,#2a2a2a 1px,transparent 1px);background-size:8px 8px;display:flex;flex-direction:column;min-height:calc(100vh - 30px)}
 .f{display:flex;justify-content:center;margin:20px 0}
-.f img{width:180px;height:180px;object-fit:contain}
+.f svg{width:200px;height:200px}
 .c{background:#252525;border-radius:15px;padding:20px;color:#fff}
 .a{text-align:center;font-size:32px;font-weight:bold;margin-bottom:15px}
 .b{width:100%;height:12px;background:#333;border-radius:6px;overflow:hidden;margin-bottom:15px}
@@ -23,13 +24,48 @@ body{background:#fff;display:flex;justify-content:center;padding:20px;min-height
 .t{display:flex;gap:10px;margin-bottom:20px}
 .t div{flex:1;text-align:center;padding:12px;border-radius:25px;color:#aaa;cursor:pointer;font-size:14px}
 .t .ac{background:linear-gradient(90deg,#ff6b00,#ffa500);color:#fff}
-.e{background:#252525;border-radius:15px;padding:40px;display:flex;justify-content:center}
+.e{background:#252525;border-radius:15px;padding:40px;display:flex;justify-content:center;flex:1;align-items:center}
 .e svg{width:60px;height:60px;fill:#fff}
 </style>
 </head>
 <body>
 <div class="p">
-<div class="f"><img src="https://cdn-icons-png.flaticon.com/512/1358/1358965.png" alt="fan"></div>
+<div class="f">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+<defs>
+<linearGradient id="blade" x1="0%" y1="0%" x2="100%" y2="100%">
+<stop offset="0%"><animate attributeName="stop-color" values="#00D4FF;#00FF88;#FFD600;#FF3B5C;#7B61FF;#00D4FF" dur="2s" repeatCount="indefinite"/></stop>
+<stop offset="100%"><animate attributeName="stop-color" values="#007BFF;#00C853;#FF9800;#D50000;#4F46E5;#007BFF" dur="2s" repeatCount="indefinite"/></stop>
+</linearGradient>
+<filter id="glow"><feGaussianBlur stdDeviation="4"/><feMerge><feMergeNode/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+</defs>
+<ellipse cx="256" cy="430" rx="90" ry="12" fill="#000" opacity=".15"/>
+<g fill="#FFD600" stroke="#B88600" stroke-width="2">
+<g><circle cx="256" cy="220" r="12"><animate attributeName="cy" values="220;120;80" dur="1s" repeatCount="indefinite"/><animate attributeName="opacity" values="1;1;0" dur="1s" repeatCount="indefinite"/></circle></g>
+<g><circle cx="210" cy="250" r="10"><animate attributeName="cx" values="210;130;90" dur="1s" repeatCount="indefinite"/><animate attributeName="cy" values="250;150;100" dur="1s" repeatCount="indefinite"/><animate attributeName="opacity" values="1;1;0" dur="1s" repeatCount="indefinite"/></circle></g>
+<g><circle cx="300" cy="250" r="11"><animate attributeName="cx" values="300;380;420" dur="1s" repeatCount="indefinite"/><animate attributeName="cy" values="250;150;100" dur="1s" repeatCount="indefinite"/><animate attributeName="opacity" values="1;1;0" dur="1s" repeatCount="indefinite"/></circle></g>
+<g><circle cx="256" cy="260" r="9"><animate attributeName="cy" values="260;160;120" dur="1s" begin=".3s" repeatCount="indefinite"/><animate attributeName="opacity" values="1;1;0" dur="1s" begin=".3s" repeatCount="indefinite"/></circle></g>
+</g>
+<g transform="translate(256 280)">
+<circle r="95" fill="none" stroke="#2F80ED" stroke-width="8"/>
+<circle r="82" fill="none" stroke="#7DD3FC" stroke-width="2"/>
+<g stroke="#7DD3FC" stroke-width="2">
+<line x1="-82" y1="0" x2="82" y2="0"/>
+<line x1="0" y1="-82" x2="0" y2="82"/>
+<line x1="-58" y1="-58" x2="58" y2="58"/>
+<line x1="-58" y1="58" x2="58" y2="-58"/>
+</g>
+<g filter="url(#glow)">
+<path d="M0-65 C45-65 70-30 35-3 L0 0 Z" fill="url(#blade)"/>
+<path d="M0-65 C45-65 70-30 35-3 L0 0 Z" fill="url(#blade)" transform="rotate(120)"/>
+<path d="M0-65 C45-65 70-30 35-3 L0 0 Z" fill="url(#blade)" transform="rotate(240)"/>
+<animateTransform attributeName="transform" type="rotate" from="0" to="360" dur=".45s" repeatCount="indefinite"/>
+</g>
+<circle r="18" fill="#0F172A"/>
+<circle r="8" fill="white"/>
+</g>
+</svg>
+</div>
 <div class="c">
 <div class="a">$120.000000</div>
 <div class="b"><div></div></div>
