@@ -1,0 +1,448 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Account</title>
+<style>
+  :root {
+    --orange: #F5871F;
+    --orange-dark: #E8751A;
+    --orange-light: #FDE8CE;
+    --bg: #F2F2F2;
+    --card: #FFFFFF;
+    --text: #1A1A1A;
+    --muted: #666666;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+  html, body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+  }
+  .phone {
+    width: 100%;
+    max-width: 526px;
+    background: var(--bg);
+    min-height: 100vh;
+    position: relative;
+    padding-bottom: 20px;
+  }
+
+  /* Status Bar with Notch */
+  .status-bar {
+    height: 30px;
+    background: #FFFFFF;
+    position: relative;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+  .notch {
+    width: 18px;
+    height: 18px;
+    background: #000;
+    border-radius: 50%;
+    margin-top: 4px;
+  }
+
+  /* Header */
+  .header {
+    background: #FFFFFF;
+    padding: 10px 20px 20px;
+    display: flex;
+    align-items: center;
+    gap: 15px;
+  }
+  .logo {
+    width: 60px;
+    height: 60px;
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .logo svg { width: 100%; height: 100%; }
+  .user-id {
+    font-size: 24px;
+    font-weight: 500;
+    color: #1a1a1a;
+    letter-spacing: 0.5px;
+  }
+
+  /* Stats */
+  .stats {
+    background: #FFFFFF;
+    display: flex;
+    justify-content: space-around;
+    padding: 15px 10px 25px;
+    position: relative;
+  }
+  .stat-item {
+    flex: 1;
+    text-align: center;
+    position: relative;
+  }
+  .stat-item:not(:last-child)::after {
+    content: '';
+    position: absolute;
+    right: 0;
+    top: 15%;
+    height: 70%;
+    width: 1px;
+    background: #E0E0E0;
+  }
+  .stat-value {
+    font-size: 20px;
+    font-weight: 600;
+    color: #1a1a1a;
+    margin-bottom: 8px;
+  }
+  .stat-label {
+    font-size: 14px;
+    color: #333;
+  }
+  .stat-item.highlight .stat-value,
+  .stat-item.highlight .stat-label {
+    color: var(--orange);
+  }
+
+  /* Section spacing */
+  .section-gap { height: 15px; background: var(--bg); }
+
+  /* Recharge / Withdrawal Card */
+  .action-card-wrap {
+    padding: 0 15px;
+  }
+  .action-card {
+    background: var(--card);
+    border-radius: 10px;
+    padding: 15px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+  }
+  .action-inner {
+    background: #FDE8CE;
+    border-radius: 10px;
+    padding: 18px 15px;
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+    gap: 10px;
+  }
+  .action-block {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex: 1;
+  }
+  .action-text {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 8px;
+  }
+  .action-title {
+    font-size: 20px;
+    font-weight: 700;
+    color: #D9531E;
+  }
+  .go-btn {
+    background: var(--orange);
+    color: #fff;
+    border: none;
+    padding: 6px 22px;
+    border-radius: 20px;
+    font-size: 15px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: transform 0.1s;
+  }
+  .go-btn:active { transform: scale(0.95); }
+  .action-icon {
+    width: 60px;
+    height: 60px;
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .action-icon svg { width: 100%; height: 100%; }
+
+  /* Mes service title */
+  .service-title {
+    padding: 20px 20px 12px;
+    font-size: 16px;
+    font-weight: 700;
+    color: #1a1a1a;
+  }
+
+  /* Services grid */
+  .services-wrap { padding: 0 15px; }
+  .services {
+    background: var(--card);
+    border-radius: 10px;
+    padding: 20px 10px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 20px 5px;
+  }
+  .service-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    gap: 8px;
+    cursor: pointer;
+    transition: transform 0.15s;
+  }
+  .service-item:active { transform: scale(0.95); }
+  .service-icon {
+    width: 40px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .service-icon svg { width: 100%; height: 100%; }
+  .service-label {
+    font-size: 13px;
+    color: #1a1a1a;
+    line-height: 1.3;
+    font-weight: 400;
+  }
+
+  @media (max-width: 380px) {
+    .user-id { font-size: 20px; }
+    .stat-value { font-size: 17px; }
+    .action-title { font-size: 17px; }
+  }
+</style>
+</head>
+<body>
+<div class="phone">
+  <!-- Status Bar -->
+  <div class="status-bar">
+    <div class="notch"></div>
+  </div>
+
+  <!-- Header -->
+  <div class="header">
+    <div class="logo">
+      <svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+        <!-- Wheat left -->
+        <g fill="none" stroke="#F5871F" stroke-width="2.5" stroke-linecap="round">
+          <path d="M15 75 Q 20 55 30 40"/>
+          <path d="M18 68 Q 12 66 10 60"/>
+          <path d="M20 62 Q 14 60 12 54"/>
+          <path d="M22 56 Q 16 54 14 48"/>
+          <path d="M24 50 Q 18 48 16 42"/>
+          <path d="M26 44 Q 20 42 18 36"/>
+        </g>
+        <!-- Wheat right -->
+        <g fill="none" stroke="#F5871F" stroke-width="2.5" stroke-linecap="round">
+          <path d="M85 75 Q 80 55 70 40"/>
+          <path d="M82 68 Q 88 66 90 60"/>
+          <path d="M80 62 Q 86 60 88 54"/>
+          <path d="M78 56 Q 84 54 86 48"/>
+          <path d="M76 50 Q 82 48 84 42"/>
+          <path d="M74 44 Q 80 42 82 36"/>
+        </g>
+        <!-- Leaves -->
+        <path d="M50 30 Q 30 40 35 65 Q 50 55 50 30 Z" fill="#7CB342"/>
+        <path d="M50 30 Q 70 40 65 65 Q 50 55 50 30 Z" fill="#4A7C2E"/>
+        <!-- Drop -->
+        <path d="M50 55 Q 45 70 50 78 Q 55 70 50 55 Z" fill="#F5871F"/>
+      </svg>
+    </div>
+    <div class="user-id">633110615</div>
+  </div>
+
+  <!-- Stats -->
+  <div class="stats">
+    <div class="stat-item">
+      <div class="stat-value">$0.00</div>
+      <div class="stat-label">Total balance</div>
+    </div>
+    <div class="stat-item">
+      <div class="stat-value">$0.00</div>
+      <div class="stat-label">Total Deposit</div>
+    </div>
+    <div class="stat-item highlight">
+      <div class="stat-value">$0.00</div>
+      <div class="stat-label">Total Withdrawal</div>
+    </div>
+  </div>
+
+  <div class="section-gap"></div>
+
+  <!-- Recharge / Withdrawal -->
+  <div class="action-card-wrap">
+    <div class="action-card">
+      <div class="action-inner">
+        <div class="action-block">
+          <div class="action-text">
+            <div class="action-title">Recharge</div>
+            <button class="go-btn">Go</button>
+          </div>
+          <div class="action-icon">
+            <!-- Hand holding phone SVG -->
+            <svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+              <!-- Phone -->
+              <rect x="35" y="10" width="35" height="60" rx="5" fill="#FFFFFF" stroke="#333" stroke-width="2"/>
+              <rect x="38" y="15" width="29" height="45" fill="#E8F4FF"/>
+              <circle cx="52.5" cy="65" r="2" fill="#666"/>
+              <!-- Arm/sleeve -->
+              <path d="M25 60 L 20 95 L 55 95 L 60 75 Z" fill="#3B82C4"/>
+              <!-- Hand -->
+              <path d="M30 55 Q 25 60 28 70 L 55 78 Q 65 75 62 65 L 50 60 Q 45 55 40 55 Z" fill="#F5C89A"/>
+              <!-- Fingers holding phone -->
+              <path d="M40 45 Q 38 50 40 60 L 55 60 Q 58 55 55 50 Z" fill="#F5C89A"/>
+            </svg>
+          </div>
+        </div>
+        <div class="action-block">
+          <div class="action-text">
+            <div class="action-title">Withdrawal</div>
+            <button class="go-btn">Go</button>
+          </div>
+          <div class="action-icon">
+            <!-- Wallet with cash SVG -->
+            <svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+              <!-- Money bills behind -->
+              <rect x="30" y="15" width="45" height="30" rx="2" fill="#7CC47C" stroke="#4A9E4A" stroke-width="1.5" transform="rotate(-10 52 30)"/>
+              <rect x="35" y="20" width="45" height="28" rx="2" fill="#8FD68F" stroke="#4A9E4A" stroke-width="1.5" transform="rotate(5 57 34)"/>
+              <circle cx="60" cy="34" r="6" fill="none" stroke="#4A9E4A" stroke-width="1.5" transform="rotate(5 60 34)"/>
+              <text x="60" y="38" font-size="8" fill="#4A9E4A" text-anchor="middle" font-weight="bold" transform="rotate(5 60 34)">$</text>
+              <!-- Wallet body -->
+              <path d="M15 45 Q 15 42 18 42 L 82 42 Q 88 42 88 48 L 88 82 Q 88 88 82 88 L 18 88 Q 15 88 15 85 Z" fill="#1E3A5F"/>
+              <!-- Wallet flap -->
+              <path d="M15 45 L 15 55 L 88 55 L 88 48 Q 88 42 82 42 L 18 42 Q 15 42 15 45 Z" fill="#2A4A75"/>
+              <!-- Card 1 -->
+              <rect x="55" y="35" width="25" height="18" rx="2" fill="#E74C3C"/>
+              <rect x="58" y="40" width="12" height="2" fill="#FFF"/>
+              <rect x="58" y="44" width="8" height="2" fill="#FFF"/>
+              <!-- Card 2 -->
+              <rect x="60" y="32" width="25" height="18" rx="2" fill="#F39C12"/>
+              <!-- Button/clasp -->
+              <circle cx="75" cy="65" r="4" fill="#F5871F"/>
+            </svg>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Service Title -->
+  <div class="service-title">Mes service</div>
+
+  <!-- Services -->
+  <div class="services-wrap">
+    <div class="services">
+      <div class="service-item">
+        <div class="service-icon">
+          <svg viewBox="0 0 40 40" xmlns="http://www.w3.org/2000/svg">
+            <rect x="6" y="6" width="28" height="28" rx="6" fill="#F5871F"/>
+            <rect x="15" y="18" width="10" height="10" rx="1" fill="#FFF"/>
+            <path d="M16 18 V 15 Q 16 11 20 11 Q 24 11 24 15 V 18" fill="none" stroke="#FFF" stroke-width="2"/>
+            <circle cx="20" cy="23" r="1.5" fill="#F5871F"/>
+          </svg>
+        </div>
+        <div class="service-label">Transaction<br>password</div>
+      </div>
+      <div class="service-item">
+        <div class="service-icon">
+          <svg viewBox="0 0 40 40" xmlns="http://www.w3.org/2000/svg">
+            <path d="M20 5 L 34 10 V 22 Q 34 30 20 36 Q 6 30 6 22 V 10 Z" fill="#F5871F"/>
+            <rect x="15" y="18" width="10" height="9" rx="1" fill="#FFF"/>
+            <path d="M16 18 V 15 Q 16 12 20 12 Q 24 12 24 15 V 18" fill="none" stroke="#FFF" stroke-width="1.8"/>
+          </svg>
+        </div>
+        <div class="service-label">Login password</div>
+      </div>
+      <div class="service-item">
+        <div class="service-icon">
+          <svg viewBox="0 0 40 40" xmlns="http://www.w3.org/2000/svg">
+            <circle cx="20" cy="20" r="14" fill="#F5871F"/>
+            <circle cx="20" cy="13" r="2" fill="#FFF"/>
+            <rect x="18.5" y="17" width="3" height="12" rx="1" fill="#FFF"/>
+          </svg>
+        </div>
+        <div class="service-label">about us</div>
+      </div>
+      <div class="service-item">
+        <div class="service-icon">
+          <svg viewBox="0 0 40 40" xmlns="http://www.w3.org/2000/svg">
+            <!-- Headset -->
+            <path d="M8 22 Q 8 10 20 10 Q 32 10 32 22" fill="none" stroke="#F5871F" stroke-width="2.5"/>
+            <!-- Face -->
+            <circle cx="20" cy="20" r="9" fill="#FDD7B0"/>
+            <!-- Hair -->
+            <path d="M11 18 Q 12 8 20 8 Q 28 8 29 18 Q 27 14 20 14 Q 13 14 11 18 Z" fill="#D9531E"/>
+            <path d="M11 18 Q 10 22 11 26 L 13 26 Q 13 22 13 20" fill="#D9531E"/>
+            <!-- Eyes -->
+            <circle cx="17" cy="21" r="1" fill="#333"/>
+            <circle cx="23" cy="21" r="1" fill="#333"/>
+            <!-- Smile -->
+            <path d="M17 25 Q 20 27 23 25" fill="none" stroke="#333" stroke-width="1" stroke-linecap="round"/>
+            <!-- Ear pieces -->
+            <rect x="6" y="20" width="4" height="7" rx="2" fill="#F5871F"/>
+            <rect x="30" y="20" width="4" height="7" rx="2" fill="#F5871F"/>
+            <!-- Mic -->
+            <path d="M30 24 Q 33 26 32 30 L 25 32" fill="none" stroke="#F5871F" stroke-width="1.5"/>
+            <circle cx="24" cy="32" r="1.5" fill="#F5871F"/>
+          </svg>
+        </div>
+        <div class="service-label">customer<br>service</div>
+      </div>
+      <div class="service-item">
+        <div class="service-icon">
+          <svg viewBox="0 0 40 40" xmlns="http://www.w3.org/2000/svg">
+            <rect x="6" y="6" width="28" height="28" rx="5" fill="#F5871F"/>
+            <rect x="11" y="20" width="4" height="10" fill="#FFF"/>
+            <rect x="18" y="15" width="4" height="15" fill="#FFF"/>
+            <rect x="25" y="10" width="4" height="20" fill="#FFF"/>
+            <circle cx="13" cy="11" r="1" fill="#FFF"/>
+            <circle cx="16" cy="9" r="1" fill="#FFF"/>
+            <circle cx="19" cy="11" r="1" fill="#FFF"/>
+          </svg>
+        </div>
+        <div class="service-label">Transaction<br>details</div>
+      </div>
+      <div class="service-item">
+        <div class="service-icon">
+          <svg viewBox="0 0 40 40" xmlns="http://www.w3.org/2000/svg">
+            <circle cx="20" cy="20" r="14" fill="#F5871F"/>
+            <rect x="19" y="10" width="2" height="12" fill="#FFF"/>
+            <path d="M20 8 A 12 12 0 1 0 30 15" fill="none" stroke="#FFF" stroke-width="2.5" stroke-linecap="round"/>
+          </svg>
+        </div>
+        <div class="service-label">sign out</div>
+      </div>
+      <div class="service-item">
+        <div class="service-icon">
+          <svg viewBox="0 0 40 40" xmlns="http://www.w3.org/2000/svg">
+            <rect x="6" y="6" width="28" height="28" rx="5" fill="#F5871F"/>
+            <rect x="18.5" y="11" width="3" height="12" fill="#FFF"/>
+            <path d="M14 20 L 20 27 L 26 20" fill="none" stroke="#FFF" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </div>
+        <div class="service-label">Download APP</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  document.querySelectorAll('.go-btn, .service-item').forEach(el => {
+    el.addEventListener('click', function(e) {
+      const label = this.textContent.trim() || 'Action';
+      console.log('Clicked:', label);
+    });
+  });
+</script>
+</body>
+</html>
