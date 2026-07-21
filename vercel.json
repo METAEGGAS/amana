@@ -1,8 +1,8 @@
 {
   "rewrites": [
     {
-      "source": "/",
-      "destination": "/pages/auth.html"
+      "source": "/auth",
+      "destination": "/auth.html"
     }
   ]
 }
