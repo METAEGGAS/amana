@@ -1,1 +1,263 @@
-<!DOCTYPE html><html lang="ar" dir="rtl"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0"><title>صفحتي</title><style>*{margin:0;padding:0;box-sizing:border-box;font-family:system-ui,-apple-system,sans-serif}body{background:#2b0a4a;min-height:100vh}.w{max-width:360px;margin:0 auto}.hd{position:relative;background:#3d0f66;border-radius:0 0 26px 26px;padding:14px 12px 0}.hero img{display:block;width:82%;max-width:270px;margin:0 auto}.row{display:flex;direction:ltr;gap:8px;padding:5px 12px 0}.row button{flex:1;background:#fff;border:none;border-radius:14px;padding:12px 3px;font-size:13px;font-weight:700;color:#0d0d0d;display:flex;align-items:center;justify-content:center;gap:5px;cursor:pointer;transition:.15s}.row button:active{transform:scale(.97);background:#ececec}.cd{background:#3d0f66;border-radius:20px;margin:12px;padding:14px}.cl{width:100%;background:#c8f31d;border:none;border-radius:14px;padding:15px;font-size:17px;font-weight:800;color:#0d0d0d;cursor:pointer;transition:.15s}.cl:active{transform:scale(.98);background:#b4dc12}.inv{margin-top:10px;display:none;gap:8px;direction:rtl}.inv.on{display:flex}.inv input{flex:1;background:#2b0a4a;border:1px solid #7a3ec8;border-radius:12px;padding:12px;color:#fff;font-size:14px;outline:none;text-align:center}.inv button{background:#c8f31d;border:none;border-radius:12px;padding:0 16px;font-weight:800;cursor:pointer;font-size:14px}.log{padding:5px 12px 24px}.log h3{font-size:13px;color:#d0b3ff;margin:6px 0 6px}.lb{background:#3d0f66;border-radius:14px;padding:22px 14px;text-align:center;color:#b090d0;font-size:13px;margin-bottom:8px}.drop{display:flex;justify-content:space-between;align-items:center;padding:10px 12px;border-bottom:1px solid #5a2a8a;color:#fff;font-size:13px}.drop .info{display:flex;flex-direction:column;gap:3px}.drop .info b{color:#c8f31d;font-weight:800}.drop .info span{color:#d0b3ff;font-size:11px}.drop button{background:#c8f31d;border:none;border-radius:9px;padding:6px 12px;font-weight:800;color:#0d0d0d;cursor:pointer;font-size:12px}.drop button:active{transform:scale(.95)}#drp{position:fixed;inset:0;background:#2b0a4a;z-index:99;display:none;flex-direction:column;align-items:center;justify-content:center;overflow:hidden}#drp.on{display:flex}#drp img{width:170px;height:170px;object-fit:contain;position:relative;z-index:3;filter:drop-shadow(0 0 25px #c8f31d)}#drp .cls{position:absolute;top:18px;left:18px;background:#3d0f66;border:none;color:#fff;width:38px;height:38px;border-radius:50%;font-size:18px;cursor:pointer;z-index:5}.sm{position:absolute;bottom:-40px;width:70px;height:70px;border-radius:50%;background:radial-gradient(circle,rgba(200,243,29,.55),rgba(122,62,200,.35) 60%,transparent 75%);filter:blur(6px);opacity:0;animation:sm 3.2s linear infinite}@keyframes sm{0%{transform:translateY(0) scale(.4);opacity:0}20%{opacity:.9}100%{transform:translateY(120vh) scale(1.6);opacity:0}}</style></head><body><div class="w"><div class="hd"><div class="hero"><img src="https://i.ibb.co/Y4Wq6Pzx/IMG.png" alt="أيقونة"></div></div><div class="row"><button onclick="addLog(1,'العمليات')">★ العمليات</button><button onclick="addLog(2,'ارسال دروب')">👤 ارسال دروب</button><button onclick="addDrop()">🎁 دروب</button></div><div class="cd"><button class="cl" onclick="toggleInv()">استدعاء</button><div class="inv" id="inv"><input id="code" placeholder="ادخل رمز الاستدعاء" /><button onclick="submitCode()">دخول</button></div></div><div class="log"><h3>سجل العمليات</h3><div class="lb" id="lb1">نو داتا</div><h3>سجل ارسال الدروب</h3><div class="lb" id="lb2">نو داتا</div><h3>سجل الدروب</h3><div class="lb" id="lb3">نو داتا</div></div></div><div id="drp"><button class="cls" onclick="closeDrp()">✕</button><img src="https://i.ibb.co/Y4Wq6Pzx/IMG.png" alt="دروب"><div id="smoke"></div></div><script>function ready(b){if(b.textContent==='نو داتا'){b.innerHTML='';b.style.padding='12px 14px';b.style.textAlign='right';b.style.color='#fff'}}function addLog(id,t){var b=document.getElementById('lb'+id);ready(b);var d=new Date().toLocaleTimeString('ar');var e=document.createElement('div');e.style.cssText='padding:8px 0;border-bottom:1px solid #5a2a8a;color:#fff;font-size:13px';e.textContent='• '+t+' — '+d;b.appendChild(e)}function addDrop(){var b=document.getElementById('lb3');ready(b);var d=new Date().toLocaleTimeString('ar');var n=Math.floor(Math.random()*9000)+1000;var e=document.createElement('div');e.className='drop';e.innerHTML='<div class="info"><b>+ '+n.toLocaleString()+' $LOON</b><span>صفقة دروب فعلي — '+d+'</span></div><button onclick="claim(this)">انزال</button>';b.appendChild(e)}function claim(btn){btn.textContent='تم';btn.style.background='#5a2a8a';btn.style.color='#fff';btn.disabled=true;addLog(3,'تم انزال الدروب بنجاح')}function toggleInv(){document.getElementById('inv').classList.toggle('on')}function submitCode(){var v=document.getElementById('code').value.trim();if(!v)return;openDrp()}function openDrp(){var d=document.getElementById('drp');d.classList.add('on');var s=document.getElementById('smoke');s.innerHTML='';for(var i=0;i<10;i++){var p=document.createElement('div');p.className='sm';p.style.left=(10+i*8)+'%';p.style.animationDelay=(i*0.3)+'s';s.appendChild(p)}}function closeDrp(){document.getElementById('drp').classList.remove('on')}</script></body></html>
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🔥 Nexora - استخراج بيانات المستخدمين</title>
+    
+    <!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
+    
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', Tahoma, sans-serif; }
+        body { background: #0a0a14; color: #e2e8f0; padding: 20px; min-height: 100vh; }
+        .container { max-width: 1200px; margin: 0 auto; }
+        h1 { color: #f97316; font-size: 28px; margin-bottom: 8px; }
+        .sub { color: #94a3b8; margin-bottom: 20px; }
+        .btn { background: #f97316; color: #fff; border: none; padding: 12px 24px; border-radius: 8px; cursor: pointer; font-size: 16px; font-weight: 600; transition: 0.3s; }
+        .btn:hover { background: #ea580c; }
+        .btn:disabled { opacity: 0.5; cursor: not-allowed; }
+        .stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 12px; margin: 20px 0; }
+        .stat-card { background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); border-radius: 10px; padding: 16px; text-align: center; }
+        .stat-card .number { font-size: 28px; font-weight: 700; color: #f97316; }
+        .stat-card .label { font-size: 13px; color: #94a3b8; }
+        .table-wrapper { background: rgba(255,255,255,0.03); border-radius: 12px; overflow: auto; border: 1px solid rgba(255,255,255,0.05); margin-top: 20px; }
+        table { width: 100%; border-collapse: collapse; font-size: 13px; }
+        th { background: rgba(255,255,255,0.05); padding: 12px 14px; text-align: right; color: #94a3b8; border-bottom: 1px solid rgba(255,255,255,0.05); white-space: nowrap; }
+        td { padding: 10px 14px; border-bottom: 1px solid rgba(255,255,255,0.03); word-break: break-word; }
+        tr:hover td { background: rgba(255,255,255,0.02); }
+        .loading { text-align: center; padding: 40px; color: #64748b; }
+        .loading .spinner { display: inline-block; width: 30px; height: 30px; border: 3px solid rgba(255,255,255,0.1); border-top-color: #f97316; border-radius: 50%; animation: spin 0.8s linear infinite; }
+        @keyframes spin { to { transform: rotate(360deg); } }
+        .badge { display: inline-block; padding: 2px 10px; border-radius: 12px; font-size: 11px; font-weight: 600; }
+        .badge-admin { background: rgba(239,68,68,0.2); color: #f87171; }
+        .badge-user { background: rgba(59,130,246,0.2); color: #60a5fa; }
+        .badge-bronze { background: rgba(180,130,70,0.2); color: #d4a574; }
+        .badge-silver { background: rgba(192,192,192,0.2); color: #c0c0c0; }
+        .badge-gold { background: rgba(255,215,0,0.2); color: #ffd700; }
+        .toast { position: fixed; bottom: 20px; right: 20px; padding: 12px 24px; border-radius: 10px; color: #fff; font-size: 14px; z-index: 999; animation: slideUp 0.3s ease; }
+        .toast-success { background: #22c55e; }
+        .toast-error { background: #ef4444; }
+        .toast-info { background: #3b82f6; }
+        @keyframes slideUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+        @media (max-width: 768px) { th, td { padding: 8px 10px; font-size: 12px; } }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>🔥 Nexora - استخراج بيانات المستخدمين</h1>
+    <div class="sub">⚡ Firestore مفتوح للقراءة العامة - استعراض جميع المستخدمين</div>
+    
+    <div style="display:flex;gap:12px;flex-wrap:wrap;margin-bottom:16px;">
+        <button class="btn" id="loadBtn" onclick="loadUsers()">📥 تحميل جميع المستخدمين</button>
+        <button class="btn" onclick="exportCSV()" style="background:#22c55e;">📤 تصدير CSV</button>
+        <button class="btn" onclick="document.getElementById('rawOutput').style.display='block'" style="background:#3b82f6;">🔍 عرض خام</button>
+    </div>
+    
+    <div class="stats" id="stats"></div>
+    
+    <div class="table-wrapper" id="tableWrapper">
+        <div class="loading" id="loading"><div class="spinner"></div> اضغط "تحميل" لعرض البيانات</div>
+        <div id="tableContainer" style="display:none;"></div>
+    </div>
+    
+    <pre id="rawOutput" style="display:none;background:rgba(0,0,0,0.3);padding:16px;border-radius:8px;overflow:auto;max-height:400px;font-size:12px;color:#94a3b8;margin-top:12px;white-space:pre-wrap;word-break:break-all;"></pre>
+</div>
+
+<script>
+// ============================================================
+// 🔥 Firebase Config (مستخرج من التطبيق)
+// ============================================================
+const firebaseConfig = {
+    apiKey: "AIzaSyBkltiLTJmgYG0x4E5_VUGCygE7lJLuYdk",
+    authDomain: "nexora-c4c6a.firebaseapp.com",
+    projectId: "nexora-c4c6a",
+    storageBucket: "nexora-c4c6a.firebasestorage.app",
+    messagingSenderId: "585160881490",
+    appId: "1:585160881490:web:d1d605a47ad08248ea368b"
+};
+
+// تهيئة Firebase
+firebase.initializeApp(firebaseConfig);
+const db = firebase.firestore();
+
+let allUsers = [];
+let loading = false;
+
+// ============================================================
+// 📥 تحميل جميع المستخدمين
+// ============================================================
+async function loadUsers() {
+    if (loading) return;
+    loading = true;
+    const btn = document.getElementById('loadBtn');
+    btn.disabled = true;
+    btn.textContent = '⏳ جاري التحميل...';
+    
+    document.getElementById('loading').style.display = 'block';
+    document.getElementById('tableContainer').style.display = 'none';
+    
+    try {
+        // 🔥 استعلام مباشر إلى Firestore (بدون مصادقة!)
+        const snapshot = await db.collection('users').get();
+        allUsers = [];
+        snapshot.forEach(doc => {
+            allUsers.push({ id: doc.id, ...doc.data() });
+        });
+        
+        renderUsers(allUsers);
+        updateStats(allUsers);
+        showToast(`✅ تم تحميل ${allUsers.length} مستخدم`, 'success');
+        
+        // عرض خام
+        document.getElementById('rawOutput').textContent = JSON.stringify(allUsers, null, 2);
+        
+    } catch (error) {
+        showToast(`❌ فشل التحميل: ${error.message}`, 'error');
+        console.error(error);
+    }
+    
+    loading = false;
+    btn.disabled = false;
+    btn.textContent = '📥 تحميل جميع المستخدمين';
+}
+
+// ============================================================
+// 📊 عرض المستخدمين
+// ============================================================
+function renderUsers(users) {
+    const container = document.getElementById('tableContainer');
+    const loading = document.getElementById('loading');
+    
+    if (!users || users.length === 0) {
+        container.innerHTML = `<div class="loading">لا توجد بيانات</div>`;
+        container.style.display = 'block';
+        loading.style.display = 'none';
+        return;
+    }
+    
+    let html = `
+        <table>
+            <thead>
+                <tr>
+                    <th>#</th>
+                    <th>UID</th>
+                    <th>البريد الإلكتروني</th>
+                    <th>الدور</th>
+                    <th>المستوى</th>
+                    <th>البرامج النشطة</th>
+                    <th>تاريخ الإنشاء</th>
+                </tr>
+            </thead>
+            <tbody>
+    `;
+    
+    users.forEach((user, index) => {
+        const roleClass = user.role === 'admin' ? 'badge-admin' : 'badge-user';
+        const levelClass = user.level === 'bronze' ? 'badge-bronze' :
+                          user.level === 'silver' ? 'badge-silver' :
+                          user.level === 'gold' ? 'badge-gold' : '';
+        const programs = user.activePrograms ? user.activePrograms.length : 0;
+        const createdAt = user.createdAt ? new Date(user.createdAt.seconds * 1000).toLocaleString('ar-EG') : '—';
+        
+        html += `
+            <tr>
+                <td>${index + 1}</td>
+                <td><code style="font-size:11px;color:#94a3b8;">${user.id || '—'}</code></td>
+                <td>${user.email || '—'}</td>
+                <td><span class="badge ${roleClass}">${user.role || 'user'}</span></td>
+                <td><span class="badge ${levelClass}">${user.level || '—'}</span></td>
+                <td>${programs}</td>
+                <td>${createdAt}</td>
+            </tr>
+        `;
+    });
+    
+    html += `</tbody></table>`;
+    container.innerHTML = html;
+    container.style.display = 'block';
+    loading.style.display = 'none';
+}
+
+// ============================================================
+// 📊 الإحصائيات
+// ============================================================
+function updateStats(users) {
+    const stats = document.getElementById('stats');
+    const admins = users.filter(u => u.role === 'admin').length;
+    const bronzes = users.filter(u => u.level === 'bronze').length;
+    const silvers = users.filter(u => u.level === 'silver').length;
+    const golds = users.filter(u => u.level === 'gold').length;
+    
+    stats.innerHTML = `
+        <div class="stat-card"><div class="number">${users.length}</div><div class="label">👥 إجمالي المستخدمين</div></div>
+        <div class="stat-card"><div class="number">${admins}</div><div class="label">🛡️ المسؤولين</div></div>
+        <div class="stat-card"><div class="number">${bronzes}</div><div class="label">🥉 برونز</div></div>
+        <div class="stat-card"><div class="number">${silvers}</div><div class="label">🥈 فضي</div></div>
+        <div class="stat-card"><div class="number">${golds}</div><div class="label">🥇 ذهبي</div></div>
+    `;
+}
+
+// ============================================================
+// 📤 تصدير CSV
+// ============================================================
+function exportCSV() {
+    if (allUsers.length === 0) {
+        showToast('⚠️ لا توجد بيانات للتصدير', 'error');
+        return;
+    }
+    
+    let csv = "UID,البريد الإلكتروني,الدور,المستوى,البرامج النشطة\n";
+    allUsers.forEach(u => {
+        csv += `${u.id || ''},${u.email || ''},${u.role || ''},${u.level || ''},${u.activePrograms ? u.activePrograms.length : 0}\n`;
+    });
+    
+    const blob = new Blob([csv], { type: 'text/csv' });
+    const link = document.createElement('a');
+    link.href = URL.createObjectURL(blob);
+    link.download = `nexora_users_${new Date().toISOString().slice(0,10)}.csv`;
+    link.click();
+    showToast('✅ تم التصدير', 'success');
+}
+
+// ============================================================
+// 📨 Toast
+// ============================================================
+function showToast(message, type = 'info') {
+    const existing = document.querySelector('.toast');
+    if (existing) existing.remove();
+    const toast = document.createElement('div');
+    toast.className = `toast toast-${type}`;
+    toast.textContent = message;
+    document.body.appendChild(toast);
+    setTimeout(() => toast.remove(), 4000);
+}
+
+// ============================================================
+// 🔍 استعلامات إضافية (نظرياً)
+// ============================================================
+async function queryCollection(collection) {
+    try {
+        const snapshot = await db.collection(collection).get();
+        const data = [];
+        snapshot.forEach(doc => data.push({ id: doc.id, ...doc.data() }));
+        console.log(`📦 ${collection}:`, data);
+        return data;
+    } catch(e) {
+        console.log(`❌ ${collection}:`, e.message);
+        return [];
+    }
+}
+
+// ============================================================
+// 🚀 تحميل تلقائي عند فتح الصفحة
+// ============================================================
+window.onload = function() {
+    showToast('🔥 جاهز! اضغط "تحميل" لعرض البيانات', 'info');
+};
+</script>
+
+</body>
+</html>
