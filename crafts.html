@@ -3,13 +3,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>🔥 Nexora - لوحة تحكم البيانات</title>
-    
+    <title>🔥 Nexora - لوحة التحكم</title>
+
     <!-- Firebase SDK -->
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
-    
-    <!-- Font Awesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
     <style>
@@ -20,10 +18,10 @@
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
         }
         body {
-            background: #0f0f1a;
+            background: #0a0a14;
             color: #e2e8f0;
             min-height: 100vh;
-            padding: 20px;
+            padding: 16px;
         }
         .container {
             max-width: 1400px;
@@ -34,17 +32,17 @@
         .header {
             background: linear-gradient(135deg, #1a1a2e, #16213e);
             border-radius: 16px;
-            padding: 24px 32px;
-            margin-bottom: 30px;
-            border: 1px solid rgba(255,255,255,0.05);
+            padding: 20px 28px;
+            margin-bottom: 24px;
+            border: 1px solid rgba(255, 255, 255, 0.05);
             display: flex;
             justify-content: space-between;
             align-items: center;
             flex-wrap: wrap;
-            gap: 16px;
+            gap: 12px;
         }
         .header h1 {
-            font-size: 24px;
+            font-size: 22px;
             font-weight: 700;
             background: linear-gradient(135deg, #f97316, #ef4444);
             -webkit-background-clip: text;
@@ -52,26 +50,64 @@
         }
         .header .subtitle {
             color: #94a3b8;
-            font-size: 14px;
+            font-size: 13px;
         }
-        .header .badge {
-            background: rgba(249,115,22,0.2);
-            border: 1px solid rgba(249,115,22,0.3);
-            color: #f97316;
+        .header .badge-status {
             padding: 6px 16px;
             border-radius: 20px;
             font-size: 13px;
+            border: 1px solid rgba(249, 115, 22, 0.3);
+        }
+        .badge-connected {
+            background: rgba(34, 197, 94, 0.15);
+            color: #4ade80;
+            border-color: rgba(34, 197, 94, 0.3);
+        }
+        .badge-error {
+            background: rgba(239, 68, 68, 0.15);
+            color: #f87171;
+            border-color: rgba(239, 68, 68, 0.3);
+        }
+
+        /* Stats */
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+            gap: 12px;
+            margin-bottom: 20px;
+        }
+        .stat-card {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            border-radius: 12px;
+            padding: 16px;
+            text-align: center;
+            transition: 0.3s;
+        }
+        .stat-card:hover {
+            border-color: rgba(249, 115, 22, 0.2);
+            background: rgba(255, 255, 255, 0.05);
+        }
+        .stat-card .number {
+            font-size: 28px;
+            font-weight: 700;
+            color: #f97316;
+        }
+        .stat-card .label {
+            font-size: 13px;
+            color: #94a3b8;
+            margin-top: 4px;
         }
 
         /* Controls */
         .controls {
             display: flex;
-            gap: 12px;
-            margin-bottom: 24px;
+            gap: 10px;
+            margin-bottom: 18px;
             flex-wrap: wrap;
         }
         .btn {
-            padding: 10px 22px;
+            padding: 10px 20px;
             border: none;
             border-radius: 10px;
             font-size: 14px;
@@ -107,11 +143,11 @@
             transform: translateY(-2px);
         }
         .btn-secondary {
-            background: rgba(255,255,255,0.08);
+            background: rgba(255, 255, 255, 0.08);
             color: #e2e8f0;
         }
         .btn-secondary:hover {
-            background: rgba(255,255,255,0.15);
+            background: rgba(255, 255, 255, 0.15);
             transform: translateY(-2px);
         }
         .btn:disabled {
@@ -119,48 +155,22 @@
             cursor: not-allowed;
             transform: none !important;
         }
-
-        /* Stats */
-        .stats {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
-            gap: 14px;
-            margin-bottom: 24px;
-        }
-        .stat-card {
-            background: rgba(255,255,255,0.03);
-            border: 1px solid rgba(255,255,255,0.05);
-            border-radius: 12px;
-            padding: 18px 20px;
-            text-align: center;
-            transition: 0.3s;
-        }
-        .stat-card:hover {
-            border-color: rgba(249,115,22,0.2);
-            background: rgba(255,255,255,0.05);
-        }
-        .stat-card .number {
-            font-size: 30px;
-            font-weight: 700;
-            color: #f97316;
-        }
-        .stat-card .label {
-            font-size: 13px;
-            color: #94a3b8;
-            margin-top: 4px;
+        .btn-sm {
+            padding: 6px 12px;
+            font-size: 12px;
         }
 
         /* Tabs */
         .tabs {
             display: flex;
-            gap: 6px;
-            margin-bottom: 20px;
+            gap: 4px;
+            margin-bottom: 18px;
             flex-wrap: wrap;
-            border-bottom: 1px solid rgba(255,255,255,0.05);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
             padding-bottom: 4px;
         }
         .tab-btn {
-            padding: 10px 20px;
+            padding: 10px 18px;
             border: none;
             border-radius: 10px 10px 0 0;
             font-size: 14px;
@@ -171,19 +181,19 @@
             color: #94a3b8;
         }
         .tab-btn.active {
-            background: rgba(249,115,22,0.15);
+            background: rgba(249, 115, 22, 0.15);
             color: #f97316;
             border-bottom: 2px solid #f97316;
         }
         .tab-btn:hover:not(.active) {
             color: #fff;
-            background: rgba(255,255,255,0.05);
+            background: rgba(255, 255, 255, 0.05);
         }
 
         /* Tables */
         .table-wrapper {
-            background: rgba(255,255,255,0.02);
-            border: 1px solid rgba(255,255,255,0.05);
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid rgba(255, 255, 255, 0.05);
             border-radius: 12px;
             overflow: hidden;
             overflow-x: auto;
@@ -194,14 +204,14 @@
             font-size: 13px;
         }
         thead {
-            background: rgba(255,255,255,0.04);
+            background: rgba(255, 255, 255, 0.04);
         }
         th {
             padding: 12px 14px;
             text-align: right;
             font-weight: 600;
             color: #94a3b8;
-            border-bottom: 1px solid rgba(255,255,255,0.05);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
             white-space: nowrap;
             font-size: 12px;
             text-transform: uppercase;
@@ -209,12 +219,12 @@
         }
         td {
             padding: 10px 14px;
-            border-bottom: 1px solid rgba(255,255,255,0.03);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.03);
             vertical-align: middle;
             word-break: break-word;
         }
         tr:hover td {
-            background: rgba(255,255,255,0.02);
+            background: rgba(255, 255, 255, 0.02);
         }
 
         /* Badges */
@@ -225,15 +235,42 @@
             font-size: 11px;
             font-weight: 600;
         }
-        .badge-admin { background: rgba(239,68,68,0.2); color: #f87171; }
-        .badge-user { background: rgba(59,130,246,0.2); color: #60a5fa; }
-        .badge-bronze { background: rgba(180,130,70,0.2); color: #d4a574; }
-        .badge-silver { background: rgba(192,192,192,0.2); color: #c0c0c0; }
-        .badge-gold { background: rgba(255,215,0,0.2); color: #ffd700; }
-        .badge-pending { background: rgba(249,115,22,0.2); color: #f97316; }
-        .badge-approved { background: rgba(34,197,94,0.2); color: #4ade80; }
-        .badge-rejected { background: rgba(239,68,68,0.2); color: #f87171; }
-        .badge-completed { background: rgba(59,130,246,0.2); color: #60a5fa; }
+        .badge-admin {
+            background: rgba(239, 68, 68, 0.2);
+            color: #f87171;
+        }
+        .badge-user {
+            background: rgba(59, 130, 246, 0.2);
+            color: #60a5fa;
+        }
+        .badge-bronze {
+            background: rgba(180, 130, 70, 0.2);
+            color: #d4a574;
+        }
+        .badge-silver {
+            background: rgba(192, 192, 192, 0.2);
+            color: #c0c0c0;
+        }
+        .badge-gold {
+            background: rgba(255, 215, 0, 0.2);
+            color: #ffd700;
+        }
+        .badge-pending {
+            background: rgba(249, 115, 22, 0.2);
+            color: #f97316;
+        }
+        .badge-approved {
+            background: rgba(34, 197, 94, 0.2);
+            color: #4ade80;
+        }
+        .badge-rejected {
+            background: rgba(239, 68, 68, 0.2);
+            color: #f87171;
+        }
+        .badge-completed {
+            background: rgba(59, 130, 246, 0.2);
+            color: #60a5fa;
+        }
 
         /* Loading */
         .loading {
@@ -245,13 +282,15 @@
             display: inline-block;
             width: 30px;
             height: 30px;
-            border: 3px solid rgba(255,255,255,0.1);
+            border: 3px solid rgba(255, 255, 255, 0.1);
             border-top-color: #f97316;
             border-radius: 50%;
             animation: spin 0.8s linear infinite;
         }
         @keyframes spin {
-            to { transform: rotate(360deg); }
+            to {
+                transform: rotate(360deg);
+            }
         }
 
         .empty {
@@ -277,420 +316,524 @@
             z-index: 999;
             animation: slideUp 0.3s ease;
             max-width: 450px;
-            box-shadow: 0 10px 40px rgba(0,0,0,0.5);
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
         }
-        .toast-success { background: #22c55e; }
-        .toast-error { background: #ef4444; }
-        .toast-info { background: #3b82f6; }
+        .toast-success {
+            background: #22c55e;
+        }
+        .toast-error {
+            background: #ef4444;
+        }
+        .toast-info {
+            background: #3b82f6;
+        }
         @keyframes slideUp {
-            from { opacity: 0; transform: translateY(20px); }
-            to { opacity: 1; transform: translateY(0); }
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
         }
 
         /* Scrollbar */
-        ::-webkit-scrollbar { width: 5px; height: 5px; }
-        ::-webkit-scrollbar-track { background: rgba(255,255,255,0.02); }
-        ::-webkit-scrollbar-thumb { background: rgba(249,115,22,0.3); border-radius: 10px; }
+        ::-webkit-scrollbar {
+            width: 5px;
+            height: 5px;
+        }
+        ::-webkit-scrollbar-track {
+            background: rgba(255, 255, 255, 0.02);
+        }
+        ::-webkit-scrollbar-thumb {
+            background: rgba(249, 115, 22, 0.3);
+            border-radius: 10px;
+        }
 
         /* Responsive */
         @media (max-width: 768px) {
-            .header { flex-direction: column; text-align: center; padding: 16px 20px; }
-            .stats { grid-template-columns: 1fr 1fr; }
-            th, td { padding: 8px 10px; font-size: 12px; }
-            .controls { flex-direction: column; }
-            .controls .btn { width: 100%; justify-content: center; }
-            .tab-btn { flex: 1; text-align: center; padding: 8px 10px; font-size: 12px; }
+            .header {
+                flex-direction: column;
+                text-align: center;
+                padding: 16px;
+            }
+            .stats {
+                grid-template-columns: 1fr 1fr;
+            }
+            th,
+            td {
+                padding: 8px 10px;
+                font-size: 12px;
+            }
+            .controls {
+                flex-direction: column;
+            }
+            .controls .btn {
+                width: 100%;
+                justify-content: center;
+            }
+            .tab-btn {
+                flex: 1;
+                text-align: center;
+                padding: 8px 10px;
+                font-size: 12px;
+            }
         }
         @media (max-width: 480px) {
-            .stats { grid-template-columns: 1fr; }
-            .header h1 { font-size: 20px; }
+            .stats {
+                grid-template-columns: 1fr;
+            }
+            .header h1 {
+                font-size: 20px;
+            }
         }
     </style>
 </head>
 <body>
 
-<div class="container">
-    <!-- Header -->
-    <div class="header">
-        <div>
-            <h1>🔥 Nexora · Data Dashboard</h1>
-            <div class="subtitle">استخراج وعرض بيانات المستخدمين، طلبات الإيداع والسحب</div>
+    <div class="container">
+        <!-- Header -->
+        <div class="header">
+            <div>
+                <h1>🔥 Nexora · لوحة التحكم</h1>
+                <div class="subtitle">إدارة المستخدمين، الإيداعات، والسحوبات</div>
+            </div>
+            <div style="display:flex;gap:10px;flex-wrap:wrap;align-items:center;">
+                <span class="badge-status badge-connected" id="connectionStatus">
+                    <i class="fas fa-circle" style="font-size:10px;color:#4ade80;"></i> متصل
+                </span>
+            </div>
         </div>
-        <div style="display:flex;gap:10px;flex-wrap:wrap;align-items:center;">
-            <span class="badge" id="connectionStatus">⏳ جاري الاتصال...</span>
+
+        <!-- Stats -->
+        <div class="stats" id="stats">
+            <div class="stat-card">
+                <div class="number" id="totalUsers">0</div>
+                <div class="label">👥 المستخدمين</div>
+            </div>
+            <div class="stat-card">
+                <div class="number" id="totalDeposits">0</div>
+                <div class="label">📥 الإيداعات</div>
+            </div>
+            <div class="stat-card">
+                <div class="number" id="totalWithdrawals">0</div>
+                <div class="label">📤 السحوبات</div>
+            </div>
+            <div class="stat-card">
+                <div class="number" id="totalAdmins">0</div>
+                <div class="label">🛡️ المسؤولين</div>
+            </div>
         </div>
-    </div>
 
-    <!-- Controls -->
-    <div class="controls">
-        <button class="btn btn-primary" id="loadBtn" onclick="loadAllData()">
-            <i class="fas fa-download"></i> تحميل جميع البيانات
-        </button>
-        <button class="btn btn-success" onclick="exportCSV()">
-            <i class="fas fa-file-export"></i> تصدير CSV
-        </button>
-        <button class="btn btn-secondary" onclick="refreshAll()">
-            <i class="fas fa-sync-alt"></i> تحديث
-        </button>
-        <button class="btn btn-secondary" onclick="document.getElementById('rawOutput').style.display='block'">
-            <i class="fas fa-code"></i> عرض خام
-        </button>
-    </div>
-
-    <!-- Stats -->
-    <div class="stats" id="stats">
-        <div class="stat-card"><div class="number" id="totalUsers">0</div><div class="label">👥 المستخدمين</div></div>
-        <div class="stat-card"><div class="number" id="totalDeposits">0</div><div class="label">📥 طلبات الإيداع</div></div>
-        <div class="stat-card"><div class="number" id="totalWithdrawals">0</div><div class="label">📤 طلبات السحب</div></div>
-        <div class="stat-card"><div class="number" id="totalAdmins">0</div><div class="label">🛡️ المسؤولين</div></div>
-    </div>
-
-    <!-- Tabs -->
-    <div class="tabs">
-        <button class="tab-btn active" data-tab="users" onclick="switchTab('users')"><i class="fas fa-users"></i> المستخدمين</button>
-        <button class="tab-btn" data-tab="deposits" onclick="switchTab('deposits')"><i class="fas fa-arrow-down"></i> الإيداعات</button>
-        <button class="tab-btn" data-tab="withdrawals" onclick="switchTab('withdrawals')"><i class="fas fa-arrow-up"></i> السحوبات</button>
-    </div>
-
-    <!-- ====== PANEL: USERS ====== -->
-    <div id="panelUsers" class="panel active">
-        <div class="table-wrapper" id="usersContainer">
-            <div class="loading"><div class="spinner"></div> اضغط "تحميل" لعرض المستخدمين</div>
+        <!-- Controls -->
+        <div class="controls">
+            <button class="btn btn-primary" id="loadBtn" onclick="loadAllData()">
+                <i class="fas fa-download"></i> تحميل البيانات
+            </button>
+            <button class="btn btn-success" onclick="exportCSV()">
+                <i class="fas fa-file-export"></i> تصدير CSV
+            </button>
+            <button class="btn btn-secondary" onclick="refreshAll()">
+                <i class="fas fa-sync-alt"></i> تحديث
+            </button>
+            <button class="btn btn-secondary" onclick="toggleRaw()">
+                <i class="fas fa-code"></i> عرض خام
+            </button>
         </div>
-    </div>
 
-    <!-- ====== PANEL: DEPOSITS ====== -->
-    <div id="panelDeposits" class="panel">
-        <div class="table-wrapper" id="depositsContainer">
-            <div class="loading"><div class="spinner"></div> اضغط "تحميل" لعرض طلبات الإيداع</div>
+        <!-- Tabs -->
+        <div class="tabs">
+            <button class="tab-btn active" data-tab="users" onclick="switchTab('users')">
+                <i class="fas fa-users"></i> المستخدمين
+            </button>
+            <button class="tab-btn" data-tab="deposits" onclick="switchTab('deposits')">
+                <i class="fas fa-arrow-down"></i> الإيداعات
+            </button>
+            <button class="tab-btn" data-tab="withdrawals" onclick="switchTab('withdrawals')">
+                <i class="fas fa-arrow-up"></i> السحوبات
+            </button>
         </div>
-    </div>
 
-    <!-- ====== PANEL: WITHDRAWALS ====== -->
-    <div id="panelWithdrawals" class="panel">
-        <div class="table-wrapper" id="withdrawalsContainer">
-            <div class="loading"><div class="spinner"></div> اضغط "تحميل" لعرض طلبات السحب</div>
+        <!-- Panel: Users -->
+        <div id="panelUsers" class="panel active">
+            <div class="table-wrapper" id="usersContainer">
+                <div class="loading"><div class="spinner"></div> جاري التحميل...</div>
+            </div>
         </div>
+
+        <!-- Panel: Deposits -->
+        <div id="panelDeposits" class="panel">
+            <div class="table-wrapper" id="depositsContainer">
+                <div class="loading"><div class="spinner"></div> جاري التحميل...</div>
+            </div>
+        </div>
+
+        <!-- Panel: Withdrawals -->
+        <div id="panelWithdrawals" class="panel">
+            <div class="table-wrapper" id="withdrawalsContainer">
+                <div class="loading"><div class="spinner"></div> جاري التحميل...</div>
+            </div>
+        </div>
+
+        <!-- Raw Output -->
+        <pre id="rawOutput"
+        style="display:none;background:rgba(0,0,0,0.3);padding:16px;border-radius:8px;overflow:auto;max-height:400px;font-size:12px;color:#94a3b8;margin-top:12px;white-space:pre-wrap;word-break:break-all;"></pre>
     </div>
 
-    <!-- Raw Output -->
-    <pre id="rawOutput" style="display:none;background:rgba(0,0,0,0.3);padding:16px;border-radius:8px;overflow:auto;max-height:400px;font-size:12px;color:#94a3b8;margin-top:12px;white-space:pre-wrap;word-break:break-all;"></pre>
-</div>
+    <script>
+        // ============================================================
+        // 🔥 Firebase Config
+        // ============================================================
+        const FIREBASE_CONFIG = {
+            apiKey: "AIzaSyBkltiLTJmgYG0x4E5_VUGCygE7lJLuYdk",
+            authDomain: "nexora-c4c6a.firebaseapp.com",
+            projectId: "nexora-c4c6a",
+            storageBucket: "nexora-c4c6a.firebasestorage.app",
+            messagingSenderId: "585160881490",
+            appId: "1:585160881490:web:d1d605a47ad08248ea368b"
+        };
 
-<script>
-// ============================================================
-// 🔥 Firebase Config
-// ============================================================
-const FIREBASE_CONFIG = {
-    apiKey: "AIzaSyBkltiLTJmgYG0x4E5_VUGCygE7lJLuYdk",
-    authDomain: "nexora-c4c6a.firebaseapp.com",
-    projectId: "nexora-c4c6a",
-    storageBucket: "nexora-c4c6a.firebasestorage.app",
-    messagingSenderId: "585160881490",
-    appId: "1:585160881490:web:d1d605a47ad08248ea368b"
-};
+        firebase.initializeApp(FIREBASE_CONFIG);
+        const db = firebase.firestore();
 
-firebase.initializeApp(FIREBASE_CONFIG);
-const db = firebase.firestore();
+        // ============================================================
+        // 📌 STATE
+        // ============================================================
+        let allUsers = [];
+        let allDeposits = [];
+        let allWithdrawals = [];
+        let currentTab = 'users';
+        let loading = false;
 
-// ============================================================
-// 📌 STATE
-// ============================================================
-let allUsers = [];
-let allDeposits = [];
-let allWithdrawals = [];
-let currentTab = 'users';
-let loading = false;
+        // ============================================================
+        // 📌 TOAST
+        // ============================================================
+        function showToast(message, type = 'info') {
+            const existing = document.querySelector('.toast');
+            if (existing) existing.remove();
+            const toast = document.createElement('div');
+            toast.className = `toast toast-${type}`;
+            toast.textContent = message;
+            document.body.appendChild(toast);
+            setTimeout(() => toast.remove(), 4000);
+        }
 
-// ============================================================
-// 📌 TOAST
-// ============================================================
-function showToast(message, type = 'info') {
-    const existing = document.querySelector('.toast');
-    if (existing) existing.remove();
-    const toast = document.createElement('div');
-    toast.className = `toast toast-${type}`;
-    toast.textContent = message;
-    document.body.appendChild(toast);
-    setTimeout(() => toast.remove(), 4000);
-}
+        // ============================================================
+        // 📌 TABS
+        // ============================================================
+        function switchTab(tab) {
+            currentTab = tab;
+            document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+            document.querySelector(`.tab-btn[data-tab="${tab}"]`).classList.add('active');
+            document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+            document.getElementById(`panel${tab.charAt(0).toUpperCase() + tab.slice(1)}`).classList.add('active');
+        }
 
-// ============================================================
-// 📌 TABS
-// ============================================================
-function switchTab(tab) {
-    currentTab = tab;
-    document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
-    document.querySelector(`.tab-btn[data-tab="${tab}"]`).classList.add('active');
-    document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
-    document.getElementById(`panel${tab.charAt(0).toUpperCase() + tab.slice(1)}`).classList.add('active');
-}
+        // ============================================================
+        // 📥 LOAD ALL DATA
+        // ============================================================
+        async function loadAllData() {
+            if (loading) return;
+            loading = true;
+            const btn = document.getElementById('loadBtn');
+            btn.disabled = true;
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> جاري التحميل...';
 
-// ============================================================
-// 📥 LOAD ALL DATA
-// ============================================================
-async function loadAllData() {
-    if (loading) return;
-    loading = true;
-    const btn = document.getElementById('loadBtn');
-    btn.disabled = true;
-    btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> جاري التحميل...';
+            try {
+                // 1. Users
+                const usersSnap = await db.collection('users').get();
+                allUsers = [];
+                usersSnap.forEach(doc => allUsers.push({ id: doc.id, ...doc.data() }));
 
-    try {
-        // 1. Users
-        const usersSnap = await db.collection('users').get();
-        allUsers = [];
-        usersSnap.forEach(doc => allUsers.push({ id: doc.id, ...doc.data() }));
+                // 2. Deposits
+                const depositsSnap = await db.collection('deposits').get();
+                allDeposits = [];
+                depositsSnap.forEach(doc => allDeposits.push({ id: doc.id, ...doc.data() }));
 
-        // 2. Deposits
-        const depositsSnap = await db.collection('deposits').get();
-        allDeposits = [];
-        depositsSnap.forEach(doc => allDeposits.push({ id: doc.id, ...doc.data() }));
+                // 3. Withdrawals
+                const withdrawalsSnap = await db.collection('withdrawals').get();
+                allWithdrawals = [];
+                withdrawalsSnap.forEach(doc => allWithdrawals.push({ id: doc.id, ...doc.data() }));
 
-        // 3. Withdrawals
-        const withdrawalsSnap = await db.collection('withdrawals').get();
-        allWithdrawals = [];
-        withdrawalsSnap.forEach(doc => allWithdrawals.push({ id: doc.id, ...doc.data() }));
+                renderUsers(allUsers);
+                renderDeposits(allDeposits);
+                renderWithdrawals(allWithdrawals);
+                updateStats();
 
-        // Render
-        renderUsers(allUsers);
-        renderDeposits(allDeposits);
-        renderWithdrawals(allWithdrawals);
-        updateStats();
+                document.getElementById('rawOutput').textContent = JSON.stringify({
+                    users: allUsers,
+                    deposits: allDeposits,
+                    withdrawals: allWithdrawals
+                }, null, 2);
 
-        document.getElementById('rawOutput').textContent = JSON.stringify({
-            users: allUsers,
-            deposits: allDeposits,
-            withdrawals: allWithdrawals
-        }, null, 2);
+                showToast(`✅ تم تحميل ${allUsers.length} مستخدم، ${allDeposits.length} إيداع، ${allWithdrawals.length} سحب`,
+                'success');
 
-        showToast(`✅ تم تحميل ${allUsers.length} مستخدم، ${allDeposits.length} إيداع، ${allWithdrawals.length} سحب`, 'success');
+            } catch (error) {
+                showToast(`❌ فشل التحميل: ${error.message}`, 'error');
+                console.error(error);
+            }
 
-    } catch (error) {
-        showToast(`❌ فشل التحميل: ${error.message}`, 'error');
-        console.error(error);
-    }
+            loading = false;
+            btn.disabled = false;
+            btn.innerHTML = '<i class="fas fa-download"></i> تحميل البيانات';
+        }
 
-    loading = false;
-    btn.disabled = false;
-    btn.innerHTML = '<i class="fas fa-download"></i> تحميل جميع البيانات';
-}
+        // ============================================================
+        // 📊 RENDER USERS
+        // ============================================================
+        function renderUsers(users) {
+            const container = document.getElementById('usersContainer');
+            if (!users || users.length === 0) {
+                container.innerHTML = `<div class="empty"><div class="icon">👥</div><div>لا يوجد مستخدمين</div></div>`;
+                return;
+            }
 
-// ============================================================
-// 📊 RENDER USERS
-// ============================================================
-function renderUsers(users) {
-    const container = document.getElementById('usersContainer');
-    if (!users || users.length === 0) {
-        container.innerHTML = `<div class="empty"><div class="icon">👥</div><div>لا يوجد مستخدمين</div></div>`;
-        return;
-    }
+            let html = `
+                <table>
+                    <thead>
+                        <tr>
+                            <th>#</th>
+                            <th>UID</th>
+                            <th>البريد الإلكتروني</th>
+                            <th>الاسم</th>
+                            <th>رقم الهاتف</th>
+                            <th>الدور</th>
+                            <th>المستوى</th>
+                            <th>الرصيد</th>
+                            <th>البرامج</th>
+                            <th>تاريخ التسجيل</th>
+                            <th>الإجراءات</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+            `;
 
-    let html = `
-        <table>
-            <thead>
-                <tr>
-                    <th>#</th>
-                    <th>UID</th>
-                    <th>البريد الإلكتروني</th>
-                    <th>الاسم</th>
-                    <th>رقم الهاتف</th>
-                    <th>الدور</th>
-                    <th>المستوى</th>
-                    <th>الرصيد</th>
-                    <th>البرامج</th>
-                    <th>تاريخ التسجيل</th>
-                </tr>
-            </thead>
-            <tbody>
-    `;
+            users.forEach((user, index) => {
+                const roleClass = user.role === 'admin' ? 'badge-admin' : 'badge-user';
+                const levelClass = user.level === 'bronze' ? 'badge-bronze' :
+                    user.level === 'silver' ? 'badge-silver' :
+                    user.level === 'gold' ? 'badge-gold' : '';
+                const createdAt = user.createdAt ? new Date(user.createdAt.seconds * 1000).toLocaleString('ar-EG') :
+                '—';
+                const balance = user.balance || user.wallet || 0;
+                const programs = user.activePrograms ? user.activePrograms.length : 0;
 
-    users.forEach((user, index) => {
-        const roleClass = user.role === 'admin' ? 'badge-admin' : 'badge-user';
-        const levelClass = user.level === 'bronze' ? 'badge-bronze' :
-                          user.level === 'silver' ? 'badge-silver' :
-                          user.level === 'gold' ? 'badge-gold' : '';
-        const createdAt = user.createdAt ? new Date(user.createdAt.seconds * 1000).toLocaleString('ar-EG') : '—';
-        const balance = user.balance || user.wallet || 0;
-        const programs = user.activePrograms ? user.activePrograms.length : 0;
+                html += `
+                        <tr>
+                            <td>${index + 1}</td>
+                            <td><code style="font-size:11px;color:#94a3b8;">${user.uid || user.id || '—'}</code></td>
+                            <td><strong>${user.email || '—'}</strong></td>
+                            <td>${user.displayName || user.name || '—'}</td>
+                            <td>${user.phone || '—'}</td>
+                            <td><span class="badge ${roleClass}">${user.role || 'user'}</span></td>
+                            <td><span class="badge ${levelClass}">${user.level || '—'}</span></td>
+                            <td>$${balance}</td>
+                            <td>${programs}</td>
+                            <td>${createdAt}</td>
+                            <td>
+                                <button class="btn btn-success btn-sm" onclick="makeAdmin('${user.uid || user.id}')">
+                                    <i class="fas fa-user-shield"></i>
+                                </button>
+                            </td>
+                        </tr>
+                    `;
+            });
 
-        html += `
-            <tr>
-                <td>${index + 1}</td>
-                <td><code style="font-size:11px;color:#94a3b8;">${user.uid || user.id || '—'}</code></td>
-                <td><strong>${user.email || '—'}</strong></td>
-                <td>${user.displayName || user.name || '—'}</td>
-                <td>${user.phone || '—'}</td>
-                <td><span class="badge ${roleClass}">${user.role || 'user'}</span></td>
-                <td><span class="badge ${levelClass}">${user.level || '—'}</span></td>
-                <td>$${balance}</td>
-                <td>${programs}</td>
-                <td>${createdAt}</td>
-            </tr>
-        `;
-    });
+            html += `</tbody></table>`;
+            container.innerHTML = html;
+        }
 
-    html += `</tbody></table>`;
-    container.innerHTML = html;
-}
+        // ============================================================
+        // 📊 RENDER DEPOSITS
+        // ============================================================
+        function renderDeposits(deposits) {
+            const container = document.getElementById('depositsContainer');
+            if (!deposits || deposits.length === 0) {
+                container.innerHTML = `<div class="empty"><div class="icon">📥</div><div>لا توجد طلبات إيداع</div></div>`;
+                return;
+            }
 
-// ============================================================
-// 📊 RENDER DEPOSITS
-// ============================================================
-function renderDeposits(deposits) {
-    const container = document.getElementById('depositsContainer');
-    if (!deposits || deposits.length === 0) {
-        container.innerHTML = `<div class="empty"><div class="icon">📥</div><div>لا توجد طلبات إيداع</div></div>`;
-        return;
-    }
+            let html = `
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>#</th>
+                                <th>المستخدم</th>
+                                <th>المبلغ ($)</th>
+                                <th>الطريقة</th>
+                                <th>الحالة</th>
+                                <th>التاريخ</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                `;
 
-    let html = `
-        <table>
-            <thead>
-                <tr>
-                    <th>#</th>
-                    <th>المستخدم</th>
-                    <th>المبلغ ($)</th>
-                    <th>الطريقة</th>
-                    <th>الحالة</th>
-                    <th>التاريخ</th>
-                </tr>
-            </thead>
-            <tbody>
-    `;
+            deposits.forEach((dep, index) => {
+                const statusClass = dep.status === 'pending' ? 'badge-pending' :
+                    dep.status === 'approved' ? 'badge-approved' :
+                    dep.status === 'completed' ? 'badge-completed' :
+                    dep.status === 'rejected' ? 'badge-rejected' : '';
+                const date = dep.createdAt ? new Date(dep.createdAt.seconds * 1000).toLocaleString('ar-EG') : '—';
 
-    deposits.forEach((dep, index) => {
-        const statusClass = dep.status === 'pending' ? 'badge-pending' :
-                           dep.status === 'approved' ? 'badge-approved' :
-                           dep.status === 'completed' ? 'badge-completed' :
-                           dep.status === 'rejected' ? 'badge-rejected' : '';
-        const date = dep.createdAt ? new Date(dep.createdAt.seconds * 1000).toLocaleString('ar-EG') : '—';
+                html += `
+                            <tr>
+                                <td>${index + 1}</td>
+                                <td>${dep.userEmail || dep.userId || '—'}</td>
+                                <td>$${dep.amount || 0}</td>
+                                <td>${dep.method || '—'}</td>
+                                <td><span class="badge ${statusClass}">${dep.status || 'pending'}</span></td>
+                                <td>${date}</td>
+                            </tr>
+                        `;
+            });
 
-        html += `
-            <tr>
-                <td>${index + 1}</td>
-                <td>${dep.userEmail || dep.userId || '—'}</td>
-                <td>$${dep.amount || 0}</td>
-                <td>${dep.method || '—'}</td>
-                <td><span class="badge ${statusClass}">${dep.status || 'pending'}</span></td>
-                <td>${date}</td>
-            </tr>
-        `;
-    });
+            html += `</tbody></table>`;
+            container.innerHTML = html;
+        }
 
-    html += `</tbody></table>`;
-    container.innerHTML = html;
-}
+        // ============================================================
+        // 📊 RENDER WITHDRAWALS
+        // ============================================================
+        function renderWithdrawals(withdrawals) {
+            const container = document.getElementById('withdrawalsContainer');
+            if (!withdrawals || withdrawals.length === 0) {
+                container.innerHTML = `<div class="empty"><div class="icon">📤</div><div>لا توجد طلبات سحب</div></div>`;
+                return;
+            }
 
-// ============================================================
-// 📊 RENDER WITHDRAWALS
-// ============================================================
-function renderWithdrawals(withdrawals) {
-    const container = document.getElementById('withdrawalsContainer');
-    if (!withdrawals || withdrawals.length === 0) {
-        container.innerHTML = `<div class="empty"><div class="icon">📤</div><div>لا توجد طلبات سحب</div></div>`;
-        return;
-    }
+            let html = `
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>#</th>
+                                <th>المستخدم</th>
+                                <th>المبلغ ($)</th>
+                                <th>الطريقة</th>
+                                <th>العنوان</th>
+                                <th>الحالة</th>
+                                <th>التاريخ</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                `;
 
-    let html = `
-        <table>
-            <thead>
-                <tr>
-                    <th>#</th>
-                    <th>المستخدم</th>
-                    <th>المبلغ ($)</th>
-                    <th>الطريقة</th>
-                    <th>العنوان</th>
-                    <th>الحالة</th>
-                    <th>التاريخ</th>
-                </tr>
-            </thead>
-            <tbody>
-    `;
+            withdrawals.forEach((wd, index) => {
+                const statusClass = wd.status === 'pending' ? 'badge-pending' :
+                    wd.status === 'approved' ? 'badge-approved' :
+                    wd.status === 'completed' ? 'badge-completed' :
+                    wd.status === 'rejected' ? 'badge-rejected' : '';
+                const date = wd.createdAt ? new Date(wd.createdAt.seconds * 1000).toLocaleString('ar-EG') : '—';
 
-    withdrawals.forEach((wd, index) => {
-        const statusClass = wd.status === 'pending' ? 'badge-pending' :
-                           wd.status === 'approved' ? 'badge-approved' :
-                           wd.status === 'completed' ? 'badge-completed' :
-                           wd.status === 'rejected' ? 'badge-rejected' : '';
-        const date = wd.createdAt ? new Date(wd.createdAt.seconds * 1000).toLocaleString('ar-EG') : '—';
+                html += `
+                            <tr>
+                                <td>${index + 1}</td>
+                                <td>${wd.userEmail || wd.userId || '—'}</td>
+                                <td>$${wd.amount || 0}</td>
+                                <td>${wd.method || '—'}</td>
+                                <td>${wd.address || wd.wallet || '—'}</td>
+                                <td><span class="badge ${statusClass}">${wd.status || 'pending'}</span></td>
+                                <td>${date}</td>
+                            </tr>
+                        `;
+            });
 
-        html += `
-            <tr>
-                <td>${index + 1}</td>
-                <td>${wd.userEmail || wd.userId || '—'}</td>
-                <td>$${wd.amount || 0}</td>
-                <td>${wd.method || '—'}</td>
-                <td>${wd.address || wd.wallet || '—'}</td>
-                <td><span class="badge ${statusClass}">${wd.status || 'pending'}</span></td>
-                <td>${date}</td>
-            </tr>
-        `;
-    });
+            html += `</tbody></table>`;
+            container.innerHTML = html;
+        }
 
-    html += `</tbody></table>`;
-    container.innerHTML = html;
-}
+        // ============================================================
+        // 📊 UPDATE STATS
+        // ============================================================
+        function updateStats() {
+            document.getElementById('totalUsers').textContent = allUsers.length;
+            document.getElementById('totalDeposits').textContent = allDeposits.length;
+            document.getElementById('totalWithdrawals').textContent = allWithdrawals.length;
+            document.getElementById('totalAdmins').textContent = allUsers.filter(u => u.role === 'admin').length;
+        }
 
-// ============================================================
-// 📊 UPDATE STATS
-// ============================================================
-function updateStats() {
-    document.getElementById('totalUsers').textContent = allUsers.length;
-    document.getElementById('totalDeposits').textContent = allDeposits.length;
-    document.getElementById('totalWithdrawals').textContent = allWithdrawals.length;
-    document.getElementById('totalAdmins').textContent = allUsers.filter(u => u.role === 'admin').length;
-}
+        // ============================================================
+        // 🛡️ MAKE ADMIN (نظرياً - يتطلب قواعد كتابة مفتوحة)
+        // ============================================================
+        async function makeAdmin(uid) {
+            if (!uid) {
+                showToast('❌ UID غير صالح', 'error');
+                return;
+            }
 
-// ============================================================
-// 📤 EXPORT CSV
-// ============================================================
-function exportCSV() {
-    if (allUsers.length === 0 && allDeposits.length === 0 && allWithdrawals.length === 0) {
-        showToast('⚠️ لا توجد بيانات للتصدير', 'error');
-        return;
-    }
+            try {
+                await db.collection('users').doc(uid).update({
+                    role: 'admin'
+                });
+                showToast(`✅ تم ترقية المستخدم ${uid} إلى Admin`, 'success');
+                loadAllData(); // إعادة تحميل البيانات
+            } catch (error) {
+                showToast(`❌ فشل الترقية: ${error.message}`, 'error');
+                console.error(error);
+            }
+        }
 
-    let csv = "=== المستخدمين ===\n";
-    csv += "UID,البريد الإلكتروني,الاسم,رقم الهاتف,الدور,المستوى,الرصيد,تاريخ التسجيل\n";
-    allUsers.forEach(u => {
-        csv += `${u.uid||u.id||''},${u.email||''},${u.displayName||u.name||''},${u.phone||''},${u.role||''},${u.level||''},${u.balance||0},${u.createdAt?.seconds||''}\n`;
-    });
+        // ============================================================
+        // 📤 EXPORT CSV
+        // ============================================================
+        function exportCSV() {
+            if (allUsers.length === 0 && allDeposits.length === 0 && allWithdrawals.length === 0) {
+                showToast('⚠️ لا توجد بيانات للتصدير', 'error');
+                return;
+            }
 
-    csv += "\n=== طلبات الإيداع ===\n";
-    csv += "المستخدم,المبلغ,الطريقة,الحالة,التاريخ\n";
-    allDeposits.forEach(d => {
-        csv += `${d.userEmail||''},${d.amount||0},${d.method||''},${d.status||''},${d.createdAt?.seconds||''}\n`;
-    });
+            let csv = "=== المستخدمين ===\n";
+            csv += "UID,البريد الإلكتروني,الاسم,رقم الهاتف,الدور,المستوى,الرصيد,تاريخ التسجيل\n";
+            allUsers.forEach(u => {
+                csv +=
+                    `${u.uid||u.id||''},${u.email||''},${u.displayName||u.name||''},${u.phone||''},${u.role||''},${u.level||''},${u.balance||0},${u.createdAt?.seconds||''}\n`;
+            });
 
-    csv += "\n=== طلبات السحب ===\n";
-    csv += "المستخدم,المبلغ,الطريقة,العنوان,الحالة,التاريخ\n";
-    allWithdrawals.forEach(w => {
-        csv += `${w.userEmail||''},${w.amount||0},${w.method||''},${w.address||w.wallet||''},${w.status||''},${w.createdAt?.seconds||''}\n`;
-    });
+            csv += "\n=== طلبات الإيداع ===\n";
+            csv += "المستخدم,المبلغ,الطريقة,الحالة,التاريخ\n";
+            allDeposits.forEach(d => {
+                csv +=
+                    `${d.userEmail||''},${d.amount||0},${d.method||''},${d.status||''},${d.createdAt?.seconds||''}\n`;
+            });
 
-    const blob = new Blob([csv], { type: 'text/csv' });
-    const link = document.createElement('a');
-    link.href = URL.createObjectURL(blob);
-    link.download = `nexora_data_${new Date().toISOString().slice(0,10)}.csv`;
-    link.click();
-    showToast('✅ تم التصدير', 'success');
-}
+            csv += "\n=== طلبات السحب ===\n";
+            csv += "المستخدم,المبلغ,الطريقة,العنوان,الحالة,التاريخ\n";
+            allWithdrawals.forEach(w => {
+                csv +=
+                    `${w.userEmail||''},${w.amount||0},${w.method||''},${w.address||w.wallet||''},${w.status||''},${w.createdAt?.seconds||''}\n`;
+            });
 
-// ============================================================
-// 🔄 REFRESH
-// ============================================================
-function refreshAll() {
-    loadAllData();
-}
+            const blob = new Blob([csv], { type: 'text/csv' });
+            const link = document.createElement('a');
+            link.href = URL.createObjectURL(blob);
+            link.download = `nexora_data_${new Date().toISOString().slice(0,10)}.csv`;
+            link.click();
+            showToast('✅ تم التصدير', 'success');
+        }
 
-// ============================================================
-// 🚀 INIT
-// ============================================================
-document.addEventListener('DOMContentLoaded', () => {
-    showToast('🔥 جاهز! اضغط "تحميل" لعرض البيانات', 'info');
-});
-</script>
+        // ============================================================
+        // 🔄 REFRESH
+        // ============================================================
+        function refreshAll() {
+            loadAllData();
+        }
+
+        // ============================================================
+        // 🔍 TOGGLE RAW
+        // ============================================================
+        function toggleRaw() {
+            const el = document.getElementById('rawOutput');
+            el.style.display = el.style.display === 'none' ? 'block' : 'none';
+        }
+
+        // ============================================================
+        // 🚀 AUTO LOAD
+        // ============================================================
+        window.onload = function() {
+            loadAllData();
+        };
+    </script>
 
 </body>
 </html>
