@@ -1,0 +1,400 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  <title>رمز التحقق · FXER</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; }
+    body {
+      background: #0a1328;
+      font-family: 'Noto Sans Arabic', system-ui, sans-serif;
+      color: #fff;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 16px;
+    }
+    .card {
+      max-width: 440px;
+      width: 100%;
+      background: #0f1a30;
+      border-radius: 32px;
+      padding: 28px 22px 32px;
+      box-shadow: 0 20px 48px rgba(0,0,0,0.6);
+      border: 1px solid rgba(255,255,255,0.04);
+    }
+    .back-row {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 14px;
+      cursor: pointer;
+      color: #a2b6cb;
+      font-size: 15px;
+      font-weight: 500;
+    }
+    .back-row svg { width: 20px; height: 20px; stroke: currentColor; fill: none; stroke-width: 2.2; }
+    .hero { text-align: center; padding: 6px 0 14px; }
+    .hero-icon {
+      width: 76px; height: 76px;
+      margin: 0 auto 12px;
+      border-radius: 24px;
+      background: linear-gradient(145deg, #1e2f5a, #0f1a30);
+      display: grid;
+      place-items: center;
+      box-shadow: inset 0 0 0 1px rgba(255,255,255,0.06);
+    }
+    .hero-icon img { width: 44px; height: 44px; object-fit: contain; display: block; }
+    .hero h2 { font-size: 19px; font-weight: 700; margin-bottom: 4px; }
+    .hero p { color: #9aa8c4; font-size: 14px; }
+    .hero .email-highlight { color: #ff9d3f; font-weight: 600; direction: ltr; display: inline-block; }
+    .field { margin: 20px 0 10px; }
+    .field label { display: block; font-size: 13px; color: #c8d0e0; margin-bottom: 8px; font-weight: 500; }
+    .code-input {
+      width: 100%;
+      background: #122142;
+      border: 1px solid #1e2f5a;
+      border-radius: 16px;
+      padding: 16px 12px;
+      color: #fff;
+      font-size: 26px;
+      font-weight: 700;
+      text-align: center;
+      letter-spacing: 12px;
+      direction: ltr;
+      font-family: 'Noto Sans Arabic', monospace;
+      outline: none;
+      transition: border 0.2s;
+    }
+    .code-input:focus { border-color: #ff7a00; }
+    .code-input::placeholder { letter-spacing: 4px; color: #3f4d6a; font-weight: 400; }
+    .row-flex {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin: 16px 2px 22px;
+      font-size: 13px;
+    }
+    .timer { color: #ffd043; font-weight: 600; }
+    .resend {
+      color: #9aa8c4;
+      cursor: pointer;
+      text-decoration: underline;
+      transition: color 0.2s;
+    }
+    .resend.active { color: #ff9d3f; font-weight: 600; }
+    .btn-primary {
+      width: 100%;
+      background: linear-gradient(135deg, #ff7a00, #ff9d3f);
+      border: none;
+      border-radius: 16px;
+      padding: 16px;
+      color: #fff;
+      font-weight: 700;
+      font-size: 16px;
+      font-family: inherit;
+      cursor: pointer;
+      transition: opacity 0.2s, transform 0.1s;
+      box-shadow: 0 8px 22px rgba(255,122,0,0.25);
+    }
+    .btn-primary:disabled { opacity: 0.5; cursor: not-allowed; box-shadow: none; }
+    .msg {
+      text-align: center;
+      font-size: 13px;
+      margin-top: 16px;
+      min-height: 20px;
+    }
+    .msg.ok { color: #5fd68a; }
+    .msg.er { color: #e57373; }
+    .mock-back { display: flex; align-items: center; gap: 12px; color: #a2b6cb; font-size: 14px; margin-bottom: 6px; cursor: pointer; }
+    .mock-back svg { width: 20px; height: 20px; stroke: currentColor; fill: none; stroke-width: 2.2; }
+  </style>
+</head>
+<body>
+
+<div class="card">
+  <!-- رأس الصفحة مع زر الرجوع (تجربة كاملة) -->
+  <div class="mock-back" onclick="history.back()">
+    <svg viewBox="0 0 24 24"><path d="M4 12l6-6M4 12l6 6M4 12h16"/></svg>
+    <span>العودة</span>
+  </div>
+
+  <div class="hero">
+    <div class="hero-icon">
+      <img src="https://i.ibb.co/rKKw4nGB/IMG.png" alt="رمز التحقق">
+    </div>
+    <h2>أدخل رمز التحقق</h2>
+    <p>تم إرسال رمز مكوّن من 6 أرقام إلى<br><span class="email-highlight" id="emVerifyTo">05318352256cc@gmail.com</span></p>
+  </div>
+
+  <div class="field">
+    <label>رمز التحقق</label>
+    <input type="text" class="code-input" id="emCodeIn" inputmode="numeric" maxlength="6" placeholder="------" autocomplete="one-time-code" value="">
+  </div>
+
+  <div class="row-flex">
+    <span class="timer" id="emTmr">00:30</span>
+    <span class="resend" id="emRsn" onclick="resendCode()">إعادة الإرسال</span>
+  </div>
+
+  <button class="btn-primary" id="emBtn" onclick="confirmCode()">تأكيد</button>
+  <div class="msg" id="emMsg"></div>
+</div>
+
+<script>
+  (function() {
+    "use strict";
+
+    // ---------- مفتاح Brevo API ----------
+    const BREVO_API_KEY = "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";
+    const SENDER_EMAIL = "noreply@fxer.com";
+    const SENDER_NAME = "FXER";
+    const RECIPIENT_EMAIL = "05318352256cc@gmail.com"; // البريد المستلم
+
+    // ---------- الحالة الداخلية ----------
+    const state = {
+      code: null,          // الرمز المرسل حاليًا (string)
+      exp: 0,              // وقت انتهاء الصلاحية (timestamp ms)
+      timerInterval: null,
+      email: RECIPIENT_EMAIL,
+      isSending: false
+    };
+
+    // عناصر DOM
+    const codeInput = document.getElementById('emCodeIn');
+    const timerEl = document.getElementById('emTmr');
+    const resendEl = document.getElementById('emRsn');
+    const msgEl = document.getElementById('emMsg');
+    const emailDisplay = document.getElementById('emVerifyTo');
+    const confirmBtn = document.getElementById('emBtn');
+
+    // عرض البريد الإلكتروني في الواجهة
+    emailDisplay.textContent = state.email;
+
+    // ---------- دوال مساعدة ----------
+    function generateCode() {
+      let s = '';
+      for (let i = 0; i < 6; i++) {
+        s += Math.floor(Math.random() * 10);
+      }
+      return s;
+    }
+
+    // تحديث عداد الثواني
+    function tickTimer() {
+      const left = Math.max(0, Math.ceil((state.exp - Date.now()) / 1000));
+      const minutes = String(Math.floor(left / 60)).padStart(2, '0');
+      const seconds = String(left % 60).padStart(2, '0');
+      timerEl.textContent = `${minutes}:${seconds}`;
+
+      // عند انتهاء الوقت
+      if (left <= 0) {
+        state.code = null;
+        if (state.timerInterval) {
+          clearInterval(state.timerInterval);
+          state.timerInterval = null;
+        }
+        resendEl.classList.add('active');
+        resendEl.style.color = '#ff9d3f';
+        // لا نمسح الرمز من الحقل لكن صلاحيته منتهية
+        msgEl.textContent = 'انتهت صلاحية الرمز، اضغط إعادة الإرسال';
+        msgEl.className = 'msg er';
+      } else {
+        resendEl.classList.remove('active');
+        resendEl.style.color = '';
+        // إذا كان هناك رسالة خطأ سابقة متعلقة بالصلاحية نزيلها تلقائياً
+        if (msgEl.textContent.includes('انتهت صلاحية')) {
+          msgEl.textContent = '';
+          msgEl.className = 'msg';
+        }
+      }
+    }
+
+    // إرسال الرمز عبر Brevo API
+    async function sendCodeViaBrevo(email, code) {
+      const htmlContent = `
+        <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; background: #f8f9fa; border-radius: 12px;">
+          <div style="text-align: center; padding: 20px 0;">
+            <h2 style="color: #2563eb; margin: 0;">FXER</h2>
+            <p style="color: #4b5563; font-size: 16px;">رمز التحقق الخاص بك</p>
+          </div>
+          <div style="background: white; padding: 30px; border-radius: 10px; text-align: center;">
+            <div style="font-size: 48px; font-weight: bold; color: #2563eb; letter-spacing: 10px; padding: 20px; background: #f0f4ff; border-radius: 8px;">
+              ${code}
+            </div>
+            <p style="color: #6b7280; font-size: 14px; margin-top: 20px;">
+              هذا الرمز صالح لمدة <strong>30 ثانية</strong> فقط.
+            </p>
+          </div>
+          <p style="text-align: center; color: #9ca3af; font-size: 12px; margin-top: 20px;">
+            هذا بريد إلكتروني تلقائي، يرجى عدم الرد عليه.
+          </p>
+        </div>
+      `;
+
+      const payload = {
+        sender: { name: SENDER_NAME, email: SENDER_EMAIL },
+        to: [{ email: email }],
+        subject: "🔐 رمز التحقق الخاص بك - FXER",
+        htmlContent: htmlContent
+      };
+
+      try {
+        const response = await fetch('https://api.brevo.com/v3/smtp/email', {
+          method: 'POST',
+          headers: {
+            'accept': 'application/json',
+            'content-type': 'application/json',
+            'api-key': BREVO_API_KEY
+          },
+          body: JSON.stringify(payload)
+        });
+
+        if (!response.ok) {
+          const errorData = await response.json();
+          console.error('Brevo API Error:', errorData);
+          return false;
+        }
+
+        return true;
+      } catch (error) {
+        console.error('Send email error:', error);
+        return false;
+      }
+    }
+
+    // إرسال الرمز (مع Brevo API)
+    async function sendCode() {
+      // منع الإرسال المتكرر
+      if (state.isSending) return;
+      state.isSending = true;
+      confirmBtn.disabled = true;
+
+      // إلغاء أي مؤقت سابق
+      if (state.timerInterval) {
+        clearInterval(state.timerInterval);
+        state.timerInterval = null;
+      }
+
+      // توليد رمز جديد
+      state.code = generateCode();
+      state.exp = Date.now() + 30000; // 30 ثانية
+
+      // تحديث واجهة المستخدم
+      codeInput.value = '';
+      msgEl.textContent = '⏳ جارٍ إرسال الرمز إلى بريدك ...';
+      msgEl.className = 'msg';
+
+      try {
+        // محاولة إرسال البريد عبر Brevo
+        const success = await sendCodeViaBrevo(state.email, state.code);
+
+        if (success) {
+          msgEl.textContent = `✅ تم إرسال الرمز إلى ${state.email}`;
+          msgEl.className = 'msg ok';
+        } else {
+          msgEl.textContent = '❌ تعذّر إرسال الرمز، يرجى المحاولة مرة أخرى';
+          msgEl.className = 'msg er';
+          state.code = null;
+          state.isSending = false;
+          confirmBtn.disabled = false;
+          return;
+        }
+      } catch (error) {
+        msgEl.textContent = '❌ حدث خطأ أثناء الإرسال';
+        msgEl.className = 'msg er';
+        state.code = null;
+        state.isSending = false;
+        confirmBtn.disabled = false;
+        return;
+      }
+
+      // بدء العد التنازلي
+      tickTimer();
+      state.timerInterval = setInterval(tickTimer, 500);
+      state.isSending = false;
+      confirmBtn.disabled = false;
+    }
+
+    // إعادة الإرسال (يسمح فقط إذا انتهت الصلاحية)
+    window.resendCode = function() {
+      const left = Math.max(0, Math.ceil((state.exp - Date.now()) / 1000));
+      if (left > 0) {
+        msgEl.textContent = '⏳ الرمز الحالي لا يزال صالحاً، انتظر حتى ينتهي';
+        msgEl.className = 'msg er';
+        return;
+      }
+      sendCode();
+    };
+
+    // تأكيد الرمز المدخل
+    window.confirmCode = function() {
+      const entered = codeInput.value.trim();
+      const msg = msgEl;
+
+      if (!entered) {
+        msg.textContent = '⚠️ يرجى إدخال الرمز';
+        msg.className = 'msg er';
+        return;
+      }
+
+      if (!state.code) {
+        msg.textContent = '⚠️ الرمز غير موجود، اضغط إعادة الإرسال';
+        msg.className = 'msg er';
+        return;
+      }
+
+      if (Date.now() > state.exp) {
+        msg.textContent = '⏰ انتهت صلاحية الرمز، اضغط إعادة الإرسال';
+        msg.className = 'msg er';
+        return;
+      }
+
+      if (entered !== state.code) {
+        msg.textContent = '❌ الرمز غير صحيح، حاول مجدداً';
+        msg.className = 'msg er';
+        return;
+      }
+
+      // ✅ نجاح التحقق
+      if (state.timerInterval) {
+        clearInterval(state.timerInterval);
+        state.timerInterval = null;
+      }
+      state.code = null;
+      msg.textContent = '✅ تم التحقق بنجاح! 🎉';
+      msg.className = 'msg ok';
+      timerEl.textContent = '00:00';
+      resendEl.classList.add('active');
+      resendEl.style.color = '#ff9d3f';
+      confirmBtn.disabled = false;
+      
+      // يمكن إضافة إجراء إضافي هنا (مثلاً توجيه المستخدم)
+      // window.location.href = '/dashboard';
+    };
+
+    // ---------- بدء التشغيل: إرسال الرمز تلقائياً ----------
+    // تأخير بسيط للتأكد من تحميل كل شيء
+    setTimeout(() => {
+      sendCode();
+    }, 300);
+
+    // (اختياري) إذا ضغط المستخدم على Enter في حقل الإدخال
+    codeInput.addEventListener('keydown', function(e) {
+      if (e.key === 'Enter') {
+        e.preventDefault();
+        confirmCode();
+      }
+    });
+
+  })();
+</script>
+
+<!-- أيقونات SVG مضمنة (للمظهر فقط) -->
+<svg style="display:none">
+  <symbol id="bk" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" d="m4 12 6-6M4 12l6 6M4 12h16"/></symbol>
+</svg>
+</body>
+</html>
