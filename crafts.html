@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>صفحتي</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box;font-family:system-ui,-apple-system,sans-serif}
+body{background:#f5f5f7;min-height:100vh}
+.topbar{position:fixed;top:0;left:0;right:0;height:56px;background:#fff;box-shadow:0 1px 8px rgba(0,0,0,.08);display:flex;align-items:center;justify-content:center;z-index:100}
+.topbar span{font-size:18px;font-weight:700;color:#1d1d1f}
+.icon-wrap{display:flex;justify-content:center;margin-top:84px;margin-bottom:28px}
+.icon-wrap img{width:130px;height:130px;object-fit:contain}
+.buttons{display:flex;flex-direction:column;gap:14px;max-width:340px;margin:0 auto;padding:0 16px}
+.btn{padding:16px 20px;border:none;border-radius:14px;font-size:17px;font-weight:600;cursor:pointer;transition:.2s;color:#fff}
+.btn:nth-child(1){background:#34c759}.btn:nth-child(1):active{background:#2bb24c}
+.btn:nth-child(2){background:#0a84ff}.btn:nth-child(2):active{background:#0872db}
+.btn:nth-child(3){background:#ff9f0a}.btn:nth-child(3):active{background:#e58e00}
+.btn:hover{opacity:.9;transform:translateY(-1px)}
+.log{max-width:340px;margin:30px auto 0;padding:0 16px}
+.log h3{font-size:15px;color:#8e8e93;margin-bottom:10px}
+.log-box{background:#fff;border-radius:14px;padding:40px 20px;text-align:center;box-shadow:0 1px 4px rgba(0,0,0,.05);color:#c7c7cc;font-size:16px}
+</style>
+</head>
+<body>
+<div class="topbar"><span>تطبيقي</span></div>
+<div class="icon-wrap"><img src="https://i.ibb.co/Y4Wq6Pzx/IMG.png" alt="أيقونة"></div>
+<div class="buttons">
+<button class="btn" onclick="addLog('تم استخدامة')">تم استخدامة</button>
+<button class="btn" onclick="addLog('رموز ايردروب')">رموز ايردروب</button>
+<button class="btn" onclick="addLog('استخدم الشخصي')">استخدم الشخصي</button>
+</div>
+<div class="log">
+<h3>السجل</h3>
+<div class="log-box" id="logBox">نو داتا</div>
+</div>
+<script>
+function addLog(t){var b=document.getElementById('logBox');if(b.textContent==='نو داتا'){b.innerHTML=''}var d=new Date().toLocaleTimeString('ar');var e=document.createElement('div');e.style.cssText='padding:10px 0;border-bottom:1px solid #f0f0f0;color:#1d1d1f;font-size:15px';e.textContent='• '+t+' — '+d;b.appendChild(e);b.style.color='#1d1d1f';b.style.padding='16px 20px';b.style.textAlign='right'}
+</script>
+</body>
+</html>
