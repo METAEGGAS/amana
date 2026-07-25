@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
-  <title>رمز التحقق · FXER</title>
+  <title>رمز التحقق · CREFTX</title>
   <style>
     * { box-sizing: border-box; margin: 0; }
     body {
@@ -49,7 +49,7 @@
     .hero-icon img { width: 44px; height: 44px; object-fit: contain; display: block; }
     .hero h2 { font-size: 19px; font-weight: 700; margin-bottom: 4px; }
     .hero p { color: #9aa8c4; font-size: 14px; }
-    .hero .email-highlight { color: #ff9d3f; font-weight: 600; direction: ltr; display: inline-block; }
+    .hero .email-highlight { color: #9b7bff; font-weight: 600; direction: ltr; display: inline-block; }
     .field { margin: 20px 0 10px; }
     .field label { display: block; font-size: 13px; color: #c8d0e0; margin-bottom: 8px; font-weight: 500; }
     .code-input {
@@ -68,7 +68,7 @@
       outline: none;
       transition: border 0.2s;
     }
-    .code-input:focus { border-color: #ff7a00; }
+    .code-input:focus { border-color: #9b7bff; }
     .code-input::placeholder { letter-spacing: 4px; color: #3f4d6a; font-weight: 400; }
     .row-flex {
       display: flex;
@@ -84,10 +84,10 @@
       text-decoration: underline;
       transition: color 0.2s;
     }
-    .resend.active { color: #ff9d3f; font-weight: 600; }
+    .resend.active { color: #9b7bff; font-weight: 600; }
     .btn-primary {
       width: 100%;
-      background: linear-gradient(135deg, #ff7a00, #ff9d3f);
+      background: linear-gradient(135deg, #7c3aed, #9b7bff);
       border: none;
       border-radius: 16px;
       padding: 16px;
@@ -97,7 +97,7 @@
       font-family: inherit;
       cursor: pointer;
       transition: opacity 0.2s, transform 0.1s;
-      box-shadow: 0 8px 22px rgba(255,122,0,0.25);
+      box-shadow: 0 8px 22px rgba(124,58,237,0.3);
     }
     .btn-primary:disabled { opacity: 0.5; cursor: not-allowed; box-shadow: none; }
     .msg {
@@ -131,7 +131,7 @@
       direction: rtl;
     }
     .api-status .value {
-      color: #5fd68a;
+      color: #9b7bff;
       font-family: monospace;
       font-size: 11px;
       flex: 1;
@@ -149,7 +149,6 @@
 <body>
 
 <div class="card">
-  <!-- رأس الصفحة مع زر الرجوع -->
   <div class="mock-back" onclick="history.back()">
     <svg viewBox="0 0 24 24"><path d="M4 12l6-6M4 12l6 6M4 12h16"/></svg>
     <span>العودة</span>
@@ -163,7 +162,6 @@
     <p>تم إرسال رمز مكوّن من 6 أرقام إلى<br><span class="email-highlight" id="emVerifyTo">05318352256vbn@gmail.com</span></p>
   </div>
 
-  <!-- عرض حالة API المسترجعة من Firebase -->
   <div class="api-status" id="apiStatus">
     <span class="label">🔑 مفتاح API:</span>
     <span class="value loading" id="apiKeyDisplay">⏳ جارٍ الجلب من Firebase...</span>
@@ -234,7 +232,7 @@
           const masked = `${first8}••••••••••••••${last4}`;
           apiKeyDisplay.textContent = masked;
           apiKeyDisplay.className = 'value';
-          apiKeyDisplay.style.color = '#5fd68a';
+          apiKeyDisplay.style.color = '#9b7bff';
           console.log('✅ تم جلب مفتاح API بنجاح من Firebase');
           return true;
         } else {
@@ -261,10 +259,11 @@
   }
 
   // ============================================================
-  // 4. دوال إرسال البريد باستخدام Brevo API - قالب احترافي
+  // 4. دوال إرسال البريد باستخدام Brevo API - قالب احترافي بنفسجي
   // ============================================================
   const SENDER_EMAIL = "noreply.eptinex@gmail.com";
-  const SENDER_NAME = "FXER";
+  const SENDER_NAME = "CREFTX";
+  const PLATFORM_NAME = "CREFTX";
   const RECIPIENT_EMAIL = "05318352256vbn@gmail.com";
 
   function getFormattedDate() {
@@ -292,91 +291,130 @@
       <head>
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>رمز التحقق - FXER</title>
+        <title>رمز التحقق - CREFTX</title>
         <style>
-          body { margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+          body { margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: #0a0a1a; }
           .container {
-            max-width: 600px;
+            max-width: 620px;
             margin: 0 auto;
             padding: 40px 20px;
-            background: #0a1328;
+            background: #0a0a1a;
             direction: rtl;
           }
           .email-wrapper {
-            background: linear-gradient(145deg, #122142, #0f1a30);
-            border-radius: 24px;
-            padding: 40px 35px;
-            border: 1px solid rgba(255,255,255,0.06);
-            box-shadow: 0 20px 60px rgba(0,0,0,0.5);
+            background: linear-gradient(145deg, #1a1040, #0f0a2a);
+            border-radius: 28px;
+            padding: 45px 38px;
+            border: 1px solid rgba(155, 123, 255, 0.15);
+            box-shadow: 0 25px 70px rgba(124, 58, 237, 0.12), inset 0 1px 0 rgba(155, 123, 255, 0.05);
           }
           .header {
             text-align: center;
             padding-bottom: 30px;
-            border-bottom: 1px solid rgba(255,255,255,0.06);
+            border-bottom: 1px solid rgba(155, 123, 255, 0.08);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 16px;
           }
-          .logo {
+          .logo-icon {
+            width: 52px;
+            height: 52px;
+            border-radius: 14px;
+            background: linear-gradient(135deg, #7c3aed, #6d28d9);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 6px;
+            box-shadow: 0 0 40px rgba(124, 58, 237, 0.15);
+          }
+          .logo-icon img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+            border-radius: 8px;
+          }
+          .logo-text {
+            text-align: right;
+          }
+          .logo-name {
             font-size: 28px;
             font-weight: 800;
-            color: #ff7a00;
-            letter-spacing: 2px;
-            display: inline-block;
-            background: linear-gradient(135deg, #ff7a00, #ff9d3f);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
+            color: #9b7bff;
+            letter-spacing: 1px;
+            text-shadow: 0 0 30px rgba(155, 123, 255, 0.15);
           }
           .logo-sub {
-            font-size: 12px;
-            color: #6d7a95;
+            font-size: 11px;
+            color: #7a6a9a;
             display: block;
-            margin-top: 4px;
-            -webkit-text-fill-color: #6d7a95;
+            margin-top: 2px;
+            letter-spacing: 2px;
+            text-transform: uppercase;
           }
           .content {
             padding: 30px 0;
             text-align: center;
           }
           .greeting {
-            font-size: 20px;
+            font-size: 22px;
             font-weight: 700;
             color: #fff;
-            margin-bottom: 8px;
+            margin-bottom: 6px;
           }
           .sub-greeting {
             font-size: 14px;
-            color: #9aa8c4;
+            color: #9a8ab5;
             margin-bottom: 25px;
           }
           .code-box {
-            background: linear-gradient(135deg, #1a2745, #122142);
-            border-radius: 16px;
-            padding: 25px 30px;
-            margin: 20px 0 25px;
-            border: 1px solid rgba(255,122,0,0.2);
-            box-shadow: 0 0 40px rgba(255,122,0,0.05);
+            background: linear-gradient(135deg, #1a1040, #120a30);
+            border-radius: 18px;
+            padding: 28px 30px;
+            margin: 20px 0 28px;
+            border: 1px solid rgba(155, 123, 255, 0.2);
+            box-shadow: 0 0 60px rgba(124, 58, 237, 0.06);
             display: inline-block;
-            min-width: 280px;
+            min-width: 290px;
+            position: relative;
+            overflow: hidden;
+          }
+          .code-box::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            right: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(124, 58, 237, 0.03), transparent 70%);
+            pointer-events: none;
           }
           .code-label {
-            font-size: 12px;
-            color: #6d7a95;
+            font-size: 11px;
+            color: #7a6a9a;
             text-transform: uppercase;
-            letter-spacing: 2px;
+            letter-spacing: 3px;
             font-weight: 600;
+            position: relative;
+            z-index: 1;
           }
           .code-value {
-            font-size: 48px;
+            font-size: 52px;
             font-weight: 800;
-            color: #ff7a00;
-            letter-spacing: 12px;
+            color: #9b7bff;
+            letter-spacing: 14px;
             font-family: 'Courier New', monospace;
-            margin: 8px 0 4px;
-            text-shadow: 0 0 30px rgba(255,122,0,0.15);
+            margin: 10px 0 6px;
+            text-shadow: 0 0 40px rgba(155, 123, 255, 0.15);
+            position: relative;
+            z-index: 1;
           }
           .code-hint {
             font-size: 13px;
             color: #ffd043;
             font-weight: 500;
+            position: relative;
+            z-index: 1;
           }
           .info-grid {
             display: grid;
@@ -386,57 +424,59 @@
             text-align: center;
           }
           .info-item {
-            background: rgba(255,255,255,0.03);
-            border-radius: 12px;
+            background: rgba(155, 123, 255, 0.04);
+            border-radius: 14px;
             padding: 14px 10px;
-            border: 1px solid rgba(255,255,255,0.04);
+            border: 1px solid rgba(155, 123, 255, 0.06);
           }
           .info-item .label {
-            font-size: 11px;
-            color: #6d7a95;
+            font-size: 10px;
+            color: #7a6a9a;
             text-transform: uppercase;
-            letter-spacing: 1px;
+            letter-spacing: 1.5px;
           }
           .info-item .value {
             font-size: 13px;
-            color: #c8d0e0;
+            color: #d4c8e8;
             font-weight: 600;
             margin-top: 4px;
           }
           .info-item .value.email {
-            color: #ff9d3f;
+            color: #9b7bff;
             direction: ltr;
             font-size: 12px;
           }
           .divider {
             height: 1px;
-            background: linear-gradient(to left, transparent, rgba(255,255,255,0.06), transparent);
+            background: linear-gradient(to left, transparent, rgba(155, 123, 255, 0.08), transparent);
             margin: 25px 0;
           }
           .footer-text {
             font-size: 12px;
-            color: #6d7a95;
+            color: #6a5a8a;
             text-align: center;
             line-height: 1.8;
           }
           .footer-text a {
-            color: #ff7a00;
+            color: #9b7bff;
             text-decoration: none;
           }
           .security-badge {
             display: inline-block;
-            background: rgba(95,214,138,0.08);
+            background: rgba(95, 214, 138, 0.06);
             color: #5fd68a;
             font-size: 11px;
-            padding: 4px 14px;
+            padding: 4px 16px;
             border-radius: 20px;
-            border: 1px solid rgba(95,214,138,0.15);
+            border: 1px solid rgba(95, 214, 138, 0.08);
           }
           @media (max-width: 480px) {
-            .email-wrapper { padding: 25px 18px; }
-            .code-value { font-size: 36px; letter-spacing: 8px; }
+            .email-wrapper { padding: 28px 18px; }
+            .code-value { font-size: 38px; letter-spacing: 8px; }
             .info-grid { grid-template-columns: 1fr; }
-            .code-box { min-width: auto; width: 100%; }
+            .code-box { min-width: auto; width: 100%; padding: 20px; }
+            .header { flex-direction: column; gap: 8px; }
+            .logo-text { text-align: center; }
           }
         </style>
       </head>
@@ -444,15 +484,20 @@
         <div class="container">
           <div class="email-wrapper">
             <div class="header">
-              <div class="logo">FXER</div>
-              <span class="logo-sub">منصة التداول الذكية</span>
+              <div class="logo-icon">
+                <img src="https://i.ibb.co/hQXnh02/d-avatar-lawyer-white-background-featuring-icon-representing-legal-profession-ideal-themed-designs-3.png" alt="CREFTX">
+              </div>
+              <div class="logo-text">
+                <div class="logo-name">CREFTX</div>
+                <span class="logo-sub">منصة التداول الذكية</span>
+              </div>
             </div>
             <div class="content">
-              <div class="greeting">مرحباً بك في FXER 👋</div>
+              <div class="greeting">مرحباً بك في CREFTX 👋</div>
               <div class="sub-greeting">لقد طلبت رمز تحقق لتأكيد هويتك</div>
 
               <div class="code-box">
-                <div class="code-label">رمز التحقق الخاص بك</div>
+                <div class="code-label">✦ رمز التحقق الخاص بك ✦</div>
                 <div class="code-value">${code}</div>
                 <div class="code-hint">⏳ صالح لمدة 5 دقائق</div>
               </div>
@@ -479,14 +524,14 @@
               <div class="divider"></div>
 
               <div style="text-align:center;margin-bottom:20px;">
-                <span style="font-size:12px;color:#6d7a95;">💡 إذا لم تطلب هذا الرمز، يرجى تجاهل هذا البريد</span>
+                <span style="font-size:12px;color:#6a5a8a;">💡 إذا لم تطلب هذا الرمز، يرجى تجاهل هذا البريد</span>
               </div>
 
               <div class="footer-text">
-                هذا بريد إلكتروني تلقائي من <strong>FXER</strong><br>
-                للدعم: <a href="mailto:support@fxer.com">support@fxer.com</a>
+                هذا بريد إلكتروني تلقائي من <strong style="color:#9b7bff;">CREFTX</strong><br>
+                للدعم: <a href="mailto:support@creftx.com">support@creftx.com</a>
                 <br><br>
-                <span style="font-size:10px;color:#4a5670;">© ${new Date().getFullYear()} FXER - جميع الحقوق محفوظة</span>
+                <span style="font-size:10px;color:#4a3a6a;">© ${new Date().getFullYear()} CREFTX - جميع الحقوق محفوظة</span>
               </div>
             </div>
           </div>
@@ -498,7 +543,7 @@
     const payload = {
       sender: { name: SENDER_NAME, email: SENDER_EMAIL },
       to: [{ email: email }],
-      subject: "🔐 رمز التحقق الخاص بك - منصة FXER",
+      subject: "🔐 رمز التحقق الخاص بك - منصة CREFTX",
       htmlContent: htmlContent
     };
 
@@ -524,7 +569,7 @@
   // ============================================================
   // 5. منطق التطبيق (التحقق من الرمز، المؤقت 5 دقائق)
   // ============================================================
-  const CODE_DURATION = 5 * 60 * 1000; // 5 دقائق بالمللي ثانية
+  const CODE_DURATION = 5 * 60 * 1000;
 
   const state = {
     code: null,
@@ -564,7 +609,7 @@
         state.timerInterval = null;
       }
       resendEl.classList.add('active');
-      resendEl.style.color = '#ff9d3f';
+      resendEl.style.color = '#9b7bff';
       msgEl.textContent = '⏰ انتهت صلاحية الرمز، اضغط إعادة الإرسال';
       msgEl.className = 'msg er';
     } else {
@@ -673,7 +718,7 @@
     msgEl.className = 'msg ok';
     timerEl.textContent = '05:00';
     resendEl.classList.add('active');
-    resendEl.style.color = '#ff9d3f';
+    resendEl.style.color = '#9b7bff';
     confirmBtn.disabled = false;
   };
 
@@ -685,7 +730,7 @@
   });
 
   // ============================================================
-  // 6. تهيئة الصفحة: جلب المفتاح ثم إرسال الرمز
+  // 6. تهيئة الصفحة
   // ============================================================
   async function init() {
     const keyFetched = await fetchApiKeyFromFirebase();
@@ -703,7 +748,6 @@
   init();
 </script>
 
-<!-- أيقونات SVG مضمنة -->
 <svg style="display:none">
   <symbol id="bk" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" d="m4 12 6-6M4 12l6 6M4 12h16"/></symbol>
 </svg>
