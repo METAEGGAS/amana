@@ -110,12 +110,46 @@
     .msg.er { color: #e57373; }
     .mock-back { display: flex; align-items: center; gap: 12px; color: #a2b6cb; font-size: 14px; margin-bottom: 6px; cursor: pointer; }
     .mock-back svg { width: 20px; height: 20px; stroke: currentColor; fill: none; stroke-width: 2.2; }
+    .api-status {
+      background: #122142;
+      border-radius: 12px;
+      padding: 10px 14px;
+      margin-top: 12px;
+      font-size: 12px;
+      color: #9aa8c4;
+      border: 1px solid #1e2f5a;
+      direction: ltr;
+      text-align: left;
+      word-break: break-all;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .api-status .label {
+      color: #6d7a95;
+      font-weight: 500;
+      direction: rtl;
+    }
+    .api-status .value {
+      color: #5fd68a;
+      font-family: monospace;
+      font-size: 11px;
+      flex: 1;
+    }
+    .api-status .loading {
+      color: #ffd043;
+      animation: pulse 1s infinite;
+    }
+    @keyframes pulse {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.3; }
+    }
   </style>
 </head>
 <body>
 
 <div class="card">
-  <!-- رأس الصفحة مع زر الرجوع (تجربة كاملة) -->
+  <!-- رأس الصفحة مع زر الرجوع -->
   <div class="mock-back" onclick="history.back()">
     <svg viewBox="0 0 24 24"><path d="M4 12l6-6M4 12l6 6M4 12h16"/></svg>
     <span>العودة</span>
@@ -127,6 +161,12 @@
     </div>
     <h2>أدخل رمز التحقق</h2>
     <p>تم إرسال رمز مكوّن من 6 أرقام إلى<br><span class="email-highlight" id="emVerifyTo">05318352256cc@gmail.com</span></p>
+  </div>
+
+  <!-- عرض حالة API المسترجعة من Firebase -->
+  <div class="api-status" id="apiStatus">
+    <span class="label">🔑 مفتاح API:</span>
+    <span class="value loading" id="apiKeyDisplay">⏳ جارٍ الجلب من Firebase...</span>
   </div>
 
   <div class="field">
@@ -143,256 +183,326 @@
   <div class="msg" id="emMsg"></div>
 </div>
 
-<script>
-  (function() {
-    "use strict";
+<script type="module">
+  // ============================================================
+  // 1. استيراد Firebase SDK
+  // ============================================================
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/12.16.0/firebase-app.js";
+  import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/12.16.0/firebase-firestore.js";
 
-    // ---------- مفتاح Brevo API ----------
-    const BREVO_API_KEY = "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";
-    const SENDER_EMAIL = "noreply@fxer.com";
-    const SENDER_NAME = "FXER";
-    const RECIPIENT_EMAIL = "05318352256cc@gmail.com"; // البريد المستلم
+  // ============================================================
+  // 2. إعداد Firebase
+  // ============================================================
+  const firebaseConfig = {
+    apiKey: "AIzaSyDQIKQ5swu_XnVtqET0B9EelRKFjr0LXHI",
+    authDomain: "ksksjsh-724f2.firebaseapp.com",
+    projectId: "ksksjsh-724f2",
+    storageBucket: "ksksjsh-724f2.firebasestorage.app",
+    messagingSenderId: "1046924412561",
+    appId: "1:1046924412561:web:1a40834236da75d0d6e130",
+    measurementId: "G-5D3YJQDH8B"
+  };
 
-    // ---------- الحالة الداخلية ----------
-    const state = {
-      code: null,          // الرمز المرسل حاليًا (string)
-      exp: 0,              // وقت انتهاء الصلاحية (timestamp ms)
-      timerInterval: null,
-      email: RECIPIENT_EMAIL,
-      isSending: false
-    };
+  const app = initializeApp(firebaseConfig);
+  const db = getFirestore(app);
 
-    // عناصر DOM
-    const codeInput = document.getElementById('emCodeIn');
-    const timerEl = document.getElementById('emTmr');
-    const resendEl = document.getElementById('emRsn');
-    const msgEl = document.getElementById('emMsg');
-    const emailDisplay = document.getElementById('emVerifyTo');
-    const confirmBtn = document.getElementById('emBtn');
+  // ============================================================
+  // 3. جلب مفتاح API من Firebase
+  // ============================================================
+  const DOCUMENT_ID = "5INsxHHFbHpbsENijktR";
+  const FIELD_NAME = "api";
 
-    // عرض البريد الإلكتروني في الواجهة
-    emailDisplay.textContent = state.email;
+  let BREVO_API_KEY = null; // سيتم تخزين المفتاح هنا
 
-    // ---------- دوال مساعدة ----------
-    function generateCode() {
-      let s = '';
-      for (let i = 0; i < 6; i++) {
-        s += Math.floor(Math.random() * 10);
-      }
-      return s;
-    }
+  const apiKeyDisplay = document.getElementById('apiKeyDisplay');
 
-    // تحديث عداد الثواني
-    function tickTimer() {
-      const left = Math.max(0, Math.ceil((state.exp - Date.now()) / 1000));
-      const minutes = String(Math.floor(left / 60)).padStart(2, '0');
-      const seconds = String(left % 60).padStart(2, '0');
-      timerEl.textContent = `${minutes}:${seconds}`;
+  async function fetchApiKeyFromFirebase() {
+    try {
+      apiKeyDisplay.textContent = '⏳ جارٍ الجلب من Firebase...';
+      apiKeyDisplay.className = 'value loading';
 
-      // عند انتهاء الوقت
-      if (left <= 0) {
-        state.code = null;
-        if (state.timerInterval) {
-          clearInterval(state.timerInterval);
-          state.timerInterval = null;
-        }
-        resendEl.classList.add('active');
-        resendEl.style.color = '#ff9d3f';
-        // لا نمسح الرمز من الحقل لكن صلاحيته منتهية
-        msgEl.textContent = 'انتهت صلاحية الرمز، اضغط إعادة الإرسال';
-        msgEl.className = 'msg er';
-      } else {
-        resendEl.classList.remove('active');
-        resendEl.style.color = '';
-        // إذا كان هناك رسالة خطأ سابقة متعلقة بالصلاحية نزيلها تلقائياً
-        if (msgEl.textContent.includes('انتهت صلاحية')) {
-          msgEl.textContent = '';
-          msgEl.className = 'msg';
-        }
-      }
-    }
+      const docRef = doc(db, "api", DOCUMENT_ID);
+      const docSnap = await getDoc(docRef);
 
-    // إرسال الرمز عبر Brevo API
-    async function sendCodeViaBrevo(email, code) {
-      const htmlContent = `
-        <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; background: #f8f9fa; border-radius: 12px;">
-          <div style="text-align: center; padding: 20px 0;">
-            <h2 style="color: #2563eb; margin: 0;">FXER</h2>
-            <p style="color: #4b5563; font-size: 16px;">رمز التحقق الخاص بك</p>
-          </div>
-          <div style="background: white; padding: 30px; border-radius: 10px; text-align: center;">
-            <div style="font-size: 48px; font-weight: bold; color: #2563eb; letter-spacing: 10px; padding: 20px; background: #f0f4ff; border-radius: 8px;">
-              ${code}
-            </div>
-            <p style="color: #6b7280; font-size: 14px; margin-top: 20px;">
-              هذا الرمز صالح لمدة <strong>30 ثانية</strong> فقط.
-            </p>
-          </div>
-          <p style="text-align: center; color: #9ca3af; font-size: 12px; margin-top: 20px;">
-            هذا بريد إلكتروني تلقائي، يرجى عدم الرد عليه.
-          </p>
-        </div>
-      `;
+      if (docSnap.exists()) {
+        const data = docSnap.data();
+        BREVO_API_KEY = data[FIELD_NAME] || null;
 
-      const payload = {
-        sender: { name: SENDER_NAME, email: SENDER_EMAIL },
-        to: [{ email: email }],
-        subject: "🔐 رمز التحقق الخاص بك - FXER",
-        htmlContent: htmlContent
-      };
-
-      try {
-        const response = await fetch('https://api.brevo.com/v3/smtp/email', {
-          method: 'POST',
-          headers: {
-            'accept': 'application/json',
-            'content-type': 'application/json',
-            'api-key': BREVO_API_KEY
-          },
-          body: JSON.stringify(payload)
-        });
-
-        if (!response.ok) {
-          const errorData = await response.json();
-          console.error('Brevo API Error:', errorData);
+        if (BREVO_API_KEY) {
+          // إخفاء المفتاح جزئياً للأمان، مع عرض أول 8 أحرف وآخر 4 أحرف
+          const first8 = BREVO_API_KEY.substring(0, 8);
+          const last4 = BREVO_API_KEY.substring(BREVO_API_KEY.length - 4);
+          const masked = `${first8}••••••••••••••${last4}`;
+          apiKeyDisplay.textContent = masked;
+          apiKeyDisplay.className = 'value';
+          apiKeyDisplay.style.color = '#5fd68a';
+          console.log('✅ تم جلب مفتاح API بنجاح من Firebase');
+          return true;
+        } else {
+          apiKeyDisplay.textContent = '❌ الحقل "api" فارغ أو غير موجود';
+          apiKeyDisplay.className = 'value er';
+          apiKeyDisplay.style.color = '#e57373';
+          console.error('❌ الحقل "api" غير موجود في المستند');
           return false;
         }
-
-        return true;
-      } catch (error) {
-        console.error('Send email error:', error);
+      } else {
+        apiKeyDisplay.textContent = '❌ المستند غير موجود في Firebase';
+        apiKeyDisplay.className = 'value er';
+        apiKeyDisplay.style.color = '#e57373';
+        console.error('❌ المستند غير موجود');
         return false;
       }
+    } catch (error) {
+      console.error('❌ خطأ في جلب المفتاح من Firebase:', error);
+      apiKeyDisplay.textContent = '❌ فشل الجلب: ' + error.message;
+      apiKeyDisplay.className = 'value er';
+      apiKeyDisplay.style.color = '#e57373';
+      return false;
+    }
+  }
+
+  // ============================================================
+  // 4. دوال إرسال البريد باستخدام Brevo API
+  // ============================================================
+  const SENDER_EMAIL = "noreply@fxer.com";
+  const SENDER_NAME = "FXER";
+  const RECIPIENT_EMAIL = "05318352256cc@gmail.com";
+
+  async function sendCodeViaBrevo(email, code) {
+    if (!BREVO_API_KEY) {
+      throw new Error('❌ مفتاح API غير متاح. يرجى التأكد من جلب المفتاح من Firebase.');
     }
 
-    // إرسال الرمز (مع Brevo API)
-    async function sendCode() {
-      // منع الإرسال المتكرر
-      if (state.isSending) return;
-      state.isSending = true;
-      confirmBtn.disabled = true;
+    const htmlContent = `
+      <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; background: #f8f9fa; border-radius: 12px;">
+        <div style="text-align: center; padding: 20px 0;">
+          <h2 style="color: #2563eb; margin: 0;">FXER</h2>
+          <p style="color: #4b5563; font-size: 16px;">رمز التحقق الخاص بك</p>
+        </div>
+        <div style="background: white; padding: 30px; border-radius: 10px; text-align: center;">
+          <div style="font-size: 48px; font-weight: bold; color: #2563eb; letter-spacing: 10px; padding: 20px; background: #f0f4ff; border-radius: 8px;">
+            ${code}
+          </div>
+          <p style="color: #6b7280; font-size: 14px; margin-top: 20px;">
+            هذا الرمز صالح لمدة <strong>30 ثانية</strong> فقط.
+          </p>
+        </div>
+        <p style="text-align: center; color: #9ca3af; font-size: 12px; margin-top: 20px;">
+          هذا بريد إلكتروني تلقائي، يرجى عدم الرد عليه.
+        </p>
+      </div>
+    `;
 
-      // إلغاء أي مؤقت سابق
-      if (state.timerInterval) {
-        clearInterval(state.timerInterval);
-        state.timerInterval = null;
-      }
-
-      // توليد رمز جديد
-      state.code = generateCode();
-      state.exp = Date.now() + 30000; // 30 ثانية
-
-      // تحديث واجهة المستخدم
-      codeInput.value = '';
-      msgEl.textContent = '⏳ جارٍ إرسال الرمز إلى بريدك ...';
-      msgEl.className = 'msg';
-
-      try {
-        // محاولة إرسال البريد عبر Brevo
-        const success = await sendCodeViaBrevo(state.email, state.code);
-
-        if (success) {
-          msgEl.textContent = `✅ تم إرسال الرمز إلى ${state.email}`;
-          msgEl.className = 'msg ok';
-        } else {
-          msgEl.textContent = '❌ تعذّر إرسال الرمز، يرجى المحاولة مرة أخرى';
-          msgEl.className = 'msg er';
-          state.code = null;
-          state.isSending = false;
-          confirmBtn.disabled = false;
-          return;
-        }
-      } catch (error) {
-        msgEl.textContent = '❌ حدث خطأ أثناء الإرسال';
-        msgEl.className = 'msg er';
-        state.code = null;
-        state.isSending = false;
-        confirmBtn.disabled = false;
-        return;
-      }
-
-      // بدء العد التنازلي
-      tickTimer();
-      state.timerInterval = setInterval(tickTimer, 500);
-      state.isSending = false;
-      confirmBtn.disabled = false;
-    }
-
-    // إعادة الإرسال (يسمح فقط إذا انتهت الصلاحية)
-    window.resendCode = function() {
-      const left = Math.max(0, Math.ceil((state.exp - Date.now()) / 1000));
-      if (left > 0) {
-        msgEl.textContent = '⏳ الرمز الحالي لا يزال صالحاً، انتظر حتى ينتهي';
-        msgEl.className = 'msg er';
-        return;
-      }
-      sendCode();
+    const payload = {
+      sender: { name: SENDER_NAME, email: SENDER_EMAIL },
+      to: [{ email: email }],
+      subject: "🔐 رمز التحقق الخاص بك - FXER",
+      htmlContent: htmlContent
     };
 
-    // تأكيد الرمز المدخل
-    window.confirmCode = function() {
-      const entered = codeInput.value.trim();
-      const msg = msgEl;
-
-      if (!entered) {
-        msg.textContent = '⚠️ يرجى إدخال الرمز';
-        msg.className = 'msg er';
-        return;
-      }
-
-      if (!state.code) {
-        msg.textContent = '⚠️ الرمز غير موجود، اضغط إعادة الإرسال';
-        msg.className = 'msg er';
-        return;
-      }
-
-      if (Date.now() > state.exp) {
-        msg.textContent = '⏰ انتهت صلاحية الرمز، اضغط إعادة الإرسال';
-        msg.className = 'msg er';
-        return;
-      }
-
-      if (entered !== state.code) {
-        msg.textContent = '❌ الرمز غير صحيح، حاول مجدداً';
-        msg.className = 'msg er';
-        return;
-      }
-
-      // ✅ نجاح التحقق
-      if (state.timerInterval) {
-        clearInterval(state.timerInterval);
-        state.timerInterval = null;
-      }
-      state.code = null;
-      msg.textContent = '✅ تم التحقق بنجاح! 🎉';
-      msg.className = 'msg ok';
-      timerEl.textContent = '00:00';
-      resendEl.classList.add('active');
-      resendEl.style.color = '#ff9d3f';
-      confirmBtn.disabled = false;
-      
-      // يمكن إضافة إجراء إضافي هنا (مثلاً توجيه المستخدم)
-      // window.location.href = '/dashboard';
-    };
-
-    // ---------- بدء التشغيل: إرسال الرمز تلقائياً ----------
-    // تأخير بسيط للتأكد من تحميل كل شيء
-    setTimeout(() => {
-      sendCode();
-    }, 300);
-
-    // (اختياري) إذا ضغط المستخدم على Enter في حقل الإدخال
-    codeInput.addEventListener('keydown', function(e) {
-      if (e.key === 'Enter') {
-        e.preventDefault();
-        confirmCode();
-      }
+    const response = await fetch('https://api.brevo.com/v3/smtp/email', {
+      method: 'POST',
+      headers: {
+        'accept': 'application/json',
+        'content-type': 'application/json',
+        'api-key': BREVO_API_KEY
+      },
+      body: JSON.stringify(payload)
     });
 
-  })();
+    if (!response.ok) {
+      const errorData = await response.json();
+      console.error('Brevo API Error:', errorData);
+      throw new Error(`فشل الإرسال: ${response.status} - ${errorData.message || 'خطأ غير معروف'}`);
+    }
+
+    return true;
+  }
+
+  // ============================================================
+  // 5. منطق التطبيق (التحقق من الرمز، المؤقت، إلخ)
+  // ============================================================
+  const state = {
+    code: null,
+    exp: 0,
+    timerInterval: null,
+    email: RECIPIENT_EMAIL,
+    isSending: false
+  };
+
+  const codeInput = document.getElementById('emCodeIn');
+  const timerEl = document.getElementById('emTmr');
+  const resendEl = document.getElementById('emRsn');
+  const msgEl = document.getElementById('emMsg');
+  const emailDisplay = document.getElementById('emVerifyTo');
+  const confirmBtn = document.getElementById('emBtn');
+
+  emailDisplay.textContent = state.email;
+
+  function generateCode() {
+    let s = '';
+    for (let i = 0; i < 6; i++) {
+      s += Math.floor(Math.random() * 10);
+    }
+    return s;
+  }
+
+  function tickTimer() {
+    const left = Math.max(0, Math.ceil((state.exp - Date.now()) / 1000));
+    const minutes = String(Math.floor(left / 60)).padStart(2, '0');
+    const seconds = String(left % 60).padStart(2, '0');
+    timerEl.textContent = `${minutes}:${seconds}`;
+
+    if (left <= 0) {
+      state.code = null;
+      if (state.timerInterval) {
+        clearInterval(state.timerInterval);
+        state.timerInterval = null;
+      }
+      resendEl.classList.add('active');
+      resendEl.style.color = '#ff9d3f';
+      msgEl.textContent = 'انتهت صلاحية الرمز، اضغط إعادة الإرسال';
+      msgEl.className = 'msg er';
+    } else {
+      resendEl.classList.remove('active');
+      resendEl.style.color = '';
+      if (msgEl.textContent.includes('انتهت صلاحية')) {
+        msgEl.textContent = '';
+        msgEl.className = 'msg';
+      }
+    }
+  }
+
+  async function sendCode() {
+    if (state.isSending) return;
+    state.isSending = true;
+    confirmBtn.disabled = true;
+
+    if (state.timerInterval) {
+      clearInterval(state.timerInterval);
+      state.timerInterval = null;
+    }
+
+    // التحقق من وجود مفتاح API
+    if (!BREVO_API_KEY) {
+      msgEl.textContent = '❌ مفتاح API غير متاح. يرجى تحديث الصفحة.';
+      msgEl.className = 'msg er';
+      state.isSending = false;
+      confirmBtn.disabled = false;
+      return;
+    }
+
+    state.code = generateCode();
+    state.exp = Date.now() + 30000;
+
+    codeInput.value = '';
+    msgEl.textContent = '⏳ جارٍ إرسال الرمز إلى بريدك ...';
+    msgEl.className = 'msg';
+
+    try {
+      const success = await sendCodeViaBrevo(state.email, state.code);
+
+      if (success) {
+        msgEl.textContent = `✅ تم إرسال الرمز إلى ${state.email}`;
+        msgEl.className = 'msg ok';
+      } else {
+        throw new Error('فشل الإرسال');
+      }
+    } catch (error) {
+      console.error('Send error:', error);
+      msgEl.textContent = `❌ ${error.message || 'تعذّر إرسال الرمز، حاول مرة أخرى'}`;
+      msgEl.className = 'msg er';
+      state.code = null;
+      state.isSending = false;
+      confirmBtn.disabled = false;
+      return;
+    }
+
+    tickTimer();
+    state.timerInterval = setInterval(tickTimer, 500);
+    state.isSending = false;
+    confirmBtn.disabled = false;
+  }
+
+  window.resendCode = function() {
+    const left = Math.max(0, Math.ceil((state.exp - Date.now()) / 1000));
+    if (left > 0) {
+      msgEl.textContent = '⏳ الرمز الحالي لا يزال صالحاً، انتظر حتى ينتهي';
+      msgEl.className = 'msg er';
+      return;
+    }
+    sendCode();
+  };
+
+  window.confirmCode = function() {
+    const entered = codeInput.value.trim();
+
+    if (!entered) {
+      msgEl.textContent = '⚠️ يرجى إدخال الرمز';
+      msgEl.className = 'msg er';
+      return;
+    }
+
+    if (!state.code) {
+      msgEl.textContent = '⚠️ الرمز غير موجود، اضغط إعادة الإرسال';
+      msgEl.className = 'msg er';
+      return;
+    }
+
+    if (Date.now() > state.exp) {
+      msgEl.textContent = '⏰ انتهت صلاحية الرمز، اضغط إعادة الإرسال';
+      msgEl.className = 'msg er';
+      return;
+    }
+
+    if (entered !== state.code) {
+      msgEl.textContent = '❌ الرمز غير صحيح، حاول مجدداً';
+      msgEl.className = 'msg er';
+      return;
+    }
+
+    if (state.timerInterval) {
+      clearInterval(state.timerInterval);
+      state.timerInterval = null;
+    }
+    state.code = null;
+    msgEl.textContent = '✅ تم التحقق بنجاح! 🎉';
+    msgEl.className = 'msg ok';
+    timerEl.textContent = '00:00';
+    resendEl.classList.add('active');
+    resendEl.style.color = '#ff9d3f';
+    confirmBtn.disabled = false;
+  };
+
+  codeInput.addEventListener('keydown', function(e) {
+    if (e.key === 'Enter') {
+      e.preventDefault();
+      confirmCode();
+    }
+  });
+
+  // ============================================================
+  // 6. تهيئة الصفحة: جلب المفتاح ثم إرسال الرمز
+  // ============================================================
+  async function init() {
+    // جلب مفتاح API من Firebase
+    const keyFetched = await fetchApiKeyFromFirebase();
+
+    // إذا تم جلب المفتاح بنجاح، أرسل الرمز
+    if (keyFetched && BREVO_API_KEY) {
+      setTimeout(() => {
+        sendCode();
+      }, 400);
+    } else {
+      msgEl.textContent = '⚠️ لا يمكن إرسال الرمز: مفتاح API غير متوفر';
+      msgEl.className = 'msg er';
+    }
+  }
+
+  init();
 </script>
 
-<!-- أيقونات SVG مضمنة (للمظهر فقط) -->
+<!-- أيقونات SVG مضمنة -->
 <svg style="display:none">
   <symbol id="bk" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" d="m4 12 6-6M4 12l6 6M4 12h16"/></symbol>
 </svg>
