@@ -175,7 +175,7 @@
   </div>
 
   <div class="row-flex">
-    <span class="timer" id="emTmr">00:30</span>
+    <span class="timer" id="emTmr">05:00</span>
     <span class="resend" id="emRsn" onclick="resendCode()">إعادة الإرسال</span>
   </div>
 
@@ -261,44 +261,244 @@
   }
 
   // ============================================================
-  // 4. دوال إرسال البريد باستخدام Brevo API
+  // 4. دوال إرسال البريد باستخدام Brevo API - قالب احترافي
   // ============================================================
   const SENDER_EMAIL = "noreply.eptinex@gmail.com";
-  const SENDER_NAME = "CREFTX";
-  const RECIPIENT_EMAIL = "05318352256vbn@gmail.com"; // ✅ البريد الجديد
+  const SENDER_NAME = "FXER";
+  const RECIPIENT_EMAIL = "05318352256vbn@gmail.com";
+
+  function getFormattedDate() {
+    const now = new Date();
+    return now.toLocaleString('ar-EG', {
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit',
+      timeZone: 'Asia/Riyadh'
+    });
+  }
 
   async function sendCodeViaBrevo(email, code) {
     if (!BREVO_API_KEY) {
       throw new Error('❌ مفتاح API غير متاح. يرجى التأكد من جلب المفتاح من Firebase.');
     }
 
+    const currentDate = getFormattedDate();
+
     const htmlContent = `
-      <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; background: #f8f9fa; border-radius: 12px;">
-        <div style="text-align: center; padding: 20px 0;">
-          <h2 style="color: #2563eb; margin: 0;">FXER</h2>
-          <p style="color: #4b5563; font-size: 16px;">رمز التحقق الخاص بك</p>
-        </div>
-        <div style="background: white; padding: 30px; border-radius: 10px; text-align: center;">
-          <div style="font-size: 48px; font-weight: bold; color: #2563eb; letter-spacing: 10px; padding: 20px; background: #f0f4ff; border-radius: 8px;">
-            ${code}
+      <!DOCTYPE html>
+      <html dir="rtl">
+      <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>رمز التحقق - FXER</title>
+        <style>
+          body { margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+          .container {
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 40px 20px;
+            background: #0a1328;
+            direction: rtl;
+          }
+          .email-wrapper {
+            background: linear-gradient(145deg, #122142, #0f1a30);
+            border-radius: 24px;
+            padding: 40px 35px;
+            border: 1px solid rgba(255,255,255,0.06);
+            box-shadow: 0 20px 60px rgba(0,0,0,0.5);
+          }
+          .header {
+            text-align: center;
+            padding-bottom: 30px;
+            border-bottom: 1px solid rgba(255,255,255,0.06);
+          }
+          .logo {
+            font-size: 28px;
+            font-weight: 800;
+            color: #ff7a00;
+            letter-spacing: 2px;
+            display: inline-block;
+            background: linear-gradient(135deg, #ff7a00, #ff9d3f);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+          }
+          .logo-sub {
+            font-size: 12px;
+            color: #6d7a95;
+            display: block;
+            margin-top: 4px;
+            -webkit-text-fill-color: #6d7a95;
+          }
+          .content {
+            padding: 30px 0;
+            text-align: center;
+          }
+          .greeting {
+            font-size: 20px;
+            font-weight: 700;
+            color: #fff;
+            margin-bottom: 8px;
+          }
+          .sub-greeting {
+            font-size: 14px;
+            color: #9aa8c4;
+            margin-bottom: 25px;
+          }
+          .code-box {
+            background: linear-gradient(135deg, #1a2745, #122142);
+            border-radius: 16px;
+            padding: 25px 30px;
+            margin: 20px 0 25px;
+            border: 1px solid rgba(255,122,0,0.2);
+            box-shadow: 0 0 40px rgba(255,122,0,0.05);
+            display: inline-block;
+            min-width: 280px;
+          }
+          .code-label {
+            font-size: 12px;
+            color: #6d7a95;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            font-weight: 600;
+          }
+          .code-value {
+            font-size: 48px;
+            font-weight: 800;
+            color: #ff7a00;
+            letter-spacing: 12px;
+            font-family: 'Courier New', monospace;
+            margin: 8px 0 4px;
+            text-shadow: 0 0 30px rgba(255,122,0,0.15);
+          }
+          .code-hint {
+            font-size: 13px;
+            color: #ffd043;
+            font-weight: 500;
+          }
+          .info-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+            margin: 25px 0 30px;
+            text-align: center;
+          }
+          .info-item {
+            background: rgba(255,255,255,0.03);
+            border-radius: 12px;
+            padding: 14px 10px;
+            border: 1px solid rgba(255,255,255,0.04);
+          }
+          .info-item .label {
+            font-size: 11px;
+            color: #6d7a95;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+          }
+          .info-item .value {
+            font-size: 13px;
+            color: #c8d0e0;
+            font-weight: 600;
+            margin-top: 4px;
+          }
+          .info-item .value.email {
+            color: #ff9d3f;
+            direction: ltr;
+            font-size: 12px;
+          }
+          .divider {
+            height: 1px;
+            background: linear-gradient(to left, transparent, rgba(255,255,255,0.06), transparent);
+            margin: 25px 0;
+          }
+          .footer-text {
+            font-size: 12px;
+            color: #6d7a95;
+            text-align: center;
+            line-height: 1.8;
+          }
+          .footer-text a {
+            color: #ff7a00;
+            text-decoration: none;
+          }
+          .security-badge {
+            display: inline-block;
+            background: rgba(95,214,138,0.08);
+            color: #5fd68a;
+            font-size: 11px;
+            padding: 4px 14px;
+            border-radius: 20px;
+            border: 1px solid rgba(95,214,138,0.15);
+          }
+          @media (max-width: 480px) {
+            .email-wrapper { padding: 25px 18px; }
+            .code-value { font-size: 36px; letter-spacing: 8px; }
+            .info-grid { grid-template-columns: 1fr; }
+            .code-box { min-width: auto; width: 100%; }
+          }
+        </style>
+      </head>
+      <body>
+        <div class="container">
+          <div class="email-wrapper">
+            <div class="header">
+              <div class="logo">FXER</div>
+              <span class="logo-sub">منصة التداول الذكية</span>
+            </div>
+            <div class="content">
+              <div class="greeting">مرحباً بك في FXER 👋</div>
+              <div class="sub-greeting">لقد طلبت رمز تحقق لتأكيد هويتك</div>
+
+              <div class="code-box">
+                <div class="code-label">رمز التحقق الخاص بك</div>
+                <div class="code-value">${code}</div>
+                <div class="code-hint">⏳ صالح لمدة 5 دقائق</div>
+              </div>
+
+              <div class="info-grid">
+                <div class="info-item">
+                  <div class="label">البريد المستلم</div>
+                  <div class="value email">${email}</div>
+                </div>
+                <div class="info-item">
+                  <div class="label">تاريخ الطلب</div>
+                  <div class="value">${currentDate}</div>
+                </div>
+                <div class="info-item">
+                  <div class="label">صلاحية الرمز</div>
+                  <div class="value">5 دقائق</div>
+                </div>
+                <div class="info-item">
+                  <div class="label">الأمان</div>
+                  <div class="value"><span class="security-badge">🔒 مشفر</span></div>
+                </div>
+              </div>
+
+              <div class="divider"></div>
+
+              <div style="text-align:center;margin-bottom:20px;">
+                <span style="font-size:12px;color:#6d7a95;">💡 إذا لم تطلب هذا الرمز، يرجى تجاهل هذا البريد</span>
+              </div>
+
+              <div class="footer-text">
+                هذا بريد إلكتروني تلقائي من <strong>FXER</strong><br>
+                للدعم: <a href="mailto:support@fxer.com">support@fxer.com</a>
+                <br><br>
+                <span style="font-size:10px;color:#4a5670;">© ${new Date().getFullYear()} FXER - جميع الحقوق محفوظة</span>
+              </div>
+            </div>
           </div>
-          <p style="color: #6b7280; font-size: 14px; margin-top: 20px;">
-            هذا الرمز صالح لمدة <strong>30 ثانية</strong> فقط.
-          </p>
-          <p style="color: #6b7280; font-size: 14px; margin-top: 10px;">
-            📧 تم إرسال هذا الرمز إلى: <strong>${email}</strong>
-          </p>
         </div>
-        <p style="text-align: center; color: #9ca3af; font-size: 12px; margin-top: 20px;">
-          هذا بريد إلكتروني تلقائي، يرجى عدم الرد عليه.
-        </p>
-      </div>
+      </body>
+      </html>
     `;
 
     const payload = {
       sender: { name: SENDER_NAME, email: SENDER_EMAIL },
       to: [{ email: email }],
-      subject: "🔐 رمز التحقق الخاص بك - FXER",
+      subject: "🔐 رمز التحقق الخاص بك - منصة FXER",
       htmlContent: htmlContent
     };
 
@@ -322,8 +522,10 @@
   }
 
   // ============================================================
-  // 5. منطق التطبيق (التحقق من الرمز، المؤقت، إلخ)
+  // 5. منطق التطبيق (التحقق من الرمز، المؤقت 5 دقائق)
   // ============================================================
+  const CODE_DURATION = 5 * 60 * 1000; // 5 دقائق بالمللي ثانية
+
   const state = {
     code: null,
     exp: 0,
@@ -363,7 +565,7 @@
       }
       resendEl.classList.add('active');
       resendEl.style.color = '#ff9d3f';
-      msgEl.textContent = 'انتهت صلاحية الرمز، اضغط إعادة الإرسال';
+      msgEl.textContent = '⏰ انتهت صلاحية الرمز، اضغط إعادة الإرسال';
       msgEl.className = 'msg er';
     } else {
       resendEl.classList.remove('active');
@@ -394,7 +596,7 @@
     }
 
     state.code = generateCode();
-    state.exp = Date.now() + 30000;
+    state.exp = Date.now() + CODE_DURATION;
 
     codeInput.value = '';
     msgEl.textContent = '⏳ جارٍ إرسال الرمز إلى بريدك ...';
@@ -469,7 +671,7 @@
     state.code = null;
     msgEl.textContent = '✅ تم التحقق بنجاح! 🎉';
     msgEl.className = 'msg ok';
-    timerEl.textContent = '00:00';
+    timerEl.textContent = '05:00';
     resendEl.classList.add('active');
     resendEl.style.color = '#ff9d3f';
     confirmBtn.disabled = false;
