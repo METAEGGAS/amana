@@ -1,0 +1,344 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🔥 Almohet - Firebase Exploiter</title>
+    
+    <!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-storage-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
+    
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', Tahoma, sans-serif; }
+        body { background: #0a0a14; color: #e2e8f0; min-height: 100vh; padding: 16px; }
+        .container { max-width: 1400px; margin: 0 auto; }
+        .header { background: linear-gradient(135deg, #1a1a2e, #16213e); border-radius: 16px; padding: 20px 28px; margin-bottom: 24px; border: 1px solid rgba(255,255,255,0.05); display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px; }
+        .header h1 { font-size: 22px; font-weight: 700; background: linear-gradient(135deg, #f97316, #ef4444); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+        .header .subtitle { color: #94a3b8; font-size: 13px; }
+        .badge-connected { background: rgba(34,197,94,0.15); color: #4ade80; padding: 6px 16px; border-radius: 20px; border: 1px solid rgba(34,197,94,0.3); }
+        .badge-error { background: rgba(239,68,68,0.15); color: #f87171; padding: 6px 16px; border-radius: 20px; border: 1px solid rgba(239,68,68,0.3); }
+        .controls { display: flex; gap: 10px; margin-bottom: 18px; flex-wrap: wrap; }
+        .btn { padding: 10px 20px; border: none; border-radius: 10px; font-size: 14px; font-weight: 600; cursor: pointer; transition: all 0.3s; display: inline-flex; align-items: center; gap: 8px; }
+        .btn-primary { background: #f97316; color: #fff; }
+        .btn-primary:hover { background: #ea580c; transform: translateY(-2px); }
+        .btn-success { background: #22c55e; color: #fff; }
+        .btn-success:hover { background: #16a34a; transform: translateY(-2px); }
+        .btn-danger { background: #ef4444; color: #fff; }
+        .btn-danger:hover { background: #dc2626; transform: translateY(-2px); }
+        .btn-secondary { background: rgba(255,255,255,0.08); color: #e2e8f0; }
+        .btn-secondary:hover { background: rgba(255,255,255,0.15); transform: translateY(-2px); }
+        .btn:disabled { opacity: 0.5; cursor: not-allowed; transform: none !important; }
+        .tabs { display: flex; gap: 4px; margin-bottom: 18px; flex-wrap: wrap; border-bottom: 1px solid rgba(255,255,255,0.05); padding-bottom: 4px; }
+        .tab-btn { padding: 10px 18px; border: none; border-radius: 10px 10px 0 0; font-size: 13px; font-weight: 600; cursor: pointer; transition: all 0.3s; background: transparent; color: #94a3b8; }
+        .tab-btn.active { background: rgba(249,115,22,0.15); color: #f97316; border-bottom: 2px solid #f97316; }
+        .tab-btn:hover:not(.active) { color: #fff; background: rgba(255,255,255,0.05); }
+        .panel { display: none; }
+        .panel.active { display: block; }
+        .table-wrapper { background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.05); border-radius: 12px; overflow: hidden; overflow-x: auto; }
+        table { width: 100%; border-collapse: collapse; font-size: 13px; }
+        thead { background: rgba(255,255,255,0.04); }
+        th { padding: 12px 14px; text-align: right; font-weight: 600; color: #94a3b8; border-bottom: 1px solid rgba(255,255,255,0.05); white-space: nowrap; font-size: 12px; text-transform: uppercase; letter-spacing: 0.5px; }
+        td { padding: 10px 14px; border-bottom: 1px solid rgba(255,255,255,0.03); vertical-align: middle; word-break: break-word; font-size: 13px; }
+        tr:hover td { background: rgba(255,255,255,0.02); }
+        .badge { display: inline-block; padding: 2px 12px; border-radius: 12px; font-size: 11px; font-weight: 600; }
+        .badge-admin { background: rgba(239,68,68,0.2); color: #f87171; }
+        .badge-user { background: rgba(59,130,246,0.2); color: #60a5fa; }
+        .badge-pending { background: rgba(249,115,22,0.2); color: #f97316; }
+        .badge-approved { background: rgba(34,197,94,0.2); color: #4ade80; }
+        .badge-rejected { background: rgba(239,68,68,0.2); color: #f87171; }
+        .loading { text-align: center; padding: 40px; color: #64748b; }
+        .loading .spinner { display: inline-block; width: 30px; height: 30px; border: 3px solid rgba(255,255,255,0.1); border-top-color: #f97316; border-radius: 50%; animation: spin 0.8s linear infinite; }
+        @keyframes spin { to { transform: rotate(360deg); } }
+        .empty { text-align: center; padding: 40px; color: #64748b; }
+        .empty .icon { font-size: 40px; margin-bottom: 10px; }
+        .toast { position: fixed; bottom: 24px; right: 24px; padding: 14px 24px; border-radius: 12px; color: #fff; font-size: 14px; font-weight: 500; z-index: 999; animation: slideUp 0.3s ease; max-width: 450px; box-shadow: 0 10px 40px rgba(0,0,0,0.5); }
+        .toast-success { background: #22c55e; }
+        .toast-error { background: #ef4444; }
+        .toast-info { background: #3b82f6; }
+        @keyframes slideUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+        .file-item { display: flex; justify-content: space-between; align-items: center; padding: 8px 12px; border-bottom: 1px solid rgba(255,255,255,0.03); }
+        .file-item:hover { background: rgba(255,255,255,0.02); }
+        .file-item .file-name { color: #60a5fa; word-break: break-all; }
+        .file-item .file-size { color: #94a3b8; font-size: 12px; white-space: nowrap; }
+        .img-preview { max-width: 150px; max-height: 100px; border-radius: 8px; }
+        ::-webkit-scrollbar { width: 5px; height: 5px; }
+        ::-webkit-scrollbar-track { background: rgba(255,255,255,0.02); }
+        ::-webkit-scrollbar-thumb { background: rgba(249,115,22,0.3); border-radius: 10px; }
+        @media (max-width: 768px) { .header { flex-direction: column; text-align: center; padding: 16px; } th, td { padding: 8px 10px; font-size: 12px; } .controls { flex-direction: column; } .controls .btn { width: 100%; justify-content: center; } .tab-btn { flex: 1; text-align: center; padding: 8px 10px; font-size: 12px; } }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <div class="header">
+        <div>
+            <h1>🔥 Almohet · Firebase Exploiter</h1>
+            <div class="subtitle">استعراض Firestore · Storage · المستخدمين</div>
+        </div>
+        <div id="statusBadge" class="badge-connected">✅ متصل</div>
+    </div>
+
+    <div class="controls">
+        <button class="btn btn-primary" id="loadBtn" onclick="loadAll()"><i class="fas fa-download"></i> تحميل الكل</button>
+        <button class="btn btn-success" onclick="exportCSV()"><i class="fas fa-file-export"></i> تصدير CSV</button>
+        <button class="btn btn-secondary" onclick="refreshAll()"><i class="fas fa-sync-alt"></i> تحديث</button>
+    </div>
+
+    <div class="tabs">
+        <button class="tab-btn active" data-tab="users" onclick="switchTab('users')">👥 المستخدمين</button>
+        <button class="tab-btn" data-tab="firestore" onclick="switchTab('firestore')">📄 Firestore</button>
+        <button class="tab-btn" data-tab="storage" onclick="switchTab('storage')">📁 Storage</button>
+        <button class="tab-btn" data-tab="auth" onclick="switchTab('auth')">🔐 Auth</button>
+    </div>
+
+    <div id="panelUsers" class="panel active"><div class="table-wrapper" id="usersContainer"><div class="loading"><div class="spinner"></div> جاري التحميل...</div></div></div>
+    <div id="panelFirestore" class="panel"><div class="table-wrapper" id="firestoreContainer"><div class="loading"><div class="spinner"></div> جاري التحميل...</div></div></div>
+    <div id="panelStorage" class="panel"><div class="table-wrapper" id="storageContainer"><div class="loading"><div class="spinner"></div> جاري التحميل...</div></div></div>
+    <div id="panelAuth" class="panel"><div class="table-wrapper" id="authContainer"><div class="loading"><div class="spinner"></div> جاري التحميل...</div></div></div>
+</div>
+
+<script>
+// ============================================================
+// 🔥 Firebase Config (من التطبيق)
+// ============================================================
+const FIREBASE_CONFIG = {
+    apiKey: "AIzaSyBiNZ9DR0rYngTh3w_4BM-h1kOJUA_3IU4",
+    authDomain: "almohet-15f9c.firebaseapp.com",
+    projectId: "almohet-15f9c",
+    storageBucket: "almohet-15f9c.firebasestorage.app",
+    messagingSenderId: "686314609729",
+    appId: "1:686314609729:android:78bc3ef25a7744c1b7fac0"
+};
+
+firebase.initializeApp(FIREBASE_CONFIG);
+const db = firebase.firestore();
+const storage = firebase.storage();
+const auth = firebase.auth();
+
+let allUsers = [];
+let allFirestoreData = {};
+let allStorageFiles = [];
+let authUsers = [];
+
+// ============================================================
+// 📌 TOAST
+// ============================================================
+function showToast(msg, type = 'info') {
+    const existing = document.querySelector('.toast');
+    if (existing) existing.remove();
+    const el = document.createElement('div');
+    el.className = `toast toast-${type}`;
+    el.textContent = msg;
+    document.body.appendChild(el);
+    setTimeout(() => el.remove(), 4000);
+}
+
+// ============================================================
+// 📌 TABS
+// ============================================================
+function switchTab(tab) {
+    document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+    document.querySelector(`.tab-btn[data-tab="${tab}"]`).classList.add('active');
+    document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+    document.getElementById(`panel${tab.charAt(0).toUpperCase() + tab.slice(1)}`).classList.add('active');
+}
+
+// ============================================================
+// 📥 LOAD ALL
+// ============================================================
+async function loadAll() {
+    const btn = document.getElementById('loadBtn');
+    btn.disabled = true;
+    btn.innerHTML = '⏳ جاري التحميل...';
+    document.getElementById('statusBadge').textContent = '⏳ جاري...';
+    
+    try {
+        await loadUsers();
+        await loadFirestore();
+        await loadStorage();
+        await loadAuth();
+        document.getElementById('statusBadge').className = 'badge-connected';
+        document.getElementById('statusBadge').textContent = '✅ متصل';
+        showToast('✅ تم تحميل كل البيانات', 'success');
+    } catch (e) {
+        document.getElementById('statusBadge').className = 'badge-error';
+        document.getElementById('statusBadge').textContent = '❌ خطأ';
+        showToast('❌ فشل: ' + e.message, 'error');
+        console.error(e);
+    }
+    
+    btn.disabled = false;
+    btn.innerHTML = '📥 تحميل الكل';
+}
+
+// ============================================================
+// 👥 USERS
+// ============================================================
+async function loadUsers() {
+    const container = document.getElementById('usersContainer');
+    const snap = await db.collection('users').get();
+    allUsers = [];
+    snap.forEach(doc => allUsers.push({ id: doc.id, ...doc.data() }));
+    
+    if (!allUsers.length) { container.innerHTML = '<div class="empty"><div class="icon">👥</div><div>لا يوجد مستخدمين</div></div>'; return; }
+    
+    let html = `<table><thead><tr><th>#</th><th>UID</th><th>البريد</th><th>الاسم</th><th>الدور</th><th>الحالة</th></tr></thead><tbody>`;
+    allUsers.forEach((u, i) => {
+        const roleClass = u.role === 'admin' ? 'badge-admin' : 'badge-user';
+        html += `<tr>
+            <td>${i+1}</td>
+            <td><code style="font-size:11px;color:#94a3b8;">${u.uid || u.id || '—'}</code></td>
+            <td>${u.email || '—'}</td>
+            <td>${u.displayName || u.name || '—'}</td>
+            <td><span class="badge ${roleClass}">${u.role || 'user'}</span></td>
+            <td>${u.isBlocked ? '⛔ محظور' : '✅ نشط'}</td>
+        </tr>`;
+    });
+    html += `</tbody></table>`;
+    container.innerHTML = html;
+}
+
+// ============================================================
+// 📄 FIRESTORE
+// ============================================================
+async function loadFirestore() {
+    const container = document.getElementById('firestoreContainer');
+    const collections = ['users', 'deposits', 'transactions', 'broadcasts', 'notifications', 'support_messages'];
+    allFirestoreData = {};
+    let totalDocs = 0;
+    
+    for (const col of collections) {
+        try {
+            const snap = await db.collection(col).get();
+            const data = [];
+            snap.forEach(doc => data.push({ id: doc.id, ...doc.data() }));
+            allFirestoreData[col] = data;
+            totalDocs += data.length;
+        } catch(e) { allFirestoreData[col] = []; }
+    }
+    
+    if (totalDocs === 0) { container.innerHTML = '<div class="empty"><div class="icon">📄</div><div>لا توجد مجموعات أو البيانات محمية</div></div>'; return; }
+    
+    let html = `<table><thead><tr><th>#</th><th>المجموعة</th><th>عدد الوثائق</th><th>البيانات</th></tr></thead><tbody>`;
+    let idx = 0;
+    for (const [col, data] of Object.entries(allFirestoreData)) {
+        if (!data.length) continue;
+        idx++;
+        const sample = data.slice(0, 2).map(d => JSON.stringify(d).substring(0, 80) + '...').join('<br>');
+        html += `<tr><td>${idx}</td><td><strong>${col}</strong></td><td>${data.length}</td><td style="font-size:12px;color:#94a3b8;">${sample}</td></tr>`;
+    }
+    html += `</tbody></table>`;
+    container.innerHTML = html;
+}
+
+// ============================================================
+// 📁 STORAGE
+// ============================================================
+async function loadStorage() {
+    const container = document.getElementById('storageContainer');
+    const listRef = storage.ref('/');
+    allStorageFiles = [];
+    
+    try {
+        const result = await listRef.listAll();
+        allStorageFiles = result.items;
+        if (!allStorageFiles.length) { container.innerHTML = '<div class="empty"><div class="icon">📁</div><div>لا توجد ملفات</div></div>'; return; }
+        
+        let html = `<div style="padding:12px;">`;
+        for (const item of allStorageFiles) {
+            const url = await item.getDownloadURL();
+            const isImage = item.name.match(/\.(png|jpg|jpeg|gif|webp|svg)$/i);
+            html += `<div class="file-item">
+                <span class="file-name">📄 ${item.name}</span>
+                <span class="file-size">${(item.size / 1024).toFixed(1)} KB</span>
+                <span><a href="${url}" target="_blank" style="color:#f97316;">فتح</a></span>
+            </div>`;
+            if (isImage) {
+                html += `<div style="padding:4px 12px 12px 12px;"><img src="${url}" class="img-preview" onerror="this.style.display='none'"></div>`;
+            }
+        }
+        html += `</div>`;
+        container.innerHTML = html;
+    } catch(e) {
+        container.innerHTML = `<div class="empty"><div class="icon">🔒</div><div>ممنوع الوصول: ${e.message}</div></div>`;
+    }
+}
+
+// ============================================================
+// 🔐 AUTH - إنشاء حساب اختبار
+// ============================================================
+async function loadAuth() {
+    const container = document.getElementById('authContainer');
+    let html = `
+        <div style="padding:20px;">
+            <h3 style="color:#f97316;margin-bottom:12px;">🔐 اختبار Firebase Authentication</h3>
+            <div style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:16px;">
+                <input id="authEmail" placeholder="البريد الإلكتروني" style="flex:1;padding:10px;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.1);border-radius:8px;color:#e2e8f0;min-width:200px;" value="test_${Date.now().toString().slice(-6)}@x.co">
+                <input id="authPass" placeholder="كلمة المرور" type="password" style="flex:1;padding:10px;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.1);border-radius:8px;color:#e2e8f0;min-width:150px;" value="Test123!">
+                <button class="btn btn-primary" onclick="testAuth()">🚀 اختبار التسجيل</button>
+            </div>
+            <div id="authResult" style="background:rgba(0,0,0,0.3);padding:12px;border-radius:8px;font-family:monospace;font-size:13px;color:#94a3b8;white-space:pre-wrap;min-height:60px;">⏳ اضغط "اختبار التسجيل"</div>
+        </div>
+    `;
+    container.innerHTML = html;
+}
+
+async function testAuth() {
+    const email = document.getElementById('authEmail').value.trim();
+    const pass = document.getElementById('authPass').value.trim();
+    const result = document.getElementById('authResult');
+    
+    if (!email || !pass) { result.textContent = '❌ أدخل البريد وكلمة المرور'; return; }
+    
+    result.textContent = '⏳ جاري الاتصال...';
+    try {
+        const userCred = await auth.createUserWithEmailAndPassword(email, pass);
+        result.textContent = `✅ تم إنشاء الحساب بنجاح!\nUID: ${userCred.user.uid}\nالبريد: ${userCred.user.email}\nتم التحقق: ${userCred.user.emailVerified}`;
+        showToast('✅ تم إنشاء الحساب', 'success');
+    } catch(e) {
+        result.textContent = `❌ فشل: ${e.message}`;
+        showToast(`❌ ${e.message}`, 'error');
+    }
+}
+
+// ============================================================
+// 📤 EXPORT CSV
+// ============================================================
+function exportCSV() {
+    if (!allUsers.length && !allStorageFiles.length) { showToast('⚠️ لا توجد بيانات', 'error'); return; }
+    let csv = "=== المستخدمين ===\nUID,البريد,الاسم,الدور\n";
+    allUsers.forEach(u => csv += `${u.uid||u.id||''},${u.email||''},${u.displayName||u.name||''},${u.role||''}\n`);
+    
+    csv += "\n=== Firestore ===\n";
+    for (const [col, data] of Object.entries(allFirestoreData)) {
+        if (!data.length) continue;
+        csv += `\n--- ${col} (${data.length}) ---\n`;
+        data.forEach(d => csv += JSON.stringify(d) + '\n');
+    }
+    
+    csv += "\n=== Storage ===\nاسم الملف,الحجم\n";
+    allStorageFiles.forEach(f => csv += `${f.name},${(f.size/1024).toFixed(1)} KB\n`);
+    
+    const blob = new Blob(["\ufeff"+csv], { type: 'text/csv;charset=utf-8' });
+    const link = document.createElement('a');
+    link.href = URL.createObjectURL(blob);
+    link.download = `almohet_firebase_${new Date().toISOString().slice(0,10)}.csv`;
+    link.click();
+    showToast('✅ تم التصدير', 'success');
+}
+
+function refreshAll() { loadAll(); }
+
+// ============================================================
+// 🚀 AUTO LOAD
+// ============================================================
+window.onload = function() {
+    showToast('🔥 جاهز! اضغط "تحميل الكل"', 'info');
+};
+</script>
+
+</body>
+</html>
