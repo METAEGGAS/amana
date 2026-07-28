@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>KYC</title><style>
+*{margin:0;padding:0;box-sizing:border-box;font-family:'Segoe UI',Tahoma,Arial,sans-serif}
+body{background:#0a1128;min-height:100vh;display:flex;justify-content:center;padding:10px;color:#fff}
+.app{width:100%;max-width:420px;background:#0f1a3d;border-radius:18px;overflow:hidden;box-shadow:0 10px 40px rgba(0,0,0,.5)}
+.header{display:flex;align-items:center;justify-content:space-between;padding:16px 18px;background:#0f1a3d;border-bottom:1px solid rgba(255,255,255,.05)}
+.close{width:38px;height:38px;background:#1e2a5a;border:none;border-radius:10px;color:#fff;font-size:18px;cursor:pointer}
+.title{font-size:17px;font-weight:600;display:flex;align-items:center;gap:8px}
+.steps{display:flex;justify-content:space-around;padding:18px 10px;background:#0f1a3d;border-bottom:1px solid rgba(255,255,255,.05)}
+.step{display:flex;flex-direction:column;align-items:center;gap:6px;flex:1;position:relative}
+.step .num{width:34px;height:34px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:14px;background:#1e2a5a;color:#8892b0}
+.step.active .num{background:#2563eb;color:#fff;box-shadow:0 0 12px rgba(37,99,235,.6)}
+.step.done .num{background:#10b981;color:#fff}
+.step .lbl{font-size:12px;color:#8892b0}
+.step.active .lbl{color:#fff}
+.step.done .lbl{color:#10b981}
+.content{padding:18px;min-height:520px}
+.section-title{color:#d4a017;font-size:15px;font-weight:600;margin-bottom:12px;text-align:right;display:flex;align-items:center;justify-content:flex-end;gap:8px}
+.search{width:100%;background:#0a1128;border:1px solid rgba(255,255,255,.08);border-radius:12px;padding:14px 16px;color:#fff;font-size:14px;text-align:right;margin-bottom:16px;outline:none}
+.list{background:#0d1633;border-radius:14px;padding:12px;border:1px solid rgba(255,255,255,.05)}
+.sub-title{color:#d4a017;font-size:13px;margin:8px 6px;text-align:right}
+.country{display:flex;align-items:center;justify-content:space-between;padding:14px;border-radius:10px;cursor:pointer;margin-bottom:6px;transition:.2s}
+.country:hover{background:rgba(255,255,255,.03)}
+.country.selected{background:rgba(37,99,235,.15);border:1px solid #2563eb}
+.country .right{display:flex;align-items:center;gap:10px;flex-direction:row-reverse}
+.country .flag{font-size:20px}
+.country .name{font-size:14px}
+.check{width:22px;height:22px;background:#10b981;border-radius:50%;display:flex;align-items:center;justify-content:center;color:#fff;font-size:12px;font-weight:700}
+.btn-row{padding:16px 18px;display:flex;gap:10px}
+.btn{flex:1;padding:14px;border:none;border-radius:12px;font-size:15px;font-weight:600;cursor:pointer;font-family:inherit}
+.btn-primary{background:linear-gradient(90deg,#3b82f6,#8b5cf6);color:#fff}
+.btn-primary:disabled{opacity:.5;cursor:not-allowed}
+.btn-secondary{background:transparent;color:#fff;border:1px solid rgba(255,255,255,.15)}
+.btn-verify{background:#1e40af;color:#fff;opacity:.8}
+.doc-card{background:#0d1633;border:1px solid rgba(255,255,255,.06);border-radius:14px;padding:18px;margin-bottom:14px;display:flex;align-items:center;justify-content:space-between;cursor:pointer;transition:.2s}
+.doc-card:hover{border-color:#2563eb;background:#122052}
+.doc-card.selected{border-color:#3b82f6;background:#132555}
+.doc-info{text-align:right;flex:1}
+.doc-info h3{font-size:16px;margin-bottom:4px}
+.doc-info p{font-size:12px;color:#8892b0}
+.doc-icon{width:48px;height:48px;background:#2a2f6a;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:22px;margin-left:14px}
+.info-box{background:rgba(59,130,246,.1);border:1px solid rgba(59,130,246,.3);border-radius:12px;padding:12px;font-size:12px;color:#a5b4fc;text-align:right;display:flex;align-items:center;justify-content:flex-end;gap:8px;margin-top:8px}
+.upload-section{margin-bottom:18px}
+.upload-title{color:#d4a017;font-size:14px;margin-bottom:10px;text-align:right;display:flex;align-items:center;justify-content:flex-end;gap:6px}
+.upload-box{background:#0d1633;border:2px dashed rgba(255,255,255,.15);border-radius:14px;padding:20px;text-align:center}
+.upload-icon{width:56px;height:56px;background:#2563eb;border-radius:14px;display:flex;align-items:center;justify-content:center;font-size:26px;margin:0 auto 10px}
+.upload-txt{font-size:14px;margin-bottom:4px}
+.upload-sub{font-size:11px;color:#8892b0;margin-bottom:14px}
+.upload-btns{display:flex;gap:10px}
+.upload-btn{flex:1;padding:10px;border-radius:10px;border:none;font-size:13px;cursor:pointer;font-family:inherit;display:flex;align-items:center;justify-content:center;gap:6px}
+.cam-btn{background:#4c1d95;color:#fff}
+.gal-btn{background:transparent;color:#fff;border:1px solid rgba(255,255,255,.15)}
+.hidden{display:none}
+.file-input{display:none}
+</style></head><body>
+<div class="app">
+<div class="header"><button class="close" onclick="closeApp()">✕</button><div class="title">التحقق من الهوية (KYC) 🪪</div></div>
+<div class="steps" id="steps">
+<div class="step" data-s="4"><div class="num">4</div><div class="lbl">مراجعة</div></div>
+<div class="step" data-s="3"><div class="num">3</div><div class="lbl">الرفع</div></div>
+<div class="step" data-s="2"><div class="num">2</div><div class="lbl">الوثيقة</div></div>
+<div class="step active" data-s="1"><div class="num">1</div><div class="lbl">البلد</div></div>
+</div>
+
+<!-- Screen 1 -->
+<div class="content" id="s1">
+<div class="section-title">اختر بلد إصدار الوثيقة 🌐</div>
+<input class="search" placeholder="🔍 ابحث عن بلد..." oninput="filterC(this.value)">
+<div class="list">
+<div class="sub-title">الولايات المتحدة الأمريكية</div>
+<div class="country selected" data-c="us" onclick="selC(this)"><div class="check">✓</div><div class="right"><span class="name">الولايات المتحدة الأمريكية</span><span class="flag">🇺🇸</span></div></div>
+<div class="sub-title">الدول الرئيسية</div>
+<div class="country" data-c="sa" onclick="selC(this)"><div></div><div class="right"><span class="name">المملكة العربية السعودية</span><span class="flag">🇸🇦</span></div></div>
+<div class="country" data-c="ae" onclick="selC(this)"><div></div><div class="right"><span class="name">الإمارات العربية المتحدة</span><span class="flag">🇦🇪</span></div></div>
+<div class="country" data-c="eg" onclick="selC(this)"><div></div><div class="right"><span class="name">مصر</span><span class="flag">🇪🇬</span></div></div>
+<div class="country" data-c="kw" onclick="selC(this)"><div></div><div class="right"><span class="name">الكويت</span><span class="flag">🇰🇼</span></div></div>
+</div>
+</div>
+<div class="btn-row" id="b1"><button class="btn btn-primary" onclick="go(2)">التالي ←</button></div>
+
+<!-- Screen 2 -->
+<div class="content hidden" id="s2">
+<div class="section-title">اختر نوع وثيقة الهوية 🔐</div>
+<div class="doc-card" data-d="passport" onclick="selD(this)"><div class="doc-icon">🌐</div><div class="doc-info"><h3>جواز السفر</h3><p>صفحة واحدة (الصفحة الرئيسية)</p></div></div>
+<div class="doc-card" data-d="id" onclick="selD(this)"><div class="doc-icon">🪪</div><div class="doc-info"><h3>بطاقة الهوية الوطنية</h3><p>الوجه الأمامي + الخلفي</p></div></div>
+<div class="doc-card" data-d="license" onclick="selD(this)"><div class="doc-icon">💳</div><div class="doc-info"><h3>رخصة القيادة</h3><p>الوجه الأمامي + الخلفي</p></div></div>
+<div class="info-box">تأكد من أن الوثيقة سارية المفعول وأن جميع الزوايا مرئية بوضوح. ℹ️</div>
+</div>
+<div class="btn-row hidden" id="b2"><button class="btn btn-primary" id="nx2" disabled onclick="go(3)">التالي ←</button><button class="btn btn-secondary" onclick="go(1)">→ رجوع</button></div>
+
+<!-- Screen 3 -->
+<div class="content hidden" id="s3">
+<div class="upload-section">
+<div class="upload-title">الوجه الأمامي للوثيقة 🖼️</div>
+<div class="upload-box">
+<div class="upload-icon">☁️</div>
+<div class="upload-txt" id="ft">ارفع صورة الوثيقة (الأمامي)</div>
+<div class="upload-sub">JPG / PNG – بحد أقصى 8MB</div>
+<div class="upload-btns">
+<button class="upload-btn cam-btn" onclick="cam('f')">📷 الكاميرا</button>
+<button class="upload-btn gal-btn" onclick="gal('f')">📁 من المعرض</button>
+</div>
+</div>
+</div>
+<div class="upload-section" id="backSec">
+<div class="upload-title">الوجه الخلفي للوثيقة 🖼️</div>
+<div class="upload-box">
+<div class="upload-icon">☁️</div>
+<div class="upload-txt" id="bt">ارفع الوجه الخلفي</div>
+<div class="upload-sub">JPG / PNG – بحد أقصى 8MB</div>
+<div class="upload-btns">
+<button class="upload-btn cam-btn" onclick="cam('b')">📷 الكاميرا</button>
+<button class="upload-btn gal-btn" onclick="gal('b')">📁 من المعرض</button>
+</div>
+</div>
+</div>
+<input type="file" class="file-input" id="fi" accept="image/jpeg,image/png">
+</div>
+<div class="btn-row hidden" id="b3"><button class="btn btn-verify" onclick="alert('بدء التحقق')">🛡️ بدء التحقق</button><button class="btn btn-secondary" onclick="go(2)">→ رجوع</button></div>
+
+</div>
+<script>
+let cur=1,selCountry='us',selDoc=null,fSide='f';
+function go(n){cur=n;
+['s1','s2','s3'].forEach((x,i)=>document.getElementById(x).classList.toggle('hidden',i+1!==n));
+['b1','b2','b3'].forEach((x,i)=>document.getElementById(x).classList.toggle('hidden',i+1!==n));
+document.querySelectorAll('#steps .step').forEach(s=>{let x=+s.dataset.s;s.classList.remove('active','done');if(x<n)s.classList.add('done');else if(x===n)s.classList.add('active');});
+if(n===3&&selDoc==='passport')document.getElementById('backSec').style.display='none';else document.getElementById('backSec').style.display='';
+}
+function selC(e){document.querySelectorAll('.country').forEach(c=>{c.classList.remove('selected');c.querySelector('.check')?.remove();c.insertAdjacentHTML('afterbegin','<div></div>');});
+e.querySelector('div').outerHTML='<div class="check">✓</div>';e.classList.add('selected');selCountry=e.dataset.c;}
+function selD(e){document.querySelectorAll('.doc-card').forEach(c=>c.classList.remove('selected'));e.classList.add('selected');selDoc=e.dataset.d;document.getElementById('nx2').disabled=false;}
+function filterC(v){document.querySelectorAll('.country').forEach(c=>{c.style.display=c.querySelector('.name').textContent.includes(v)?'':'none';});}
+function cam(s){fSide=s;const i=document.getElementById('fi');i.setAttribute('capture','environment');i.onchange=hF;i.click();}
+function gal(s){fSide=s;const i=document.getElementById('fi');i.removeAttribute('capture');i.onchange=hF;i.click();}
+function hF(e){const f=e.target.files[0];if(!f)return;if(f.size>8*1024*1024){alert('الحد الأقصى 8MB');return;}document.getElementById(fSide==='f'?'ft':'bt').textContent='✓ '+f.name;}
+function closeApp(){if(confirm('إغلاق؟'))document.querySelector('.app').style.display='none';}
+</script></body></html>
