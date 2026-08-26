@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="ar">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Supabase Tester - YouSyria</title>
+    <style>
+        body { font-family: monospace; background: #0b0e14; color: #e6edf5; padding: 2rem; direction: ltr; }
+        .container { max-width: 900px; margin: 0 auto; }
+        h1 { color: #00b894; }
+        textarea { width: 100%; height: 200px; background: #151e2a; color: #e6edf5; border: 1px solid #2a3a4a; padding: 0.8rem; border-radius: 8px; }
+        button { background: #00b894; color: #000; border: none; padding: 0.6rem 1.5rem; border-radius: 8px; font-weight: 700; cursor: pointer; margin: 0.5rem 0; }
+        button:hover { background: #00d2a0; }
+        .result { background: #151e2a; padding: 1rem; border-radius: 8px; border: 1px solid #2a3a4a; margin-top: 1rem; white-space: pre-wrap; word-break: break-all; max-height: 400px; overflow-y: auto; }
+        .status { display: inline-block; padding: 0.2rem 0.8rem; border-radius: 20px; font-size: 0.8rem; font-weight: 700; }
+        .status.success { background: #00b894; color: #000; }
+        .status.fail { background: #ff6b6b; color: #000; }
+        .status.warning { background: #f0c000; color: #000; }
+        .flex { display: flex; gap: 1rem; flex-wrap: wrap; }
+        input { background: #151e2a; border: 1px solid #2a3a4a; color: #e6edf5; padding: 0.6rem 1rem; border-radius: 8px; flex: 1; min-width: 200px; }
+        .hidden { display: none; }
+    </style>
+</head>
+<body>
+<div class="container">
+    <h1>🛡️ Supabase Tester — YouSyria (RLS & Admin API)</h1>
+    <p>اختبار نقاط النهاية المكشوفة في تطبيق YouSyria <span class="status warning">⚠️ للأغراض التعليمية فقط</span></p>
+
+    <div class="flex" style="margin-bottom: 1rem;">
+        <div style="flex: 1;">
+            <label><strong>🔑 Supabase Anon Key (JWT)</strong></label>
+            <input id="anonKey" value="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImFzbWZubW12YmhnY3F3Z2h3YWhlIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzc3MTAyMjIsImV4cCI6MjA5MzI4NjIyMn0.LaENP5dwRx1wbyMvDd7fVBagHtpn0fG42CCcgMURtzM" style="width: 100%;">
+        </div>
+        <div style="flex: 1;">
+            <label><strong>🌐 Supabase URL</strong></label>
+            <input id="supaUrl" value="https://asmfnmmvbhgcqwghwahe.supabase.co/rest/v1" style="width: 100%;">
+        </div>
+    </div>
+
+    <div class="flex" style="margin-bottom: 1rem;">
+        <div style="flex: 1;">
+            <label><strong>🔗 Admin API Base</strong></label>
+            <input id="adminBase" value="https://api.yousyria.com/api/admin" style="width: 100%;">
+        </div>
+        <div style="flex: 1;">
+            <label><strong>🪪 JWT Token (لـ Admin API)</strong></label>
+            <input id="jwtToken" placeholder="ضع التوكن هنا..." style="width: 100%;">
+        </div>
+    </div>
+
+    <div class="flex">
+        <button onclick="testSupabase()">📡 اختبار Supabase (RLS)</button>
+        <button onclick="testAdminAPI()">🔍 اختبار Admin API</button>
+        <button onclick="testAll()">⚡ اختبار الكل</button>
+        <button onclick="clearResults()">🗑️ مسح</button>
+    </div>
+
+    <div id="resultContainer">
+        <div class="result" id="result">⏳ انتظر النتائج...</div>
+    </div>
+</div>
+
+<script>
+    function log(msg, type = 'info') {
+        const result = document.getElementById('result');
+        const colors = {
+            success: '#00b894',
+            fail: '#ff6b6b',
+            warning: '#f0c000',
+            info: '#e6edf5'
+        };
+        const prefix = type.toUpperCase();
+        result.innerHTML += `<div style="border-left: 3px solid ${colors[type] || '#555'}; padding-left: 0.8rem; margin: 0.4rem 0;">
+            <span style="color: ${colors[type] || '#555'}; font-weight: 700;">[${prefix}]</span> ${msg}
+        </div>`;
+        result.scrollTop = result.scrollHeight;
+    }
+
+    function clearResults() {
+        document.getElementById('result').innerHTML = '✅ جاهز...';
+    }
+
+    async function fetchJSON(url, headers = {}) {
+        try {
+            const res = await fetch(url, { headers });
+            const text = await res.text();
+            let json = null;
+            try { json = JSON.parse(text); } catch (e) { json = { raw: text }; }
+            return { status: res.status, ok: res.ok, headers: res.headers, data: json, raw: text };
+        } catch (e) {
+            return { status: 0, ok: false, error: e.message };
+        }
+    }
+
+    async function testSupabase() {
+        const anon = document.getElementById('anonKey').value.trim();
+        const base = document.getElementById('supaUrl').value.trim();
+        if (!anon || !base) { log('❌ أدخل المفتاح والرابط أولاً', 'fail'); return; }
+
+        log('🚀 اختبار Supabase RLS...', 'info');
+        const tables = ['profiles?select=id,display_name,phone&limit=2', 'conversations?limit=2'];
+        for (const table of tables) {
+            const url = `${base}/${table}`;
+            log(`📡 GET ${url}`, 'info');
+            const result = await fetchJSON(url, {
+                'apikey': anon,
+                'Authorization': `Bearer ${anon}`
+            });
+            if (result.ok) {
+                const data = result.data;
+                if (Array.isArray(data) && data.length > 0) {
+                    log(`✅ ${table} → نجاح (${data.length} سجل) ⚠️ RLS مكسورة أو عامة!`, 'warning');
+                    log(`📋 العينة: ${JSON.stringify(data, null, 2).slice(0, 300)}...`, 'info');
+                } else if (Array.isArray(data) && data.length === 0) {
+                    log(`🟡 ${table} → 200 OK ولكن لا توجد بيانات ([])، RLS قد تكون مفعلة أو الجدول فارغ`, 'warning');
+                } else {
+                    log(`🟡 ${table} → 200 OK ولكن الرد غير متوقع: ${JSON.stringify(data).slice(0, 200)}`, 'warning');
+                }
+            } else {
+                log(`❌ ${table} → فشل (${result.status}) ${JSON.stringify(result.data).slice(0, 200)}`, 'fail');
+            }
+        }
+        log('✅ انتهى اختبار Supabase.', 'success');
+    }
+
+    async function testAdminAPI() {
+        const base = document.getElementById('adminBase').value.trim();
+        const token = document.getElementById('jwtToken').value.trim();
+        if (!base) { log('❌ أدخل Admin API Base', 'fail'); return; }
+        if (!token) { log('⚠️ لم يتم إدخال توكن، سيتم الاختبار بدون مصادقة (قد يفشل)', 'warning'); }
+
+        log('🚀 اختبار Admin API...', 'info');
+        const endpoints = ['/users', '/listings', '/stats'];
+        for (const ep of endpoints) {
+            const url = `${base}${ep}`;
+            log(`📡 GET ${url}`, 'info');
+            const headers = {};
+            if (token) headers['Authorization'] = `Bearer ${token}`;
+            const result = await fetchJSON(url, headers);
+            if (result.ok) {
+                log(`✅ ${ep} → 200 OK (${JSON.stringify(result.data).length} حرف) - 🔴 قد تكون مكشوفة!`, 'warning');
+                log(`📋 العينة: ${JSON.stringify(result.data).slice(0, 400)}...`, 'info');
+            } else if (result.status === 401 || result.status === 403) {
+                log(`🛡️ ${ep} → ${result.status} (محمية بشكل صحيح)`, 'success');
+            } else {
+                log(`❌ ${ep} → ${result.status} ${JSON.stringify(result.data).slice(0, 200)}`, 'fail');
+            }
+        }
+        log('✅ انتهى اختبار Admin API.', 'success');
+    }
+
+    async function testAll() {
+        clearResults();
+        log('🔄 بدء الاختبار الشامل...', 'info');
+        await testSupabase();
+        await testAdminAPI();
+        log('✅ اكتمل الاختبار الشامل.', 'success');
+    }
+
+    // تشغيل تلقائي عند التحميل
+    window.onload = function() {
+        document.getElementById('result').innerHTML = '✅ جاهز. اضغط على أي زر للاختبار.';
+    };
+</script>
+</body>
+</html>
