@@ -1,4 +1,4 @@
-<script>(function(){
+(function(){
 if(document.getElementById('accountOverlay')){document.getElementById('accountOverlay').style.display='block';return;}
 var R='https://raw.githubusercontent.com/METAEGGAS/amana/main/',
 IC={ch:R+'Shajjs.png',au:R+'Ozbsjjz.png',wh:'https://gulfxdl.com/assets/draw-light-Ddf7eLEI.png',inv:R+'Isbshsh.png',st:'https://gulfxdl.com/assets/setting-DQ3FSC7i.png',lg:'https://gulfxdl.com/assets/language-Bymc3Lbd.png',id:R+'Nzosknznz.png',cp:R+'Kzkzjjz.png',lv:R+'Zjisjzhbz.png',ac:R+'ZnjJajaj.png',cs:R+'Zbjakskjz.png',dl:R+'Jzjzjfhhh.png',ab:R+'Jzjsijs.png',lo:R+'Nzjsiskjs.png'};
@@ -56,4 +56,4 @@ e.addEventListener('click',function(){h=!h;b.textContent=h?'***':rv;});
 document.querySelectorAll('#accountOverlay .ac-copy').forEach(function(c){c.addEventListener('click',function(){var t=c.previousElementSibling.textContent;if(navigator.clipboard)navigator.clipboard.writeText(t);c.style.opacity='1';setTimeout(function(){c.style.opacity='.5';},400);});});
 document.querySelectorAll('#accountOverlay .ac-action, #accountOverlay .ac-item').forEach(function(b){b.addEventListener('click',function(){b.style.transform='scale(.97)';setTimeout(function(){b.style.transform='';},120);});});
 document.getElementById('acSettings').addEventListener('click',function(){this.style.transform='scale(.9)';var s=this;setTimeout(function(){s.style.transform='';},150);});
-})();</script>
+})();</
