@@ -23,23 +23,35 @@ var css=`#supPage{position:fixed;top:0;left:0;right:0;bottom:0;max-width:480px;m
 #supPage .foot{background:#fff;border-top:1px solid #E5E5E5;padding:10px 14px 14px;flex-shrink:0}
 #supPage .fic{display:flex;gap:14px;margin-bottom:8px}
 #supPage .fic .fbtn{background:none;border:none;padding:0;cursor:pointer;display:flex;align-items:center;justify-content:center}
-#supPage .fic .fbtn svg{width:28px;height:28px}
-#supPage .fic .fbtn.rec-on svg circle{fill:#E82127}
+#supPage .fic .fbtn img{width:28px;height:28px;object-fit:contain}
 #supPage .fin{display:flex;align-items:flex-end;gap:10px}
 #supPage .fin input{flex:1;border:none;outline:none;font-size:14px;padding:8px 0;color:#333;background:transparent;font-family:inherit}
 #supPage .fin input::placeholder{color:#B5B5B5}
-#supPage .snd{background:#1877F2;color:#fff;border:none;padding:9px 22px;border-radius:6px;font-size:14px;font-weight:600;cursor:pointer;font-family:inherit}`;
+#supPage .snd{background:#1877F2;color:#fff;border:none;padding:9px 22px;border-radius:6px;font-size:14px;font-weight:600;cursor:pointer;font-family:inherit}
+#supPage .recbar{display:none;align-items:center;gap:12px;padding:6px 0}
+#supPage .recdot{width:12px;height:12px;border-radius:50%;background:#E82127;flex-shrink:0;animation:supBlink 1s infinite}
+@keyframes supBlink{0%,100%{opacity:1}50%{opacity:.15}}
+#supPage .wtxt{flex:1;font-size:15px;color:#1a1a1a;font-weight:600;display:flex;align-items:center;gap:1px;overflow:hidden;white-space:nowrap}
+#supPage .wtxt i{font-style:normal;display:inline-block;animation:supWave 1.1s ease-in-out infinite}
+@keyframes supWave{0%,100%{transform:translateY(0)}50%{transform:translateY(-5px)}}
+#supPage .rtime{font-size:13px;color:#7a7a7a;direction:ltr;font-family:monospace;flex-shrink:0}
+#supPage .rbtn{border:none;cursor:pointer;border-radius:50%;width:40px;height:40px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+#supPage .rstop{background:#E5E5E5}
+#supPage .rstop svg{width:16px;height:16px;fill:#555}
+#supPage .rsend{background:#1877F2}
+#supPage .rsend svg{width:20px;height:20px;fill:#fff}`;
 
 var st=document.createElement('style');
 st.id='supPageCss';
 st.textContent=css;
 document.head.appendChild(st);
 
-var mic='<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><rect x="9" y="3" width="6" height="11" rx="3" fill="%23546E7A"/><path d="M6 11a6 6 0 0 0 12 0" stroke="%23546E7A" stroke-width="2" fill="none" stroke-linecap="round"/><line x1="12" y1="17" x2="12" y2="21" stroke="%23546E7A" stroke-width="2" stroke-linecap="round"/><line x1="8" y1="21" x2="16" y2="21" stroke="%23546E7A" stroke-width="2" stroke-linecap="round"/><circle cx="12" cy="8" r="0" fill="%23546E7A"/></svg>';
-
-var pic='<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="16" rx="2" fill="%23B0BEC5"/><circle cx="8" cy="9.5" r="1.6" fill="%23fff"/><path d="M4 18l5-5 4 4 3-3 4 4v1H4z" fill="%23fff"/></svg>';
-
+var micUrl='https://cdn-icons-png.flaticon.com/128/7022/7022983.png';
+var picUrl='https://cdn-icons-png.flaticon.com/128/2659/2659360.png';
 var op='https://www.zgulfx.com/css/images/logo.png';
+
+var stopSvg='<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><rect x="5" y="5" width="14" height="14" rx="2"/></svg>';
+var sendSvg='<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M2.7 21.3L23 12 2.7 2.7 2.7 10l14.6 2-14.6 2z"/></svg>';
 
 var html=`<div id="supPage">
 <div class="sh">
@@ -50,13 +62,20 @@ var html=`<div id="supPage">
 <div class="body"></div>
 <div class="foot">
 <div class="fic">
-<button class="fbtn" id="supMic" type="button" title="Record voice">${mic}</button>
-<button class="fbtn" id="supPic" type="button" title="Upload image">${pic}</button>
+<button class="fbtn" id="supMic" type="button" title="Record voice"><img src="${micUrl}" alt=""></button>
+<button class="fbtn" id="supPic" type="button" title="Upload image"><img src="${picUrl}" alt=""></button>
 <input type="file" id="supFile" accept="image/*" style="display:none">
 </div>
-<div class="fin">
+<div class="fin" id="supFin">
 <input type="text" id="supInput" placeholder="Please Enter Your Question">
 <button class="snd" id="supSend">Send</button>
+</div>
+<div class="recbar" id="supRec">
+<span class="recdot"></span>
+<span class="wtxt" id="supWtxt"></span>
+<span class="rtime" id="supRtime">00:00</span>
+<button class="rbtn rstop" id="supRstop" type="button" title="Cancel">${stopSvg}</button>
+<button class="rbtn rsend" id="supRsend" type="button" title="Send">${sendSvg}</button>
 </div>
 </div>
 </div>`;
@@ -65,31 +84,33 @@ var w=document.createElement('div');
 w.innerHTML=html;
 document.body.appendChild(w.firstChild);
 
+var wtxt=document.getElementById('supWtxt');
+var wword='جاري التسجيل';
+for(var i=0;i<wword.length;i++){
+var sp=document.createElement('i');
+sp.textContent=wword[i]===' '?'\u00A0':wword[i];
+sp.style.animationDelay=(i*0.08)+'s';
+wtxt.appendChild(sp);
+}
+
 function nowStr(){
 var d=new Date();
 function p(n){return (n<10?'0':'')+n}
 return d.getFullYear()+'/'+p(d.getMonth()+1)+'/'+p(d.getDate())+' '+p(d.getHours())+':'+p(d.getMinutes())+':'+p(d.getSeconds());
 }
 
-function addMsg(inner,isOp){
+function addMsg(inner){
 var b=document.querySelector('#supPage .body');
 var m=document.createElement('div');
-m.className='msg '+(isOp?'op-msg':'me');
+m.className='msg op-msg';
 var tm=document.createElement('div');
 tm.className='tm';
-if(isOp){tm.style.textAlign='right';tm.textContent='GulfX customer service '+nowStr();}else{tm.textContent=nowStr();}
+tm.textContent=nowStr();
 var bub=document.createElement('div');
 bub.className='bub';
 if(typeof inner==='string'){bub.textContent=inner;}else{bub.appendChild(inner);}
-if(isOp){m.appendChild(bub);}else{
-var row=document.createElement('div');
-row.className='row';
-row.innerHTML='<span class="rd"><svg viewBox="0 0 24 24"><path d="M5 12l4 4L19 6"/></svg></span>';
-row.appendChild(bub);
 m.appendChild(tm);
-m.appendChild(row);
-}
-if(isOp){m.insertBefore(tm,m.firstChild);}
+m.appendChild(bub);
 b.appendChild(m);
 b.scrollTop=b.scrollHeight;
 }
@@ -104,7 +125,7 @@ document.getElementById('supSend').addEventListener('click',function(){
 var inp=document.getElementById('supInput');
 var v=inp.value.trim();
 if(!v)return;
-addMsg(v,false);
+addMsg(v);
 inp.value='';
 });
 
@@ -124,44 +145,78 @@ r.onload=function(ev){
 var img=document.createElement('img');
 img.className='att';
 img.src=ev.target.result;
-addMsg(img,false);
+addMsg(img);
 };
 r.readAsDataURL(f);
 this.value='';
 });
 
-var mediaRec=null,recChunks=[];
-document.getElementById('supMic').addEventListener('click',function(){
-var btn=this;
-if(mediaRec&&mediaRec.state==='recording'){
-mediaRec.stop();
-btn.classList.remove('rec-on');
-return;
+var mediaRec=null,recChunks=[],recTimer=null,recStart=0,recSendIt=false;
+
+function fmtT(ms){
+var s=Math.floor(ms/1000);
+var m=Math.floor(s/60);
+s=s%60;
+return (m<10?'0':'')+m+':'+(s<10?'0':'')+s;
 }
+
+function showRecUI(on){
+document.getElementById('supFin').style.display=on?'none':'flex';
+document.getElementById('supRec').style.display=on?'flex':'none';
+document.getElementById('supMic').style.opacity=on?'0.4':'1';
+document.getElementById('supPic').style.opacity=on?'0.4':'1';
+}
+
+function stopRec(){
+if(recTimer){clearInterval(recTimer);recTimer=null;}
+if(mediaRec&&mediaRec.state==='recording'){mediaRec.stop();}
+}
+
+document.getElementById('supMic').addEventListener('click',function(){
+if(mediaRec&&mediaRec.state==='recording')return;
 if(!navigator.mediaDevices||!navigator.mediaDevices.getUserMedia){
 alert('Voice recording is not supported in this browser');
 return;
 }
 navigator.mediaDevices.getUserMedia({audio:true}).then(function(stream){
 recChunks=[];
+recSendIt=false;
 mediaRec=new MediaRecorder(stream);
 mediaRec.ondataavailable=function(e){if(e.data.size>0)recChunks.push(e.data);};
 mediaRec.onstop=function(){
 stream.getTracks().forEach(function(t){t.stop();});
+if(recSendIt&&recChunks.length){
 var blob=new Blob(recChunks,{type:mediaRec.mimeType||'audio/webm'});
 var url=URL.createObjectURL(blob);
 var au=document.createElement('audio');
 au.className='att';
 au.controls=true;
 au.src=url;
-addMsg(au,false);
-btn.classList.remove('rec-on');
+addMsg(au);
+}
+recChunks=[];
+showRecUI(false);
 };
 mediaRec.start();
-btn.classList.add('rec-on');
+recStart=Date.now();
+document.getElementById('supRtime').textContent='00:00';
+recTimer=setInterval(function(){
+document.getElementById('supRtime').textContent=fmtT(Date.now()-recStart);
+},250);
+showRecUI(true);
 }).catch(function(){
 alert('Microphone permission denied');
 });
+});
+
+document.getElementById('supRstop').addEventListener('click',function(){
+recSendIt=false;
+stopRec();
+});
+
+document.getElementById('supRsend').addEventListener('click',function(){
+recSendIt=true;
+stopRec();
 });
 
 var b=document.querySelector('#supPage .body');
