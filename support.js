@@ -1,6 +1,15 @@
 (function(){
 if(document.getElementById('supPage'))return;
 
+// ====== تحميل Firebase (compat) جوه السكربت نفسه ======
+function loadScript(src){
+  return new Promise(function(res,rej){
+    var s=document.createElement('script');
+    s.src=src;s.onload=res;s.onerror=rej;
+    document.head.appendChild(s);
+  });
+}
+
 var css=`#supPage{position:fixed;top:0;left:0;right:0;bottom:0;max-width:480px;margin:0 auto;background:#F2E9E8;z-index:9998;display:flex;flex-direction:column;font-family:'Noto Sans Arabic',-apple-system,'Segoe UI',Tahoma,Arial,sans-serif;direction:rtl}
 #supPage .sh{background:#1877F2;color:#fff;padding:14px 16px;display:flex;align-items:center;justify-content:space-between;flex-shrink:0;direction:ltr}
 #supPage .sh .bk{background:none;border:none;color:#fff;font-size:22px;cursor:pointer;padding:0;width:30px;display:flex;align-items:center;justify-content:flex-start}
@@ -99,33 +108,99 @@ function p(n){return (n<10?'0':'')+n}
 return d.getFullYear()+'/'+p(d.getMonth()+1)+'/'+p(d.getDate())+' '+p(d.getHours())+':'+p(d.getMinutes())+':'+p(d.getSeconds());
 }
 
-function addMsg(inner){
+// ====== عرض الرسالة (بدون حفظ — الحفظ بيتم عند الإرسال) ======
+function renderMsg(data){
 var b=document.querySelector('#supPage .body');
+if(!b)return;
 var m=document.createElement('div');
-m.className='msg op-msg';
+m.className='msg '+(data.sender==='me'?'me':'op-msg');
 var tm=document.createElement('div');
 tm.className='tm';
-tm.textContent=nowStr();
+tm.textContent=data.time||nowStr();
 var bub=document.createElement('div');
 bub.className='bub';
-if(typeof inner==='string'){bub.textContent=inner;}else{bub.appendChild(inner);}
+if(data.type==='image'){
+  var img=document.createElement('img');
+  img.className='att';
+  img.src=data.content;
+  bub.appendChild(img);
+}else if(data.type==='audio'){
+  var au=document.createElement('audio');
+  au.className='att';
+  au.controls=true;
+  au.src=data.content;
+  bub.appendChild(au);
+}else{
+  bub.textContent=data.content;
+}
 m.appendChild(tm);
 m.appendChild(bub);
 b.appendChild(m);
 b.scrollTop=b.scrollHeight;
 }
 
+// ====== Firebase ======
+var db=null;
+var renderedIds={}; // عشان منعرضش الرسالة مرتين
+
+var firebaseConfig={
+  apiKey:"AIzaSyBvzfJOOjRFZnTgTUrwEZQPr8Ba7zKKlNg",
+  authDomain:"hhhxh-5ebe4.firebaseapp.com",
+  projectId:"hhhxh-5ebe4",
+  storageBucket:"hhhxh-5ebe4.firebasestorage.app",
+  messagingSenderId:"79243000696",
+  appId:"1:79243000696:web:ee0fb2d2ccce791954e68d",
+  measurementId:"G-08BR6LN6PT"
+};
+
+Promise.all([
+  loadScript('https://www.gstatic.com/firebasejs/12.18.0/firebase-app-compat.js'),
+  loadScript('https://www.gstatic.com/firebasejs/12.18.0/firebase-firestore-compat.js')
+]).then(function(){
+  firebase.initializeApp(firebaseConfig);
+  db=firebase.firestore();
+
+  // استماع لحظي لكل الرسايل مرتبة بالوقت
+  db.collection('messages').orderBy('ts','asc').onSnapshot(function(snap){
+    snap.docChanges().forEach(function(ch){
+      if(ch.type==='added'){
+        var d=ch.doc.data();
+        if(renderedIds[ch.doc.id])return;
+        renderedIds[ch.doc.id]=true;
+        renderMsg(d);
+      }
+    });
+  });
+}).catch(function(){
+  console.error('Firebase failed to load');
+});
+
+// ====== إرسال رسالة لفيربيس ======
+// sender: 'me' = الرسالة المُرسلة (الأخضر) | 'op' = المستلمة (الأبيض)
+function sendMsg(type,content,sender){
+  if(!db)return;
+  db.collection('messages').add({
+    type:type,           // 'text' | 'image' | 'audio'
+    content:content,     // نص أو base64
+    sender:sender||'me',
+    time:nowStr(),
+    ts:firebase.firestore.FieldValue.serverTimestamp()
+  });
+}
+
+// ====== زر الرجوع ======
 document.getElementById('supBk').addEventListener('click',function(){
 var p=document.getElementById('supPage'),c=document.getElementById('supPageCss');
 if(p)p.remove();
 if(c)c.remove();
 });
 
+// ====== إرسال نص ======
 document.getElementById('supSend').addEventListener('click',function(){
 var inp=document.getElementById('supInput');
 var v=inp.value.trim();
 if(!v)return;
-addMsg(v);
+sendMsg('text',v,'me'); // بتظهر تلقائي من onSnapshot
 inp.value='';
 });
 
@@ -133,6 +208,7 @@ document.getElementById('supInput').addEventListener('keydown',function(e){
 if(e.key==='Enter'){document.getElementById('supSend').click();}
 });
 
+// ====== رفع صورة (base64 -> Firestore) ======
 document.getElementById('supPic').addEventListener('click',function(){
 document.getElementById('supFile').click();
 });
@@ -142,15 +218,13 @@ var f=this.files&&this.files[0];
 if(!f)return;
 var r=new FileReader();
 r.onload=function(ev){
-var img=document.createElement('img');
-img.className='att';
-img.src=ev.target.result;
-addMsg(img);
+  sendMsg('image',ev.target.result,'me'); // ev.target.result = base64
 };
 r.readAsDataURL(f);
 this.value='';
 });
 
+// ====== تسجيل صوت (base64 -> Firestore) ======
 var mediaRec=null,recChunks=[],recTimer=null,recStart=0,recSendIt=false;
 
 function fmtT(ms){
@@ -186,13 +260,13 @@ mediaRec.ondataavailable=function(e){if(e.data.size>0)recChunks.push(e.data);};
 mediaRec.onstop=function(){
 stream.getTracks().forEach(function(t){t.stop();});
 if(recSendIt&&recChunks.length){
-var blob=new Blob(recChunks,{type:mediaRec.mimeType||'audio/webm'});
-var url=URL.createObjectURL(blob);
-var au=document.createElement('audio');
-au.className='att';
-au.controls=true;
-au.src=url;
-addMsg(au);
+  var blob=new Blob(recChunks,{type:mediaRec.mimeType||'audio/webm'});
+  // تحويل المقطع الصوتي لـ base64 وحفظه في Firestore
+  var fr=new FileReader();
+  fr.onload=function(ev){
+    sendMsg('audio',ev.target.result,'me');
+  };
+  fr.readAsDataURL(blob);
 }
 recChunks=[];
 showRecUI(false);
