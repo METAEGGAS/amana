@@ -17,16 +17,19 @@ var css=`#supPage{position:fixed;top:0;left:0;right:0;bottom:0;max-width:480px;m
 #supPage .sh .op{position:relative;width:38px;height:38px;flex-shrink:0}
 #supPage .sh .op img{width:38px;height:38px;border-radius:50%;object-fit:cover;border:2px solid #fff;background:#fff}
 #supPage .sh .op::after{content:'';position:absolute;bottom:0;right:0;width:10px;height:10px;background:#E82127;border-radius:50%;border:2px solid #fff}
+#supPage .sh .op.on::after{background:#2BD46B}
 #supPage .body{flex:1;overflow-y:auto;padding:14px 12px;display:flex;flex-direction:column;gap:14px}
 #supPage .msg{max-width:78%;display:flex;flex-direction:column;gap:4px}
-#supPage .msg.op-msg{align-self:flex-start}
-#supPage .msg.me{align-self:flex-end;align-items:flex-end}
+#supPage .msg.op-msg{align-self:flex-end}
+#supPage .msg.me{align-self:flex-start;align-items:flex-end}
 #supPage .tm{font-size:12px;color:#7a7a7a;direction:ltr;padding:0 4px}
 #supPage .bub{background:#fff;padding:11px 14px;border-radius:6px;font-size:14.5px;line-height:1.7;color:#1a1a1a;word-wrap:break-word;box-shadow:0 1px 1px rgba(0,0,0,.04)}
 #supPage .me .bub{background:#7FD858;color:#000;font-family:monospace;font-size:14px;display:flex;align-items:center;gap:6px}
 #supPage .me .row{display:flex;align-items:center;gap:6px;flex-direction:row-reverse}
 #supPage .rd{width:20px;height:20px;border-radius:50%;border:1.5px solid #B5B5C3;display:inline-flex;align-items:center;justify-content:center;flex-shrink:0;background:#fff}
 #supPage .rd svg{width:12px;height:12px;fill:none;stroke:#B5B5C3;stroke-width:2.5;stroke-linecap:round;stroke-linejoin:round}
+#supPage .rd.read{border-color:#2BD46B}
+#supPage .rd.read svg{stroke:#2BD46B}
 #supPage .bub img.att{max-width:200px;max-height:200px;border-radius:6px;display:block}
 #supPage .bub audio.att{max-width:220px;display:block}
 #supPage .foot{background:#fff;border-top:1px solid #E5E5E5;padding:10px 14px 14px;flex-shrink:0}
@@ -61,6 +64,7 @@ var op='https://www.zgulfx.com/css/images/logo.png';
 
 var stopSvg='<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><rect x="5" y="5" width="14" height="14" rx="2"/></svg>';
 var sendSvg='<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M2.7 21.3L23 12 2.7 2.7 2.7 10l14.6 2-14.6 2z"/></svg>';
+var checkSvg='<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M4 12.5l5 5L20 6.5"/></svg>';
 
 var html=`<div id="supPage">
 <div class="sh">
@@ -108,8 +112,11 @@ function p(n){return (n<10?'0':'')+n}
 return d.getFullYear()+'/'+p(d.getMonth()+1)+'/'+p(d.getDate())+' '+p(d.getHours())+':'+p(d.getMinutes())+':'+p(d.getSeconds());
 }
 
-// ====== عرض الرسالة (بدون حفظ — الحفظ بيتم عند الإرسال) ======
-function renderMsg(data){
+// ====== عناصر الرسايل المعروضة (عشان نحدث علامة القراءة) ======
+var msgEls={}; // docId -> {el, rd}
+
+// ====== عرض الرسالة ======
+function renderMsg(id,data){
 var b=document.querySelector('#supPage .body');
 if(!b)return;
 var m=document.createElement('div');
@@ -134,14 +141,39 @@ if(data.type==='image'){
   bub.textContent=data.content;
 }
 m.appendChild(tm);
-m.appendChild(bub);
+
+// الرسايل المُرسلة: فقاعة + علامة قراءة جنبها
+if(data.sender==='me'){
+  var row=document.createElement('div');
+  row.className='row';
+  var rd=document.createElement('span');
+  rd.className='rd'+(data.read?' read':'');
+  rd.innerHTML=checkSvg;
+  row.appendChild(bub);
+  row.appendChild(rd);
+  m.appendChild(row);
+  msgEls[id]={el:m,rd:rd};
+}else{
+  m.appendChild(bub);
+  msgEls[id]={el:m,rd:null};
+}
+
 b.appendChild(m);
 b.scrollTop=b.scrollHeight;
 }
 
+// ====== تحديث علامة القراءة لما الرسالة تتقري ======
+function updateRead(id,read){
+var rec=msgEls[id];
+if(rec&&rec.rd){
+  if(read){rec.rd.classList.add('read');}
+  else{rec.rd.classList.remove('read');}
+}
+}
+
 // ====== Firebase ======
 var db=null;
-var renderedIds={}; // عشان منعرضش الرسالة مرتين
+var renderedIds={};
 
 var firebaseConfig={
   apiKey:"AIzaSyBvzfJOOjRFZnTgTUrwEZQPr8Ba7zKKlNg",
@@ -160,29 +192,44 @@ Promise.all([
   firebase.initializeApp(firebaseConfig);
   db=firebase.firestore();
 
-  // استماع لحظي لكل الرسايل مرتبة بالوقت
+  // ====== استماع لحظي للرسايل (إضافة + تعديل حالة القراءة) ======
   db.collection('messages').orderBy('ts','asc').onSnapshot(function(snap){
     snap.docChanges().forEach(function(ch){
+      var d=ch.doc.data();
       if(ch.type==='added'){
-        var d=ch.doc.data();
         if(renderedIds[ch.doc.id])return;
         renderedIds[ch.doc.id]=true;
-        renderMsg(d);
+        renderMsg(ch.doc.id,d);
+      }else if(ch.type==='modified'){
+        updateRead(ch.doc.id,d.read);
       }
     });
   });
+
+  // ====== استماع لحظي لحالة الاتصال (متصل = أخضر / غير متصل = أحمر) ======
+  db.collection('status').doc('operator').onSnapshot(function(doc){
+    var opEl=document.querySelector('#supPage .op');
+    if(!opEl)return;
+    var d=doc.data();
+    if(d&&d.online===true){opEl.classList.add('on');}
+    else{opEl.classList.remove('on');}
+  },function(){
+    // لو المستند مش موجود تفضل النقطة حمرا (غير متصل)
+  });
+
 }).catch(function(){
   console.error('Firebase failed to load');
 });
 
 // ====== إرسال رسالة لفيربيس ======
-// sender: 'me' = الرسالة المُرسلة (الأخضر) | 'op' = المستلمة (الأبيض)
+// sender: 'me' = المُرسلة (الأخضر) | 'op' = المستلمة (الأبيض)
 function sendMsg(type,content,sender){
   if(!db)return;
   db.collection('messages').add({
-    type:type,           // 'text' | 'image' | 'audio'
-    content:content,     // نص أو base64
+    type:type,
+    content:content,
     sender:sender||'me',
+    read:false,
     time:nowStr(),
     ts:firebase.firestore.FieldValue.serverTimestamp()
   });
@@ -200,7 +247,7 @@ document.getElementById('supSend').addEventListener('click',function(){
 var inp=document.getElementById('supInput');
 var v=inp.value.trim();
 if(!v)return;
-sendMsg('text',v,'me'); // بتظهر تلقائي من onSnapshot
+sendMsg('text',v,'me');
 inp.value='';
 });
 
@@ -218,7 +265,7 @@ var f=this.files&&this.files[0];
 if(!f)return;
 var r=new FileReader();
 r.onload=function(ev){
-  sendMsg('image',ev.target.result,'me'); // ev.target.result = base64
+  sendMsg('image',ev.target.result,'me');
 };
 r.readAsDataURL(f);
 this.value='';
