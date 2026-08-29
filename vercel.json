@@ -1,8 +1,8 @@
 {
   "rewrites": [
     {
-      "source": "/pages",
-      "destination": "/auth.html"
+      "source": "/pages/register/login",
+      "destination": "/register.html"
     }
   ]
 }
