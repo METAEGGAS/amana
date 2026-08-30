@@ -1,5 +1,37 @@
 (function(){
 if(!window.firebase){console.error('Firebase SDK غير محمّل');}
+/* ========== بوابة التحقق من الجلسة: بريد + كلمة سر فقط ========== */
+/* لا Anonymous — لا Popup — أي مستخدم بدون جلسة بريد صالحة يُحوَّل إلى register.html */
+var __REDIRECT_PAGE='register.html';
+var __authGateStarted=false;
+function authGate(){
+if(__authGateStarted)return;
+__authGateStarted=true;
+try{
+if(!window.firebase||!firebase.auth){
+setTimeout(function(){window.location.replace(__REDIRECT_PAGE);},800);
+return;
+}
+firebase.auth().onAuthStateChanged(function(u){
+/* مرفوض تمامًا: لا مستخدم، أو مستخدم مجهول، أو مستخدم بدون بريد إلكتروني */
+if(!u||u.isAnonymous||!u.email){
+try{firebase.auth().signOut()}catch(e){}
+if(!/register\.html$/i.test(location.pathname)){
+window.location.replace(__REDIRECT_PAGE);
+}
+return;
+}
+/* جلسة بريد + كلمة سر صالحة: تحميل بيانات المستخدم في الخلفية */
+window.__userEmail=u.email||window.__userEmail||'';
+try{
+if(typeof loadAddr==='function')loadAddr();
+}catch(e){}
+});
+}catch(e){
+setTimeout(function(){window.location.replace(__REDIRECT_PAGE);},800);
+}
+}
+authGate();
 /* ========== حماية: منع النسخ والتحديد والتكبير ========== */
 var protCss="html,body{-webkit-user-select:none!important;-moz-user-select:none!important;user-select:none!important;-webkit-touch-callout:none!important;touch-action:manipulation!important;overscroll-behavior:none!important}"+
 "input,textarea{-webkit-user-select:text!important;user-select:text!important}"+
