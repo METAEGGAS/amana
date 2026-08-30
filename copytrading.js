@@ -67,7 +67,19 @@ var CSS='#ctRoot,#ctRoot *{margin:0;padding:0;box-sizing:border-box;font-family:
 +'#ctRoot .ct-empty img{width:130px}'
 +'#ctRoot .ct-empty div{color:#9a9aa5;font-size:13px;margin-top:12px}'
 +'#ctSpin{display:none;text-align:center;padding-top:28vh}'
-+'#ctSpin img{width:64px}';
++'#ctSpin img{width:64px}'
++'#ctList{padding:14px}'
++'#ctList .ct-rec{background:#fff;border-radius:14px;padding:15px 16px;margin-bottom:12px;box-shadow:0 2px 10px rgba(0,0,0,.05)}'
++'#ctList .ct-rtop{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px}'
++'#ctList .ct-rcode{font-size:15px;font-weight:700;color:#1a1a1a}'
++'#ctList .ct-rdone{background:#e8f9f1;color:#12b981;font-size:12px;font-weight:700;border-radius:20px;padding:4px 12px}'
++'#ctList .ct-rrow{display:flex;justify-content:space-between;font-size:12.5px;color:#9a9aa5;margin-top:6px}'
++'#ctList .ct-rrow b{color:#1a1a1a;font-weight:700}'
++'#ctList .ct-rprof{color:#12b981!important;font-weight:800}'
++'#ctWin{position:fixed;inset:0;background:#6a4df0;z-index:10000;display:flex;flex-direction:column;align-items:center;justify-content:center;opacity:0;visibility:hidden;transition:.3s}'
++'#ctWin.ct-on{opacity:1;visibility:visible}'
++'#ctWin .ct-wc{width:92px;height:92px;border-radius:50%;background:rgba(255,255,255,.18);display:flex;align-items:center;justify-content:center;margin-bottom:20px}'
++'#ctWin .ct-wt{color:#fff;font-size:20px;font-weight:800}';
 var st=document.createElement('style');
 st.setAttribute('data-inj-root','copytrading');
 st.textContent=CSS;
@@ -78,7 +90,7 @@ root.setAttribute('data-inj-root','copytrading');
 root.innerHTML=[
 '<div class="ct-card">',
 '<h2>إجمالي الربح والخسارة</h2>',
-'<div class="ct-total"><b>0.00 <span>USD</span></b><span class="ct-pill">اليوم 0.00</span></div>',
+'<div class="ct-total"><b id="ctTot">0.00 <span>USD</span></b><span class="ct-pill" id="ctToday">اليوم 0.00</span></div>',
 '<div class="ct-row">',
 '<div>حصة الشريك<b>+ 0.00 USD</b></div>',
 '<div>الاحتفاظ بمركز أدنى<b>+ 0.00 USD</b></div>',
@@ -152,17 +164,22 @@ root.innerHTML=[
 '<div class="ct-pg" id="ctPage">',
 '<div class="ct-pbar"><svg class="ct-bk" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg><span>سجلات النسخ</span></div>',
 '<div class="ct-tabs"><div data-i="0">قيد المراجعة</div><div data-i="1">جارٍ النسخ</div><div class="ct-on" data-i="2">مكتمل</div><div data-i="3">مرفوض</div></div>',
+'<div id="ctList"></div>',
 '<div id="ctSpin"><img src="https://gulfxdl.com/assets/loading-D0BtznxM.gif" alt=""></div>',
 '<div class="ct-empty" id="ctEmp"><img src="https://gulfxdl.com/assets/empty-light-B1A8k_0V.png" alt=""><div>لا يوجد محتوى</div></div>',
 '</div>',
 '<div class="ct-pg" id="ctPage2">',
 '<div class="ct-pbar"><svg class="ct-bk" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg><span>متابعو التداول اليوم</span></div>',
 '<div class="ct-empty" style="display:block"><img src="https://gulfxdl.com/assets/empty-light-B1A8k_0V.png" alt=""><div>لا يوجد محتوى</div></div>',
+'</div>',
+'<div id="ctWin">',
+'<div class="ct-wc"><svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></div>',
+'<div class="ct-wt">نجاح الاستخدام</div>',
 '</div>'
 ].join('');
 document.body.appendChild(root);
 /* ================= Firebase (Auth: email/password only + Cloud Firestore) ================= */
-var FB={ready:false,user:null,fs:null,auth:null,doc:null,getDoc:null,setDoc:null,getDocs:null,collection:null,query:null,limit:null,balance:0};
+var FB={ready:false,user:null,fs:null,auth:null,doc:null,getDoc:null,setDoc:null,getDocs:null,collection:null,query:null,limit:null,balance:0,totalProfit:0,dayProfit:0};
 var FIREBASE_CONFIG={
 apiKey:"AIzaSyBvzfJOOjRFZnTgTUrwEZQPr8Ba7zKKlNg",
 authDomain:"hhhxh-5ebe4.firebaseapp.com",
@@ -178,12 +195,22 @@ var CT_DAY_MS=24*60*60*1000;
 var CT_DEFAULT_CODES={ALPHA100:true,GOLD200:true,PROFIT300:true,SIGNAL400:true,TRADE500:true,WIN600:true};
 function ctBlocked(){return !FB.ready||!FB.user}
 function ctFmt(n){return (+n).toFixed(2)}
+function ctTodayKey(){var d=new Date();return d.getFullYear()+'-'+(d.getMonth()+1)+'-'+d.getDate()}
 function ctShowBalance(){document.getElementById('ctAvail').innerHTML=ctFmt(FB.balance)+' <span>USD</span>'}
+/* عرض إجمالي الربح التراكمي + ربح اليوم في البطاقة الرئيسية */
+function ctRenderCard(){
+document.getElementById('ctTot').innerHTML=ctFmt(FB.totalProfit)+' <span>USD</span>';
+document.getElementById('ctToday').textContent='اليوم '+ctFmt(FB.dayProfit);
+}
 function ctLoadBalance(){
 if(!FB.user)return;
 FB.getDoc(FB.doc(FB.fs,'users',FB.user.uid)).then(function(s){
-FB.balance=parseFloat(s.exists()?s.data().balance:0)||0;
+var d=s.exists()?s.data():{};
+FB.balance=parseFloat(d.balance)||0;
+FB.totalProfit=parseFloat(d.totalProfit)||0;
+FB.dayProfit=(d.dayKey===ctTodayKey())?(parseFloat(d.dayProfit)||0):0;
 ctShowBalance();
+ctRenderCard();
 }).catch(function(){});
 }
 Promise.all([
@@ -211,9 +238,41 @@ if(root&&root.parentNode)root.parentNode.removeChild(root);
 });
 }).catch(function(e){console.error('Firebase init error',e)});
 /* ================= /Firebase ================= */
-var ovl=document.getElementById('ctOvl'),sh=document.getElementById('ctSheet'),amt=document.getElementById('ctAmt'),pg=document.getElementById('ctPage'),pg2=document.getElementById('ctPage2'),spin=document.getElementById('ctSpin'),emp=document.getElementById('ctEmp');
-function openS(){if(ctBlocked()){alert('يجب تسجيل الدخول بالبريد الإلكتروني وكلمة المرور أولاً');return}ovl.classList.add('ct-on');sh.classList.add('ct-on');root.style.overflow='hidden'}
-function closeS(){ovl.classList.remove('ct-on');sh.classList.remove('ct-on');root.style.overflow=''}
+var ovl=document.getElementById('ctOvl'),sh=document.getElementById('ctSheet'),amt=document.getElementById('ctAmt'),pg=document.getElementById('ctPage'),pg2=document.getElementById('ctPage2'),spin=document.getElementById('ctSpin'),emp=document.getElementById('ctEmp'),list=document.getElementById('ctList'),win=document.getElementById('ctWin');
+/* ===== إخفاء الشريط السفلي للصفحة الأم أثناء فتح الشيت ===== */
+var ctHidden=[];
+function ctHideBar(){
+ctHidden=[];
+var els=document.querySelectorAll('body *');
+for(var i=0;i<els.length;i++){
+var el=els[i];
+if(el===root||root.contains(el))continue;
+var cs;
+try{cs=getComputedStyle(el)}catch(e){continue}
+if(cs.position!=='fixed'&&cs.position!=='sticky')continue;
+var r=el.getBoundingClientRect();
+if(r.height<20||r.height>140)continue;
+if(r.bottom>=window.innerHeight-1&&r.top>window.innerHeight*0.55){
+ctHidden.push([el,el.style.display||'']);
+el.style.setProperty('display','none','important');
+}
+}
+}
+function ctShowBar(){
+for(var i=0;i<ctHidden.length;i++){
+ctHidden[i][0].style.removeProperty('display');
+if(ctHidden[i][1])ctHidden[i][0].style.display=ctHidden[i][1];
+}
+ctHidden=[];
+}
+/* ===== شاشة "نجاح الاستخدام" فقط ===== */
+function ctWinShow(){
+win.classList.add('ct-on');
+setTimeout(function(){win.classList.remove('ct-on')},2500);
+}
+win.onclick=function(){win.classList.remove('ct-on')};
+function openS(){if(ctBlocked()){alert('يجب تسجيل الدخول بالبريد الإلكتروني وكلمة المرور أولاً');return}ctHideBar();ovl.classList.add('ct-on');sh.classList.add('ct-on');root.style.overflow='hidden'}
+function closeS(){ovl.classList.remove('ct-on');sh.classList.remove('ct-on');root.style.overflow='';ctShowBar()}
 root.querySelectorAll('.ct-sec .ct-head').forEach(function(h){h.onclick=openS});
 ovl.onclick=closeS;
 document.getElementById('ctCnl').onclick=closeS;
@@ -251,23 +310,60 @@ var ud=us.exists()?us.data():{};
 var log=ud.sigLog||{};
 var keys=Object.keys(log),cnt=0,i;
 for(i=0;i<keys.length;i++){if(now-(+log[keys[i]]||0)<CT_DAY_MS)cnt++}
+/* لا يمكن استخدام نفس الكود أكثر من مرة */
 if(log[code]){okBtn.disabled=false;return alert('لا يمكن استخدام نفس الرمز مرتين')}
+/* الحد الأقصى 3 أكواد فقط خلال 24 ساعة */
 if(cnt>=CT_DAILY_LIMIT){okBtn.disabled=false;return alert('لقد استخدمت الحد الأقصى: 3 رموز إشارة خلال 24 ساعة، حاول لاحقاً')}
-/* 4) احتساب الربح 1.6667% من الرصيد وإضافته إلى حقل balance */
+/* 4) احتساب الربح 1.6667% من الرصيد وإضافته إلى حقل balance + الربح التراكمي + ربح اليوم */
 var bal=parseFloat(ud.balance)||0;
-var profit=bal*CT_RATE;
+var profit=+(bal*CT_RATE).toFixed(2);
 var nb=+(bal+profit).toFixed(2);
-var upd={balance:nb};
+var tp=+((parseFloat(ud.totalProfit)||0)+profit).toFixed(2);
+var tk=ctTodayKey();
+var dp=(ud.dayKey===tk)?(parseFloat(ud.dayProfit)||0):0;
+dp=+(dp+profit).toFixed(2);
+/* تسجيل تفاصيل الكود المستخدم لعرضها في سجلات النسخ - مكتمل */
+var recs=(ud.ctRecs||[]).slice();
+recs.push({code:code,amt:+amt.value,profit:profit,time:now});
+var upd={balance:nb,totalProfit:tp,dayProfit:dp,dayKey:tk,ctRecs:recs};
 upd['sigLog.'+code]=now;
 return FB.setDoc(FB.doc(FB.fs,'users',uid),upd,{merge:true}).then(function(){
-FB.balance=nb;ctShowBalance();
+FB.balance=nb;FB.totalProfit=tp;FB.dayProfit=dp;
+ctShowBalance();
+ctRenderCard();
 okBtn.disabled=false;
-alert('تم إرسال طلب نسخ التداول بنجاح\nتمت إضافة ربح '+ctFmt(profit)+' USD (1.6667%) إلى رصيدك\nرصيدك الجديد: '+ctFmt(nb)+' USD');
 closeS();
+/* شاشة نجاح الاستخدام فقط */
+ctWinShow();
 });
 }).catch(function(e){okBtn.disabled=false;console.error(e);alert('حدث خطأ أثناء معالجة الطلب، حاول مرة أخرى')});
 };
-function loadC(){emp.style.display='none';spin.style.display='block';setTimeout(function(){spin.style.display='none';emp.style.display='block'},1200)}
+/* ===== تحميل وعرض سجلات النسخ المكتملة ===== */
+function ctLoadRecs(){
+var uid=FB.user?FB.user.uid:null;
+if(!uid){spin.style.display='none';emp.style.display='block';return}
+FB.getDoc(FB.doc(FB.fs,'users',uid)).then(function(s){
+spin.style.display='none';
+var d=s.exists()?s.data():{};
+var recs=d.ctRecs||[];
+var active=root.querySelector('.ct-tabs div.ct-on');
+var ti=active?active.dataset.i:'2';
+/* عرض التفاصيل فقط في تبويب "مكتمل" */
+if(ti!=='2'||!recs.length){list.innerHTML='';emp.style.display='block';return}
+recs=recs.slice().reverse();
+var h='';
+for(var i=0;i<recs.length;i++){
+var r=recs[i];
+h+='<div class="ct-rec"><div class="ct-rtop"><div class="ct-rcode">'+r.code+'</div><div class="ct-rdone">مكتمل</div></div>'
++'<div class="ct-rrow"><span>مبلغ النسخ</span><b>'+ctFmt(r.amt)+' USD</b></div>'
++'<div class="ct-rrow"><span>الربح</span><b class="ct-rprof">+'+ctFmt(r.profit)+' USD</b></div>'
++'<div class="ct-rrow"><span>التاريخ</span><b>'+new Date(r.time).toLocaleString('ar-EG')+'</b></div></div>';
+}
+list.innerHTML=h;
+emp.style.display='none';
+}).catch(function(){spin.style.display='none';emp.style.display='block'});
+}
+function loadC(){list.innerHTML='';emp.style.display='none';spin.style.display='block';setTimeout(ctLoadRecs,400)}
 document.getElementById('ctCmy').onclick=function(){pg.classList.add('ct-on');loadC()};
 document.getElementById('ctPdet').onclick=function(){pg2.classList.add('ct-on')};
 root.querySelectorAll('.ct-bk').forEach(function(b){b.onclick=function(){b.closest('.ct-pg').classList.remove('ct-on')}});
