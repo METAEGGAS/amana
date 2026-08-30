@@ -37,6 +37,31 @@ body{background:#f2f3f7;max-width:480px;margin:auto}
 .pnl{font-size:19px;font-weight:800}
 .lbl{font-size:12px;color:#999;margin-top:3px}
 .rate{color:#12b981;font-size:17px;font-weight:800;margin-top:10px}
+/* ====== Bottom Sheet (متابعة الإشارة) ====== */
+#ovl{position:fixed;inset:0;background:rgba(0,0,0,.45);opacity:0;visibility:hidden;transition:.3s;z-index:98}
+#sheet{position:fixed;left:0;right:0;bottom:0;max-width:480px;margin:auto;background:#fff;border-radius:20px 20px 0 0;padding:26px 20px 22px;z-index:99;transform:translateY(100%);transition:transform .35s ease}
+#ovl.on{opacity:1;visibility:visible}
+#sheet.on{transform:translateY(0)}
+#sheet h3{text-align:center;font-size:16px;font-weight:700;margin-bottom:22px}
+#sheet .lb{font-size:14px;font-weight:700;margin-bottom:10px}
+#sheet .av{color:#6a4df0;font-size:22px;font-weight:800;margin-bottom:20px}
+#sheet .av span{font-size:15px;font-weight:700}
+#sheet .fld{background:#f2f3f7;border-radius:8px;display:flex;align-items:center;margin-bottom:22px}
+#sheet .fld input{border:0;outline:0;background:none;flex:1;padding:15px 14px;font-size:13px;color:#333}
+#sheet .fld input::placeholder{color:#b5b5c3}
+#sheet .mx{padding:0 18px;font-size:15px;font-weight:700;color:#1a1a1a;cursor:pointer}
+.chips{display:flex;gap:8px;margin:-8px 0 22px}
+.chips div{flex:1;background:#f2f3f7;border-radius:8px;text-align:center;padding:11px 0;font-size:14px;cursor:pointer;transition:.15s}
+.chips div.sel{background:#ece9fd;color:#6a4df0;font-weight:700}
+.cpn{font-size:12.5px;color:#9c9c9c;margin-bottom:22px}
+.agr{display:flex;align-items:center;gap:8px;font-size:12.5px;color:#9c9c9c;margin-bottom:20px;cursor:pointer;user-select:none}
+.agr .cb{width:16px;height:16px;border-radius:4px;background:#6a4df0;flex-shrink:0;display:flex;align-items:center;justify-content:center;color:#fff;font-size:11px;font-weight:700}
+.agr.off .cb{background:#fff;border:2px solid #d5d5de;color:transparent}
+.agr b{color:#6a4df0;font-weight:400}
+.sbt{display:flex;gap:12px}
+.sbt button{flex:1;border-radius:10px;padding:13px 0;font-size:14px;cursor:pointer}
+#cnl{background:#fff;border:1px solid #d8d8e0;color:#333}
+#ok{border:0;background:#6a4df0;color:#fff;font-weight:700}
 </style>
 </head>
 <body>
@@ -48,7 +73,7 @@ body{background:#f2f3f7;max-width:480px;margin:auto}
 <div>Keep Lower Position<b>+ 0.00 USD</b></div>
 </div>
 <div class="min">Minimum Transaction Balance <b>0.00 USD</b></div>
-<div class="btns"><button>Copy My Trades</button><button>Partner Details</button></div>
+<div class="btns"><button id="copyBtn">Copy My Trades</button><button>Partner Details</button></div>
 </div>
 <div class="search">
 <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#aaa" stroke-width="2"><circle cx="11" cy="11" r="7"/><line x1="16.5" y1="16.5" x2="21" y2="21"/></svg>
@@ -98,5 +123,42 @@ body{background:#f2f3f7;max-width:480px;margin:auto}
 </div>
 </div>
 </div>
+
+<!-- ====== Bottom Sheet: متابعة الإشارة ====== -->
+<div id="ovl"></div>
+<div id="sheet" dir="rtl">
+<h3>متابعة الإشارة</h3>
+<div class="lb">المتاح</div>
+<div class="av" id="avail">0 <span>USD</span></div>
+<div class="lb">رمز الإشارة</div>
+<div class="fld"><input id="sig" type="text" placeholder="يرجى إدخال رمز الإشارة"></div>
+<div class="lb">مبلغ النسخ</div>
+<div class="fld"><input id="amt" type="number" placeholder="يرجى إدخال مبلغ النسخ"><span class="mx" id="mx">MAX</span></div>
+<div class="chips"><div data-v="1000">1000</div><div data-v="3000">3000</div><div data-v="5000">5000</div><div data-v="10000">10000</div></div>
+<div class="lb">اختر قسيمة</div>
+<div class="cpn">لا يوجد</div>
+<div class="agr" id="agr"><span class="cb">✓</span>اتفاقية تتبع النسخ <b>لقد قرأت ووافقت على</b></div>
+<div class="sbt"><button id="cnl">إلغاء</button><button id="ok">تقديم طلب نسخ التداول</button></div>
+</div>
+
+<script>
+var ovl=document.getElementById('ovl'),sh=document.getElementById('sheet'),amt=document.getElementById('amt');
+function openS(){ovl.classList.add('on');sh.classList.add('on');document.body.style.overflow='hidden'}
+function closeS(){ovl.classList.remove('on');sh.classList.remove('on');document.body.style.overflow=''}
+document.getElementById('copyBtn').onclick=openS;
+ovl.onclick=closeS;
+document.getElementById('cnl').onclick=closeS;
+document.getElementById('mx').onclick=function(){amt.value=document.getElementById('avail').textContent.trim().split(' ')[0];markChip()};
+document.querySelectorAll('.chips div').forEach(function(c){c.onclick=function(){amt.value=c.dataset.v;markChip()}});
+function markChip(){document.querySelectorAll('.chips div').forEach(function(c){c.classList.toggle('sel',c.dataset.v===amt.value)})}
+amt.oninput=markChip;
+document.getElementById('agr').onclick=function(){this.classList.toggle('off')};
+document.getElementById('ok').onclick=function(){
+  if(!document.getElementById('sig').value.trim())return alert('يرجى إدخال رمز الإشارة');
+  if(!amt.value||+amt.value<=0)return alert('يرجى إدخال مبلغ النسخ');
+  if(document.getElementById('agr').classList.contains('off'))return alert('يجب الموافقة على اتفاقية تتبع النسخ');
+  alert('تم تقديم طلب نسخ التداول بنجاح');closeS();
+};
+</script>
 </body>
 </html>
