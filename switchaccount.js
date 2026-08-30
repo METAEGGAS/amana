@@ -1,7 +1,7 @@
 /* ============================================================
    switchaccount.js  —  صفحة "سجل تغييرات الحساب"
    تُحقن عبر injectJS('switchaccount.js') من زر "تغير الحساب"
-   تعرض طلبات الإيداع الخاصة بالمستخدم من Firebase
+   تعرض طلبات الإيداع + طلبات السحب الخاصة بالمستخدم من Firebase
    (نفس إعدادات ونظام recharge.js)
    ============================================================ */
 (function(){
@@ -38,14 +38,18 @@
       '#swAccRoot .sw-empty.show{display:flex}',
       '#swAccRoot .sw-empty img{width:110px;height:110px;display:block;object-fit:contain}',
       '#swAccRoot .sw-empty p{margin-top:12px;color:#9BA0AA;font-size:13px}',
-      /* قائمة طلبات الإيداع */
+      /* قائمة طلبات الإيداع والسحب */
       '#swAccRoot .sw-list{display:none;flex-direction:column;gap:10px}',
       '#swAccRoot .sw-list.show{display:flex}',
       '#swAccRoot .sw-item{background:#fff;border-radius:12px;box-shadow:0 2px 8px rgba(30,30,60,.06);padding:13px 12px;display:flex;align-items:center;gap:10px}',
       '#swAccRoot .sw-item .sw-ic{width:36px;height:36px;border-radius:50%;object-fit:cover;flex-shrink:0;background:#F4F4F8}',
       '#swAccRoot .sw-item .sw-mid{flex:1;min-width:0;display:flex;flex-direction:column;gap:3px}',
-      '#swAccRoot .sw-item .sw-amt{font-size:14.5px;font-weight:800;color:#1A1A2E;direction:ltr;text-align:right}',
+      '#swAccRoot .sw-item .sw-amt{font-size:14.5px;font-weight:800;color:#1B9E57;direction:ltr;text-align:right}',
+      '#swAccRoot .sw-item .sw-amt.out{color:#D64545}',
       '#swAccRoot .sw-item .sw-sub{font-size:11px;color:#9BA0AA;display:flex;align-items:center;gap:6px;flex-wrap:wrap}',
+      '#swAccRoot .sw-item .sw-type{font-size:9.5px;font-weight:800;padding:2px 7px;border-radius:6px;flex-shrink:0}',
+      '#swAccRoot .sw-item .sw-type.in{color:#1B9E57;background:#E2F7EB}',
+      '#swAccRoot .sw-item .sw-type.wd{color:#D64545;background:#FDE8E8}',
       '#swAccRoot .sw-item .sw-net{font-size:10px;font-weight:700;color:#7C83F6;background:#F0EFFE;padding:2px 7px;border-radius:6px;direction:ltr}',
       '#swAccRoot .sw-item .sw-date{font-size:11px;color:#9BA0AA;direction:ltr}',
       '#swAccRoot .sw-item .sw-addr{font-size:10px;color:#B9BBC4;font-family:monospace;direction:ltr;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:170px}',
@@ -135,8 +139,9 @@
     return {cls:'pending',tx:'قيد المراجعة'};
   }
 
-  /* ---------- 7) عرض عنصر واحد ---------- */
+  /* ---------- 7) عرض عنصر واحد (إيداع أو سحب) ---------- */
   function renderItem(it){
+    var isWd=it.__type==='withdraw';
     var cur=(it.currency||'USDT').toString().toUpperCase();
     var icon=CUR_ICONS[cur]||CUR_ICONS.USDT;
     var amt=(it.amount!==undefined&&it.amount!==null)?it.amount:(it.amountCoin!==undefined?it.amountCoin:it.amountUSD);
@@ -149,8 +154,9 @@
     el.innerHTML=
       '<img class="sw-ic" src="'+icon+'" alt="">'+
       '<div class="sw-mid">'+
-        '<div class="sw-amt">+'+amt+' '+cur+'</div>'+
+        '<div class="sw-amt'+(isWd?' out':'')+'">'+(isWd?'-':'+')+amt+' '+cur+'</div>'+
         '<div class="sw-sub">'+
+          '<span class="sw-type '+(isWd?'wd':'in')+'">'+(isWd?'سحب':'إيداع')+'</span>'+
           (net?'<span class="sw-net">'+net+'</span>':'')+
           (dt?'<span class="sw-date">'+dt+'</span>':'')+
         '</div>'+
@@ -160,7 +166,7 @@
     return el;
   }
 
-  /* ---------- 8) جلب طلبات الإيداع الخاصة بالمستخدم ---------- */
+  /* ---------- 8) جلب طلبات الإيداع + السحب الخاصة بالمستخدم ---------- */
   var fetchDone=false,items=[],closed=false;
 
   function fetchRecharges(){
@@ -173,22 +179,25 @@
         var db=fb.db,f=fb.fns;
         var results=[],seen={};
 
-        function pushDocs(snap){
+        function pushDocs(snap,type){
           snap.forEach(function(dc){
             if(seen[dc.id])return;
             seen[dc.id]=true;
             var d=dc.data()||{};
             d.__id=dc.id;
+            d.__type=type||'deposit';
             results.push(d);
           });
         }
 
         /* 1) المجموعة الفرعية users/{uid}/recharges */
-        var p1=f.getDocs(f.collection(db,'users/'+uid+'/recharges')).then(function(s){pushDocs(s)}).catch(function(){});
+        var p1=f.getDocs(f.collection(db,'users/'+uid+'/recharges')).then(function(s){pushDocs(s,'deposit')}).catch(function(){});
         /* 2) المجموعة الرئيسية recharge_requests حيث uid = المستخدم */
-        var p2=f.getDocs(f.query(f.collection(db,'recharge_requests'),f.where('uid','==',uid))).then(function(s){pushDocs(s)}).catch(function(){});
+        var p2=f.getDocs(f.query(f.collection(db,'recharge_requests'),f.where('uid','==',uid))).then(function(s){pushDocs(s,'deposit')}).catch(function(){});
+        /* 3) المجموعة الرئيسية withdrawals حيث uid = المستخدم (نفس مكان حفظ withdraw.js) */
+        var p3=f.getDocs(f.query(f.collection(db,'withdrawals'),f.where('uid','==',uid))).then(function(s){pushDocs(s,'withdraw')}).catch(function(){});
 
-        Promise.all([p1,p2]).then(function(){
+        Promise.all([p1,p2,p3]).then(function(){
           /* ترتيب من الأحدث للأقدم */
           results.sort(function(a,b){
             var ta=(a.createdAt&&a.createdAt.seconds)?a.createdAt.seconds*1000:(a.date?new Date(a.date).getTime():0);
@@ -208,12 +217,12 @@
     tryShow();
   }
 
-  /* ---------- 9) التحميل 4 ثواني + عرض النتيجة ---------- */
+  /* ---------- 9) التحميل نص ثانية بالظبط + عرض النتيجة ---------- */
   var minTimePassed=false;
   var loadTimer=setTimeout(function(){
     minTimePassed=true;
     tryShow();
-  },4000);
+  },500);
 
   var shown=false;
   function tryShow(){
@@ -232,10 +241,10 @@
     }
   }
 
-  /* لو Firebase اتأخر أكتر من 12 ثانية نوقف التحميل ونعرض الفارغ */
+  /* لو Firebase اتأخر أكتر من 8 ثواني نوقف التحميل ونعرض الفارغ */
   var guardTimer=setTimeout(function(){
     if(!fetchDone){finishFetch([])}
-  },12000);
+  },8000);
 
   fetchRecharges();
 
