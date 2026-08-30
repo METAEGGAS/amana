@@ -64,14 +64,19 @@ body{background:#f2f3f7;max-width:480px;margin:auto;touch-action:pan-x pan-y}
 #page{position:fixed;inset:0;background:#f6f7fb;z-index:100;max-width:480px;margin:auto;transform:translateX(100%);transition:transform .35s ease;overflow-y:auto}
 #page.on{transform:translateX(0)}
 .pbar{height:56px;background:url('https://i.ibb.co/hRm446rn/IMG.png') center/cover;display:flex;align-items:center;justify-content:center;color:#fff;font-size:16px;font-weight:700;position:relative}
-.pbar svg{position:absolute;left:16px;top:50%;transform:translateY(-50%);cursor:pointer}
+.pbar svg{position:absolute;inset-inline-start:16px;top:50%;transform:translateY(-50%);cursor:pointer}
+#page[dir="ltr"] .pbar svg{transform:translateY(-50%) scaleX(-1)}
+#lng{position:absolute;inset-inline-end:14px;top:50%;transform:translateY(-50%);background:rgba(255,255,255,.22);border:0;color:#fff;font-size:12px;font-weight:700;padding:5px 11px;border-radius:14px;cursor:pointer}
 .tabs{display:flex;background:#fff}
 .tabs div{flex:1;text-align:center;font-size:13px;color:#888;padding:15px 0 13px;position:relative;cursor:pointer;white-space:nowrap}
 .tabs div.on{font-weight:700;color:#1a1a1a}
 .tabs div.on:after{content:'';position:absolute;bottom:0;left:50%;transform:translateX(-50%);width:34px;height:3px;border-radius:2px;background:#6a4df0}
-.empty{text-align:center;padding-top:26vh}
+.empty{text-align:center;padding-top:26vh;display:none}
 .empty img{width:130px}
 .empty div{color:#9a9aa5;font-size:13px;margin-top:12px}
+#spin{display:none;text-align:center;padding-top:28vh}
+#spin i{display:inline-block;width:38px;height:38px;border:3.5px solid #e3e0f5;border-top-color:#6a4df0;border-radius:50%;animation:rt .7s linear infinite}
+@keyframes rt{to{transform:rotate(360deg)}}
 </style>
 </head>
 <body>
@@ -149,12 +154,13 @@ body{background:#f2f3f7;max-width:480px;margin:auto;touch-action:pan-x pan-y}
 <div class="sbt"><button id="cnl">Cancel</button><button id="ok">Submit Copy Trading Request</button></div>
 </div>
 <div id="page" dir="rtl">
-<div class="pbar"><svg id="back" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>سجلات النسخ</div>
-<div class="tabs"><div>قيد المراجعة</div><div>جاري النسخ</div><div class="on">انتهى</div><div>تم الرفض</div></div>
-<div class="empty"><img src="https://gulfxdl.com/assets/empty-light-B1A8k_0V.png" alt=""><div>لا يوجد محتوى</div></div>
+<div class="pbar"><svg id="back" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg><span id="pttl">سجلات النسخ</span><button id="lng">EN</button></div>
+<div class="tabs"><div data-i="0">قيد المراجعة</div><div data-i="1">جاري النسخ</div><div class="on" data-i="2">انتهى</div><div data-i="3">تم الرفض</div></div>
+<div id="spin"><i></i></div>
+<div class="empty" id="emp"><img src="https://gulfxdl.com/assets/empty-light-B1A8k_0V.png" alt=""><div id="emt">لا يوجد محتوى</div></div>
 </div>
 <script>
-var ovl=document.getElementById('ovl'),sh=document.getElementById('sheet'),amt=document.getElementById('amt'),pg=document.getElementById('page');
+var ovl=document.getElementById('ovl'),sh=document.getElementById('sheet'),amt=document.getElementById('amt'),pg=document.getElementById('page'),spin=document.getElementById('spin'),emp=document.getElementById('emp');
 function openS(){ovl.classList.add('on');sh.classList.add('on');document.body.style.overflow='hidden'}
 function closeS(){ovl.classList.remove('on');sh.classList.remove('on');document.body.style.overflow=''}
 document.querySelectorAll('.sec .head').forEach(function(h){h.onclick=openS});
@@ -170,9 +176,12 @@ if(!document.getElementById('sig').value.trim())return alert('Please enter the s
 if(!amt.value||+amt.value<=0)return alert('Please enter the copy amount');
 if(document.getElementById('agr').classList.contains('off'))return alert('You must agree to the Copy Tracking Agreement');
 alert('Copy trading request submitted successfully');closeS()};
-document.getElementById('cmy').onclick=function(){pg.classList.add('on')};
+function loadC(){emp.style.display='none';spin.style.display='block';setTimeout(function(){spin.style.display='none';emp.style.display='block'},250)}
+document.getElementById('cmy').onclick=function(){pg.classList.add('on');loadC()};
 document.getElementById('back').onclick=function(){pg.classList.remove('on')};
-document.querySelectorAll('.tabs div').forEach(function(t){t.onclick=function(){document.querySelectorAll('.tabs div').forEach(function(x){x.classList.remove('on')});t.classList.add('on')}});
+document.querySelectorAll('.tabs div').forEach(function(t){t.onclick=function(){if(t.classList.contains('on'))return;document.querySelectorAll('.tabs div').forEach(function(x){x.classList.remove('on')});t.classList.add('on');loadC()}});
+var L={ar:{t:'سجلات النسخ',tb:['قيد المراجعة','جاري النسخ','انتهى','تم الرفض'],e:'لا يوجد محتوى',b:'EN',d:'rtl'},en:{t:'Copy Records',tb:['Under Review','Copying','Completed','Rejected'],e:'No content',b:'ع',d:'ltr'}},cur='ar';
+document.getElementById('lng').onclick=function(){cur=cur==='ar'?'en':'ar';var x=L[cur];pg.dir=x.d;document.getElementById('pttl').textContent=x.t;document.getElementById('emt').textContent=x.e;this.textContent=x.b;document.querySelectorAll('.tabs div').forEach(function(t){t.textContent=x.tb[+t.dataset.i]})};
 document.addEventListener('contextmenu',function(e){e.preventDefault()});
 document.addEventListener('copy',function(e){e.preventDefault()});
 document.addEventListener('cut',function(e){e.preventDefault()});
