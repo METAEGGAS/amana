@@ -161,12 +161,11 @@ root.innerHTML=[
 '</div>'
 ].join('');
 document.body.appendChild(root);
-/* ================= Firebase (Auth: email/password only + Realtime Database) ================= */
-var FB={ready:false,user:null,db:null,auth:null,ref:null,get:null,set:null,update:null,balance:0};
+/* ================= Firebase (Auth: email/password only + Cloud Firestore) ================= */
+var FB={ready:false,user:null,fs:null,auth:null,doc:null,getDoc:null,setDoc:null,getDocs:null,collection:null,query:null,limit:null,balance:0};
 var FIREBASE_CONFIG={
 apiKey:"AIzaSyBvzfJOOjRFZnTgTUrwEZQPr8Ba7zKKlNg",
 authDomain:"hhhxh-5ebe4.firebaseapp.com",
-databaseURL:"https://hhhxh-5ebe4-default-rtdb.firebaseio.com",
 projectId:"hhhxh-5ebe4",
 storageBucket:"hhhxh-5ebe4.firebasestorage.app",
 messagingSenderId:"79243000696",
@@ -182,22 +181,23 @@ function ctFmt(n){return (+n).toFixed(2)}
 function ctShowBalance(){document.getElementById('ctAvail').innerHTML=ctFmt(FB.balance)+' <span>USD</span>'}
 function ctLoadBalance(){
 if(!FB.user)return;
-FB.get(FB.ref(FB.db,'users/'+FB.user.uid+'/balance')).then(function(s){
-FB.balance=parseFloat(s.val())||0;
+FB.getDoc(FB.doc(FB.fs,'users',FB.user.uid)).then(function(s){
+FB.balance=parseFloat(s.exists()?s.data().balance:0)||0;
 ctShowBalance();
 }).catch(function(){});
 }
 Promise.all([
 import('https://www.gstatic.com/firebasejs/12.18.0/firebase-app.js'),
 import('https://www.gstatic.com/firebasejs/12.18.0/firebase-auth.js'),
-import('https://www.gstatic.com/firebasejs/12.18.0/firebase-database.js')
+import('https://www.gstatic.com/firebasejs/12.18.0/firebase-firestore.js')
 ]).then(function(mods){
-var appMod=mods[0],authMod=mods[1],dbMod=mods[2];
+var appMod=mods[0],authMod=mods[1],fsMod=mods[2];
 var app=appMod.initializeApp(FIREBASE_CONFIG);
 try{import('https://www.gstatic.com/firebasejs/12.18.0/firebase-analytics.js').then(function(an){try{an.getAnalytics(app)}catch(e){}})}catch(e){}
 FB.auth=authMod.getAuth(app);
-FB.db=dbMod.getDatabase(app);
-FB.ref=dbMod.ref;FB.get=dbMod.get;FB.set=dbMod.set;FB.update=dbMod.update;
+FB.fs=fsMod.getFirestore(app);
+FB.doc=fsMod.doc;FB.getDoc=fsMod.getDoc;FB.setDoc=fsMod.setDoc;
+FB.getDocs=fsMod.getDocs;FB.collection=fsMod.collection;FB.query=fsMod.query;FB.limit=fsMod.limit;
 authMod.onAuthStateChanged(FB.auth,function(u){
 var ok=!!u && !u.isAnonymous && u.providerData && u.providerData.some(function(p){return p.providerId==='password'});
 if(ok){
@@ -231,37 +231,39 @@ if(document.getElementById('ctAgr').classList.contains('ct-off'))return alert('�
 var okBtn=document.getElementById('ctOk');
 okBtn.disabled=true;
 var uid=FB.user.uid,now=Date.now();
-/* 1) التحقق من وجود قاعدة codess، وإنشاؤها تلقائياً مع أكواد افتراضية إذا لم تكن موجودة */
-FB.get(FB.ref(FB.db,'codess')).then(function(snap){
-if(!snap.exists()){return FB.set(FB.ref(FB.db,'codess'),CT_DEFAULT_CODES)}
+/* 1) التحقق من مجموعة codess، وإنشاء الأكواد الافتراضية تلقائياً إذا كانت فارغة */
+FB.getDocs(FB.query(FB.collection(FB.fs,'codess'),FB.limit(1))).then(function(snap){
+if(snap.empty){
+var codes=Object.keys(CT_DEFAULT_CODES),ps=[];
+for(var i=0;i<codes.length;i++){ps.push(FB.setDoc(FB.doc(FB.fs,'codess',codes[i]),{active:true}))}
+return Promise.all(ps);
+}
 }).then(function(){
 /* 2) التحقق من رمز الإشارة داخل codess */
-return FB.get(FB.ref(FB.db,'codess/'+code));
+return FB.getDoc(FB.doc(FB.fs,'codess',code));
 }).then(function(cs){
 if(!cs.exists()){okBtn.disabled=false;return alert('رمز الإشارة غير صحيح أو غير موجود')}
-/* 3) سجل استخدام الرموز لهذا المستخدم */
-return FB.get(FB.ref(FB.db,'users/'+uid+'/sigLog'));
-}).then(function(logSnap){
-if(!logSnap)return;
-var log=logSnap.val()||{};
+/* 3) سجل استخدام الرموز والرصيد من مستند المستخدم */
+return FB.getDoc(FB.doc(FB.fs,'users',uid));
+}).then(function(us){
+if(!us)return;
+var ud=us.exists()?us.data():{};
+var log=ud.sigLog||{};
 var keys=Object.keys(log),cnt=0,i;
 for(i=0;i<keys.length;i++){if(now-(+log[keys[i]]||0)<CT_DAY_MS)cnt++}
 if(log[code]){okBtn.disabled=false;return alert('لا يمكن استخدام نفس الرمز مرتين')}
 if(cnt>=CT_DAILY_LIMIT){okBtn.disabled=false;return alert('لقد استخدمت الحد الأقصى: 3 رموز إشارة خلال 24 ساعة، حاول لاحقاً')}
 /* 4) احتساب الربح 1.6667% من الرصيد وإضافته إلى حقل balance */
-return FB.get(FB.ref(FB.db,'users/'+uid+'/balance')).then(function(bs){
-var bal=parseFloat(bs.val())||0;
+var bal=parseFloat(ud.balance)||0;
 var profit=bal*CT_RATE;
 var nb=+(bal+profit).toFixed(2);
-var upd={};
-upd['users/'+uid+'/balance']=nb;
-upd['users/'+uid+'/sigLog/'+code]=now;
-return FB.update(FB.ref(FB.db),upd).then(function(){
+var upd={balance:nb};
+upd['sigLog.'+code]=now;
+return FB.setDoc(FB.doc(FB.fs,'users',uid),upd,{merge:true}).then(function(){
 FB.balance=nb;ctShowBalance();
 okBtn.disabled=false;
 alert('تم إرسال طلب نسخ التداول بنجاح\nتمت إضافة ربح '+ctFmt(profit)+' USD (1.6667%) إلى رصيدك\nرصيدك الجديد: '+ctFmt(nb)+' USD');
 closeS();
-});
 });
 }).catch(function(e){okBtn.disabled=false;console.error(e);alert('حدث خطأ أثناء معالجة الطلب، حاول مرة أخرى')});
 };
