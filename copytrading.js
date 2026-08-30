@@ -31,8 +31,8 @@ var CSS='#ctRoot,#ctRoot *{margin:0;padding:0;box-sizing:border-box;font-family:
 +'#ctRoot .ct-pnl{font-size:19px;font-weight:800}'
 +'#ctRoot .ct-lbl{font-size:12px;color:#999;margin-top:3px}'
 +'#ctRoot .ct-rate{color:#12b981;font-size:17px;font-weight:800;margin-top:10px}'
-+'#ctOvl{position:fixed;inset:0;background:rgba(0,0,0,.45);opacity:0;visibility:hidden;transition:.3s;z-index:140}'
-+'#ctSheet{position:fixed;left:0;right:0;bottom:0;max-width:480px;margin:auto;background:#fff;border-radius:20px 20px 0 0;padding:26px 20px 22px;z-index:141;transform:translateY(100%);transition:transform .35s ease}'
++'#ctOvl{position:fixed;inset:0;background:rgba(0,0,0,.45);opacity:0;visibility:hidden;transition:.3s;z-index:9998}'
++'#ctSheet{position:fixed;left:0;right:0;bottom:0;max-width:480px;margin:auto;background:#fff;border-radius:20px 20px 0 0;padding:26px 20px 22px;z-index:9999;transform:translateY(100%);transition:transform .35s ease;box-shadow:0 -6px 24px rgba(0,0,0,.18)}'
 +'#ctOvl.ct-on{opacity:1;visibility:visible}'
 +'#ctSheet.ct-on{transform:translateY(0)}'
 +'#ctSheet h3{text-align:center;font-size:16px;font-weight:700;margin-bottom:22px}'
@@ -161,8 +161,58 @@ root.innerHTML=[
 '</div>'
 ].join('');
 document.body.appendChild(root);
+/* ================= Firebase (Auth: email/password only + Realtime Database) ================= */
+var FB={ready:false,user:null,db:null,auth:null,ref:null,get:null,set:null,update:null,balance:0};
+var FIREBASE_CONFIG={
+apiKey:"AIzaSyBvzfJOOjRFZnTgTUrwEZQPr8Ba7zKKlNg",
+authDomain:"hhhxh-5ebe4.firebaseapp.com",
+databaseURL:"https://hhhxh-5ebe4-default-rtdb.firebaseio.com",
+projectId:"hhhxh-5ebe4",
+storageBucket:"hhhxh-5ebe4.firebasestorage.app",
+messagingSenderId:"79243000696",
+appId:"1:79243000696:web:ee0fb2d2ccce791954e68d",
+measurementId:"G-08BR6LN6PT"
+};
+var CT_RATE=0.016667;/* نسبة ثابتة 1.6667% من الرصيد */
+var CT_DAILY_LIMIT=3;/* 3 رموز إشارة كل 24 ساعة */
+var CT_DAY_MS=24*60*60*1000;
+var CT_DEFAULT_CODES={ALPHA100:true,GOLD200:true,PROFIT300:true,SIGNAL400:true,TRADE500:true,WIN600:true};
+function ctBlocked(){return !FB.ready||!FB.user}
+function ctFmt(n){return (+n).toFixed(2)}
+function ctShowBalance(){document.getElementById('ctAvail').innerHTML=ctFmt(FB.balance)+' <span>USD</span>'}
+function ctLoadBalance(){
+if(!FB.user)return;
+FB.get(FB.ref(FB.db,'users/'+FB.user.uid+'/balance')).then(function(s){
+FB.balance=parseFloat(s.val())||0;
+ctShowBalance();
+}).catch(function(){});
+}
+Promise.all([
+import('https://www.gstatic.com/firebasejs/12.18.0/firebase-app.js'),
+import('https://www.gstatic.com/firebasejs/12.18.0/firebase-auth.js'),
+import('https://www.gstatic.com/firebasejs/12.18.0/firebase-database.js')
+]).then(function(mods){
+var appMod=mods[0],authMod=mods[1],dbMod=mods[2];
+var app=appMod.initializeApp(FIREBASE_CONFIG);
+try{import('https://www.gstatic.com/firebasejs/12.18.0/firebase-analytics.js').then(function(an){try{an.getAnalytics(app)}catch(e){}})}catch(e){}
+FB.auth=authMod.getAuth(app);
+FB.db=dbMod.getDatabase(app);
+FB.ref=dbMod.ref;FB.get=dbMod.get;FB.set=dbMod.set;FB.update=dbMod.update;
+authMod.onAuthStateChanged(FB.auth,function(u){
+var ok=!!u && !u.isAnonymous && u.providerData && u.providerData.some(function(p){return p.providerId==='password'});
+if(ok){
+FB.user=u;FB.ready=true;ctLoadBalance();
+}else{
+FB.user=null;FB.ready=false;
+if(u){try{authMod.signOut(FB.auth)}catch(e){}}
+alert('هذه الصفحة تتطلب تسجيل الدخول باستخدام البريد الإلكتروني وكلمة المرور فقط (بدون دخول مجهول)');
+if(root&&root.parentNode)root.parentNode.removeChild(root);
+}
+});
+}).catch(function(e){console.error('Firebase init error',e)});
+/* ================= /Firebase ================= */
 var ovl=document.getElementById('ctOvl'),sh=document.getElementById('ctSheet'),amt=document.getElementById('ctAmt'),pg=document.getElementById('ctPage'),pg2=document.getElementById('ctPage2'),spin=document.getElementById('ctSpin'),emp=document.getElementById('ctEmp');
-function openS(){ovl.classList.add('ct-on');sh.classList.add('ct-on');root.style.overflow='hidden'}
+function openS(){if(ctBlocked()){alert('يجب تسجيل الدخول بالبريد الإلكتروني وكلمة المرور أولاً');return}ovl.classList.add('ct-on');sh.classList.add('ct-on');root.style.overflow='hidden'}
 function closeS(){ovl.classList.remove('ct-on');sh.classList.remove('ct-on');root.style.overflow=''}
 root.querySelectorAll('.ct-sec .ct-head').forEach(function(h){h.onclick=openS});
 ovl.onclick=closeS;
@@ -172,7 +222,49 @@ root.querySelectorAll('.ct-chips div').forEach(function(c){c.onclick=function(){
 function markChip(){root.querySelectorAll('.ct-chips div').forEach(function(c){c.classList.toggle('ct-sel',c.dataset.v===amt.value)})}
 amt.oninput=markChip;
 document.getElementById('ctAgr').onclick=function(){this.classList.toggle('ct-off')};
-document.getElementById('ctOk').onclick=function(){if(!document.getElementById('ctSig').value.trim())return alert('الرجاء إدخال رمز الإشارة');if(!amt.value||+amt.value<=0)return alert('الرجاء إدخال مبلغ النسخ');if(document.getElementById('ctAgr').classList.contains('ct-off'))return alert('يجب الموافقة على اتفاقية تتبع النسخ');alert('تم إرسال طلب نسخ التداول بنجاح');closeS()};
+document.getElementById('ctOk').onclick=function(){
+if(ctBlocked())return alert('يجب تسجيل الدخول بالبريد الإلكتروني وكلمة المرور أولاً');
+var code=document.getElementById('ctSig').value.trim();
+if(!code)return alert('الرجاء إدخال رمز الإشارة');
+if(!amt.value||+amt.value<=0)return alert('الرجاء إدخال مبلغ النسخ');
+if(document.getElementById('ctAgr').classList.contains('ct-off'))return alert('يجب الموافقة على اتفاقية تتبع النسخ');
+var okBtn=document.getElementById('ctOk');
+okBtn.disabled=true;
+var uid=FB.user.uid,now=Date.now();
+/* 1) التحقق من وجود قاعدة codess، وإنشاؤها تلقائياً مع أكواد افتراضية إذا لم تكن موجودة */
+FB.get(FB.ref(FB.db,'codess')).then(function(snap){
+if(!snap.exists()){return FB.set(FB.ref(FB.db,'codess'),CT_DEFAULT_CODES)}
+}).then(function(){
+/* 2) التحقق من رمز الإشارة داخل codess */
+return FB.get(FB.ref(FB.db,'codess/'+code));
+}).then(function(cs){
+if(!cs.exists()){okBtn.disabled=false;return alert('رمز الإشارة غير صحيح أو غير موجود')}
+/* 3) سجل استخدام الرموز لهذا المستخدم */
+return FB.get(FB.ref(FB.db,'users/'+uid+'/sigLog'));
+}).then(function(logSnap){
+if(!logSnap)return;
+var log=logSnap.val()||{};
+var keys=Object.keys(log),cnt=0,i;
+for(i=0;i<keys.length;i++){if(now-(+log[keys[i]]||0)<CT_DAY_MS)cnt++}
+if(log[code]){okBtn.disabled=false;return alert('لا يمكن استخدام نفس الرمز مرتين')}
+if(cnt>=CT_DAILY_LIMIT){okBtn.disabled=false;return alert('لقد استخدمت الحد الأقصى: 3 رموز إشارة خلال 24 ساعة، حاول لاحقاً')}
+/* 4) احتساب الربح 1.6667% من الرصيد وإضافته إلى حقل balance */
+return FB.get(FB.ref(FB.db,'users/'+uid+'/balance')).then(function(bs){
+var bal=parseFloat(bs.val())||0;
+var profit=bal*CT_RATE;
+var nb=+(bal+profit).toFixed(2);
+var upd={};
+upd['users/'+uid+'/balance']=nb;
+upd['users/'+uid+'/sigLog/'+code]=now;
+return FB.update(FB.ref(FB.db),upd).then(function(){
+FB.balance=nb;ctShowBalance();
+okBtn.disabled=false;
+alert('تم إرسال طلب نسخ التداول بنجاح\nتمت إضافة ربح '+ctFmt(profit)+' USD (1.6667%) إلى رصيدك\nرصيدك الجديد: '+ctFmt(nb)+' USD');
+closeS();
+});
+});
+}).catch(function(e){okBtn.disabled=false;console.error(e);alert('حدث خطأ أثناء معالجة الطلب، حاول مرة أخرى')});
+};
 function loadC(){emp.style.display='none';spin.style.display='block';setTimeout(function(){spin.style.display='none';emp.style.display='block'},1200)}
 document.getElementById('ctCmy').onclick=function(){pg.classList.add('ct-on');loadC()};
 document.getElementById('ctPdet').onclick=function(){pg2.classList.add('ct-on')};
