@@ -1,37 +1,86 @@
 (function(){
-if(!window.firebase){console.error('Firebase SDK غير محمّل');}
 /* ========== بوابة التحقق من الجلسة: بريد + كلمة سر فقط ========== */
 /* لا Anonymous — لا Popup — أي مستخدم بدون جلسة بريد صالحة يُحوَّل إلى register.html */
 var __REDIRECT_PAGE='register.html';
 var __authGateStarted=false;
+
+/* نفس إعدادات مشروع Firebase المستخدمة في الصفحة الرئيسية */
+var firebaseConfig={
+  apiKey:"AIzaSyBvzfJOOjRFZnTgTUrwEZQPr8Ba7zKKlNg",
+  authDomain:"hhhxh-5ebe4.firebaseapp.com",
+  projectId:"hhhxh-5ebe4",
+  storageBucket:"hhhxh-5ebe4.firebasestorage.app",
+  messagingSenderId:"79243000696",
+  appId:"1:79243000696:web:ee0fb2d2ccce791954e68d",
+  measurementId:"G-08BR6LN6PT"
+};
+
+var FB=null; /* سيحمل مراجع Modular SDK: auth + firestore */
+
+/* تحميل نفس إصدار Modular SDK v12 المستخدم في الصفحة الرئيسية */
+function initFirebase(){
+  return Promise.all([
+    import("https://www.gstatic.com/firebasejs/12.18.0/firebase-app.js"),
+    import("https://www.gstatic.com/firebasejs/12.18.0/firebase-auth.js"),
+    import("https://www.gstatic.com/firebasejs/12.18.0/firebase-firestore.js")
+  ]).then(function(m){
+    var appMod=m[0], authMod=m[1], fsMod=m[2];
+    var app;
+    try{
+      /* لو الصفحة الرئيسية مهيّأة بالفعل نستخدم نفس التطبيق، وإلا نهيئ واحداً */
+      app=appMod.getApps().length?appMod.getApp():appMod.initializeApp(firebaseConfig);
+    }catch(e){
+      app=appMod.getApp();
+    }
+    FB={
+      app:app,
+      auth:authMod.getAuth(app),
+      db:fsMod.getFirestore(app),
+      onAuthStateChanged:authMod.onAuthStateChanged,
+      signOut:authMod.signOut,
+      EmailAuthProvider:authMod.EmailAuthProvider,
+      reauthenticateWithCredential:authMod.reauthenticateWithCredential,
+      updatePassword:authMod.updatePassword,
+      doc:fsMod.doc,
+      getDoc:fsMod.getDoc,
+      setDoc:fsMod.setDoc,
+      runTransaction:fsMod.runTransaction
+    };
+    return FB;
+  });
+}
+
 function authGate(){
-if(__authGateStarted)return;
-__authGateStarted=true;
-try{
-if(!window.firebase||!firebase.auth){
-setTimeout(function(){window.location.replace(__REDIRECT_PAGE);},800);
-return;
+  if(__authGateStarted)return;
+  __authGateStarted=true;
+  try{
+    FB.onAuthStateChanged(FB.auth,function(u){
+      /* مرفوض تمامًا: لا مستخدم، أو مستخدم مجهول، أو مستخدم بدون بريد إلكتروني */
+      if(!u||u.isAnonymous||!u.email){
+        try{FB.signOut(FB.auth)}catch(e){}
+        if(!/register\.html$/i.test(location.pathname)){
+          window.location.replace(__REDIRECT_PAGE);
+        }
+        return;
+      }
+      /* جلسة بريد + كلمة سر صالحة: تحميل بيانات المستخدم في الخلفية */
+      window.__userEmail=u.email||window.__userEmail||'';
+      try{
+        if(typeof loadAddr==='function')loadAddr();
+      }catch(e){}
+    });
+  }catch(e){
+    setTimeout(function(){window.location.replace(__REDIRECT_PAGE);},800);
+  }
 }
-firebase.auth().onAuthStateChanged(function(u){
-/* مرفوض تمامًا: لا مستخدم، أو مستخدم مجهول، أو مستخدم بدون بريد إلكتروني */
-if(!u||u.isAnonymous||!u.email){
-try{firebase.auth().signOut()}catch(e){}
-if(!/register\.html$/i.test(location.pathname)){
-window.location.replace(__REDIRECT_PAGE);
-}
-return;
-}
-/* جلسة بريد + كلمة سر صالحة: تحميل بيانات المستخدم في الخلفية */
-window.__userEmail=u.email||window.__userEmail||'';
-try{
-if(typeof loadAddr==='function')loadAddr();
-}catch(e){}
+
+/* بدء التهيئة ثم تشغيل البوابة */
+initFirebase().then(function(){
+  authGate();
+}).catch(function(){
+  setTimeout(function(){window.location.replace(__REDIRECT_PAGE);},800);
 });
-}catch(e){
-setTimeout(function(){window.location.replace(__REDIRECT_PAGE);},800);
-}
-}
-authGate();
+
 /* ========== حماية: منع النسخ والتحديد والتكبير ========== */
 var protCss="html,body{-webkit-user-select:none!important;-moz-user-select:none!important;user-select:none!important;-webkit-touch-callout:none!important;touch-action:manipulation!important;overscroll-behavior:none!important}"+
 "input,textarea{-webkit-user-select:text!important;user-select:text!important}"+
@@ -41,29 +90,31 @@ var vp=document.querySelector('meta[name="viewport"]');
 if(!vp){vp=document.createElement('meta');vp.name='viewport';document.head.appendChild(vp);}
 vp.content='width=device-width,initial-scale=1.0,maximum-scale=1.0,minimum-scale=1.0,user-scalable=no';
 ['contextmenu','copy','cut','selectstart','dragstart'].forEach(function(ev){
-document.addEventListener(ev,function(e){
-if(e.target&&(e.target.tagName==='INPUT'||e.target.tagName==='TEXTAREA')){if(ev==='contextmenu')e.preventDefault();return;}
-e.preventDefault();e.stopPropagation();
-},true);
+  document.addEventListener(ev,function(e){
+    if(e.target&&(e.target.tagName==='INPUT'||e.target.tagName==='TEXTAREA')){if(ev==='contextmenu')e.preventDefault();return;}
+    e.preventDefault();e.stopPropagation();
+  },true);
 });
 document.addEventListener('keydown',function(e){
-var k=(e.key||'').toLowerCase();
-if((e.ctrlKey||e.metaKey)&&['c','x','s','u','p','a'].indexOf(k)>-1){e.preventDefault();}
-if(e.key==='F12')e.preventDefault();
+  var k=(e.key||'').toLowerCase();
+  if((e.ctrlKey||e.metaKey)&&['c','x','s','u','p','a'].indexOf(k)>-1){e.preventDefault();}
+  if(e.key==='F12')e.preventDefault();
 },true);
 document.addEventListener('wheel',function(e){if(e.ctrlKey)e.preventDefault();},{passive:false});
 document.addEventListener('gesturestart',function(e){e.preventDefault();});
 document.addEventListener('touchmove',function(e){if(e.touches&&e.touches.length>1)e.preventDefault();},{passive:false});
 var lastTap=0;
 document.addEventListener('touchend',function(e){
-var now=Date.now();
-if(now-lastTap<300)e.preventDefault();
-lastTap=now;
+  var now=Date.now();
+  if(now-lastTap<300)e.preventDefault();
+  lastTap=now;
 },{passive:false});
-/* ========== Firebase helpers ========== */
-function fbUser(){try{return firebase.auth().currentUser}catch(e){return null}}
-function fbRef(path){return firebase.database().ref(path)}
-function userRef(uid,field){return fbRef('users/'+uid+'/'+field)}
+
+/* ========== Firestore helpers ========== */
+function fbUser(){try{return FB?FB.auth.currentUser:null}catch(e){return null}}
+/* مستند المستخدم في Firestore: users/{uid} — نفس بنية الصفحة الرئيسية */
+function userDocRef(uid){return FB.doc(FB.db,'users',uid)}
+
 /* ========== CSS ========== */
 var css="#setPage{position:fixed;inset:0;max-width:480px;margin:0 auto;z-index:110;opacity:0;pointer-events:none;transition:opacity .3s ease;display:flex;flex-direction:column;background:#EEF1F8;direction:ltr}"+
 "#setPage.open{opacity:1;pointer-events:auto}"+
@@ -119,12 +170,14 @@ var css="#setPage{position:fixed;inset:0;max-width:480px;margin:0 auto;z-index:1
 "#wdPage .wdsend.busy{opacity:.6;pointer-events:none}"+
 "#wdPage .wdsend.hide{display:none!important}";
 var st=document.createElement('style');st.setAttribute('data-inj-root','');st.textContent=css;document.head.appendChild(st);
+
 var ch='<svg viewBox="0 0 24 24"><path d="M9 5l7 7-7 7"/></svg>';
 var back='<svg viewBox="0 0 24 24"><path d="M15 5l-7 7 7 7"/></svg>';
 var dn='<svg viewBox="0 0 24 24"><path d="M6 9l6 6 6-6"/></svg>';
 var lock='<svg class="lk" viewBox="0 0 24 24"><rect x="4.5" y="10.5" width="15" height="9.5" rx="2"/><path d="M8 10.5V7.5a4 4 0 0 1 8 0v3"/></svg>';
 var eyeOff='<svg viewBox="0 0 24 24"><path d="M3 3l18 18"/><path d="M10.6 5.2A9.9 9.9 0 0 1 12 5c7 0 10 7 10 7a17.3 17.3 0 0 1-2.9 3.9M6.6 6.6A16.9 16.9 0 0 0 2 12s3 7 10 7a9.7 9.7 0 0 0 5.4-1.6"/><path d="M9.9 9.9a3 3 0 0 0 4.2 4.2"/></svg>';
 var eyeOn='<svg viewBox="0 0 24 24"><path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7z"/><circle cx="12" cy="12" r="3"/></svg>';
+
 /* ========== Settings Page ========== */
 var pg=document.createElement('div');pg.id='setPage';pg.setAttribute('data-inj-root','');
 pg.innerHTML='<div class="sph"><span class="spb" id="setBack">'+back+'</span><span class="ttl">الإعدادات</span></div>'+
@@ -135,6 +188,7 @@ pg.innerHTML='<div class="sph"><span class="spb" id="setBack">'+back+'</span><sp
 '<div class="srow" id="rowWdAddr"><span class="slbl">ربط عنوان السحب</span><span class="sr"><span class="sval" id="setAddrVal"></span>'+ch+'</span></div>'+
 '</div>';
 document.body.appendChild(pg);
+
 /* ========== Password Page ========== */
 var tp=document.createElement('div');tp.id='tpPage';tp.setAttribute('data-inj-root','');
 tp.innerHTML='<div class="tph"><span class="tpb" id="tpBack">'+back+'</span><span class="ttl" id="tpTitle">تعديل كلمة مرور التداول</span></div>'+
@@ -145,6 +199,7 @@ tp.innerHTML='<div class="tph"><span class="tpb" id="tpBack">'+back+'</span><spa
 '</div>'+
 '<div class="tpbtn" id="tpConfirm">تأكيد التعديل</div>';
 document.body.appendChild(tp);
+
 /* ========== Withdraw Address Page ========== */
 var wd=document.createElement('div');wd.id='wdPage';wd.setAttribute('data-inj-root','');
 wd.innerHTML='<div class="wdh"><span class="wdb" id="wdBack">'+back+'</span><span class="ttl">ربط عنوان السحب</span></div>'+
@@ -162,151 +217,171 @@ wd.innerHTML='<div class="wdh"><span class="wdb" id="wdBack">'+back+'</span><spa
 '</div>'+
 '<div class="wdsend" id="wdSend">إرسال</div>';
 document.body.appendChild(wd);
+
 requestAnimationFrame(function(){requestAnimationFrame(function(){pg.classList.add('open')})});
 document.getElementById('setBack').addEventListener('click',function(){pg.classList.remove('open')});
+
 /* ========== TRC20 Strict Validator ========== */
 function isTRC20(a){
-if(typeof a!=='string')return false;
-a=a.trim();
-if(a.length!==34)return false;               /* الطول 34 حرف بالظبط */
-if(a.charAt(0)!=='T')return false;            /* يبدأ بـ T كبيرة */
-return /^T[1-9A-HJ-NP-Za-km-z]{33}$/.test(a); /* Base58 بدون 0,O,I,l */
+  if(typeof a!=='string')return false;
+  a=a.trim();
+  if(a.length!==34)return false;               /* الطول 34 حرف بالظبط */
+  if(a.charAt(0)!=='T')return false;            /* يبدأ بـ T كبيرة */
+  return /^T[1-9A-HJ-NP-Za-km-z]{33}$/.test(a); /* Base58 بدون 0,O,I,l */
 }
+
 /* ========== حالة العنوان المحفوظ ========== */
 var savedAddr=null;
 function renderAddrState(){
-var inW=document.getElementById('wdInWrap'),
-show=document.getElementById('wdShow'),
-btn=document.getElementById('wdSend'),
-msg=document.getElementById('wdMsg'),
-setVal=document.getElementById('setAddrVal');
-if(savedAddr){
-inW.style.display='none';
-show.style.display='flex';
-show.textContent=savedAddr;
-btn.classList.add('hide');            /* اختفاء زر إرسال نهائيًا */
-msg.style.display='none';
-setVal.textContent=savedAddr.slice(0,8)+'...'+savedAddr.slice(-6);
-}else{
-inW.style.display='flex';
-show.style.display='none';
-btn.classList.remove('hide');
-setVal.textContent='';
+  var inW=document.getElementById('wdInWrap'),
+      show=document.getElementById('wdShow'),
+      btn=document.getElementById('wdSend'),
+      msg=document.getElementById('wdMsg'),
+      setVal=document.getElementById('setAddrVal');
+  if(savedAddr){
+    inW.style.display='none';
+    show.style.display='flex';
+    show.textContent=savedAddr;
+    btn.classList.add('hide');            /* اختفاء زر إرسال نهائيًا */
+    msg.style.display='none';
+    setVal.textContent=savedAddr.slice(0,8)+'...'+savedAddr.slice(-6);
+  }else{
+    inW.style.display='flex';
+    show.style.display='none';
+    btn.classList.remove('hide');
+    setVal.textContent='';
+  }
 }
-}
+
+/* قراءة العنوان من Firestore: users/{uid}.addres */
 function loadAddr(){
-var u=fbUser();if(!u)return;
-userRef(u.uid,'addres').once('value').then(function(s){
-var v=s.val();
-if(v&&isTRC20(v)){savedAddr=v;}
-renderAddrState();
-}).catch(function(){});
+  var u=fbUser();if(!u)return;
+  FB.getDoc(userDocRef(u.uid)).then(function(s){
+    var d=s.exists()?s.data():{};
+    var v=d.addres;
+    if(v&&isTRC20(v)){savedAddr=v;}
+    renderAddrState();
+  }).catch(function(){});
 }
 loadAddr();
+
 /* ========== تغيير كلمة المرور (فعّالة) ========== */
 var pwdType='trade';
 function openPwd(type){
-pwdType=type;
-document.getElementById('tpTitle').textContent=type==='login'?'تعديل كلمة مرور الدخول':'تعديل كلمة مرور التداول';
-['tpOld','tpNew','tpNew2'].forEach(function(id){document.getElementById(id).value=''});
-tp.classList.add('open');
+  pwdType=type;
+  document.getElementById('tpTitle').textContent=type==='login'?'تعديل كلمة مرور الدخول':'تعديل كلمة مرور التداول';
+  ['tpOld','tpNew','tpNew2'].forEach(function(id){document.getElementById(id).value=''});
+  tp.classList.add('open');
 }
 document.getElementById('rowLoginPwd').addEventListener('click',function(){openPwd('login')});
 document.getElementById('rowTradePwd').addEventListener('click',function(){openPwd('trade')});
 document.getElementById('tpBack').addEventListener('click',function(){tp.classList.remove('open')});
 Array.prototype.forEach.call(tp.querySelectorAll('.eye'),function(e){
-e.addEventListener('click',function(){
-var inp=e.parentNode.querySelector('input');
-if(inp.type==='password'){inp.type='text';e.innerHTML=eyeOn}else{inp.type='password';e.innerHTML=eyeOff}
+  e.addEventListener('click',function(){
+    var inp=e.parentNode.querySelector('input');
+    if(inp.type==='password'){inp.type='text';e.innerHTML=eyeOn}else{inp.type='password';e.innerHTML=eyeOff}
+  });
 });
-});
+
 document.getElementById('tpConfirm').addEventListener('click',function(){
-var o=document.getElementById('tpOld'),n=document.getElementById('tpNew'),n2=document.getElementById('tpNew2');
-if(!o.value){alert('يرجى إدخال كلمة المرور القديمة');return}
-if(!n.value||n.value.length<6){alert('كلمة المرور الجديدة يجب ألا تقل عن 6 أحرف');return}
-if(n.value!==n2.value){alert('كلمتا المرور الجديدتان غير متطابقتين');return}
-if(o.value===n.value){alert('كلمة المرور الجديدة مطابقة للقديمة');return}
-var u=fbUser();
-if(!u){alert('يرجى تسجيل الدخول أولاً');return}
-var btn=document.getElementById('tpConfirm');
-btn.classList.add('busy');
-if(pwdType==='login'){
-/* كلمة مرور الدخول: إعادة توثيق ثم تحديث عبر Firebase Auth */
-var email=u.email||window.__userEmail;
-if(!email){btn.classList.remove('busy');alert('تعذر تحديد البريد الإلكتروني');return}
-var cred=firebase.auth.EmailAuthProvider.credential(email,o.value);
-u.reauthenticateWithCredential(cred).then(function(){
-return u.updatePassword(n.value);
-}).then(function(){
-btn.classList.remove('busy');
-tp.classList.remove('open');
-alert('تم تغيير كلمة مرور الدخول بنجاح');
-}).catch(function(err){
-btn.classList.remove('busy');
-if(err&&err.code==='auth/wrong-password')alert('كلمة المرور القديمة غير صحيحة');
-else if(err&&err.code==='auth/too-many-requests')alert('محاولات كثيرة، حاول لاحقًا');
-else alert('فشل تغيير كلمة المرور، حاول مرة أخرى');
+  var o=document.getElementById('tpOld'),n=document.getElementById('tpNew'),n2=document.getElementById('tpNew2');
+  if(!o.value){alert('يرجى إدخال كلمة المرور القديمة');return}
+  if(!n.value||n.value.length<6){alert('كلمة المرور الجديدة يجب ألا تقل عن 6 أحرف');return}
+  if(n.value!==n2.value){alert('كلمتا المرور الجديدتان غير متطابقتين');return}
+  if(o.value===n.value){alert('كلمة المرور الجديدة مطابقة للقديمة');return}
+  var u=fbUser();
+  if(!u){alert('يرجى تسجيل الدخول أولاً');return}
+  var btn=document.getElementById('tpConfirm');
+  btn.classList.add('busy');
+  if(pwdType==='login'){
+    /* كلمة مرور الدخول: إعادة توثيق ثم تحديث عبر Firebase Auth (Modular) */
+    var email=u.email||window.__userEmail;
+    if(!email){btn.classList.remove('busy');alert('تعذر تحديد البريد الإلكتروني');return}
+    var cred=FB.EmailAuthProvider.credential(email,o.value);
+    FB.reauthenticateWithCredential(u,cred).then(function(){
+      return FB.updatePassword(u,n.value);
+    }).then(function(){
+      btn.classList.remove('busy');
+      tp.classList.remove('open');
+      alert('تم تغيير كلمة مرور الدخول بنجاح');
+    }).catch(function(err){
+      btn.classList.remove('busy');
+      if(err&&(err.code==='auth/wrong-password'||err.code==='auth/invalid-credential'))alert('كلمة المرور القديمة غير صحيحة');
+      else if(err&&err.code==='auth/too-many-requests')alert('محاولات كثيرة، حاول لاحقًا');
+      else alert('فشل تغيير كلمة المرور، حاول مرة أخرى');
+    });
+  }else{
+    /* كلمة مرور التداول: تحقق من القديمة في Firestore ثم حفظ الجديدة */
+    var ref=userDocRef(u.uid);
+    FB.getDoc(ref).then(function(s){
+      var d=s.exists()?s.data():{};
+      var cur=d.tradePwd;
+      if(cur&&cur!==o.value)throw{code:'wrong'};
+      return FB.setDoc(ref,{tradePwd:n.value},{merge:true});
+    }).then(function(){
+      btn.classList.remove('busy');
+      tp.classList.remove('open');
+      alert('تم تغيير كلمة مرور التداول بنجاح');
+    }).catch(function(err){
+      btn.classList.remove('busy');
+      if(err&&err.code==='wrong')alert('كلمة مرور التداول القديمة غير صحيحة');
+      else alert('فشل تغيير كلمة المرور، حاول مرة أخرى');
+    });
+  }
 });
-}else{
-/* كلمة مرور التداول: تحقق من القديمة في قاعدة البيانات ثم حفظ الجديدة */
-var ref=userRef(u.uid,'tradePwd');
-ref.once('value').then(function(s){
-var cur=s.val();
-if(cur&&cur!==o.value)throw{code:'wrong'};
-return ref.set(n.value);
-}).then(function(){
-btn.classList.remove('busy');
-tp.classList.remove('open');
-alert('تم تغيير كلمة مرور التداول بنجاح');
-}).catch(function(err){
-btn.classList.remove('busy');
-if(err&&err.code==='wrong')alert('كلمة مرور التداول القديمة غير صحيحة');
-else alert('فشل تغيير كلمة المرور، حاول مرة أخرى');
-});
-}
-});
+
 /* ========== صفحة عنوان السحب ========== */
 document.getElementById('rowWdAddr').addEventListener('click',function(){renderAddrState();wd.classList.add('open')});
 document.getElementById('wdBack').addEventListener('click',function(){wd.classList.remove('open')});
 var addrInput=document.getElementById('wdAddr');
 addrInput.addEventListener('input',function(){
-document.getElementById('wdInWrap').classList.remove('err');
-document.getElementById('wdMsg').style.display='none';
+  document.getElementById('wdInWrap').classList.remove('err');
+  document.getElementById('wdMsg').style.display='none';
 });
 function showAddrErr(t){
-document.getElementById('wdInWrap').classList.add('err');
-var m=document.getElementById('wdMsg');
-m.textContent=t;m.style.display='block';
+  document.getElementById('wdInWrap').classList.add('err');
+  var m=document.getElementById('wdMsg');
+  m.textContent=t;m.style.display='block';
 }
+
 document.getElementById('wdSend').addEventListener('click',function(){
-if(savedAddr){renderAddrState();return}          /* محفوظ مسبقًا = لا شيء */
-var a=addrInput.value.trim();
-if(!a){showAddrErr('يرجى إدخال عنوان السحب');return}
-if(a.charAt(0)!=='T'){showAddrErr('العنوان غير صالح: عنوان TRC20 يجب أن يبدأ بالحرف T');return}
-if(a.length!==34){showAddrErr('العنوان غير صالح: يجب أن يتكون من 34 حرفًا بالضبط (الحالي: '+a.length+')');return}
-if(!isTRC20(a)){showAddrErr('العنوان غير صالح: يحتوي على أحرف غير مسموحة في شبكة TRC20');return}
-var u=fbUser();
-if(!u){alert('يرجى تسجيل الدخول أولاً');return}
-var btn=document.getElementById('wdSend');
-btn.classList.add('busy');
-var ref=userRef(u.uid,'addres');                 /* ← مسار الحقل: users/{uid}/addres */
-ref.transaction(function(cur){
-if(cur===null)return a;                          /* يحفظ فقط لو مفيش عنوان قبل كده */
-return;                                          /* abort: موجود بالفعل */
-},function(err,committed,snap){
-btn.classList.remove('busy');
-if(err){alert('فشل حفظ العنوان، تحقق من الاتصال وحاول مجددًا');return}
-if(!committed){
-var v=snap&&snap.val();
-if(v&&isTRC20(v))savedAddr=v;
-renderAddrState();
-alert('تم ربط عنوان سحب مسبقًا ولا يمكن تغييره');
-return;
-}
-savedAddr=a;
-renderAddrState();
-alert('تم ربط عنوان السحب بنجاح');
+  if(savedAddr){renderAddrState();return}          /* محفوظ مسبقًا = لا شيء */
+  var a=addrInput.value.trim();
+  if(!a){showAddrErr('يرجى إدخال عنوان السحب');return}
+  if(a.charAt(0)!=='T'){showAddrErr('العنوان غير صالح: عنوان TRC20 يجب أن يبدأ بالحرف T');return}
+  if(a.length!==34){showAddrErr('العنوان غير صالح: يجب أن يتكون من 34 حرفًا بالضبط (الحالي: '+a.length+')');return}
+  if(!isTRC20(a)){showAddrErr('العنوان غير صالح: يحتوي على أحرف غير مسموحة في شبكة TRC20');return}
+  var u=fbUser();
+  if(!u){alert('يرجى تسجيل الدخول أولاً');return}
+  var btn=document.getElementById('wdSend');
+  btn.classList.add('busy');
+  var ref=userDocRef(u.uid);                       /* ← مستند Firestore: users/{uid} — حقل addres */
+  FB.runTransaction(FB.db,function(t){
+    return t.get(ref).then(function(s){
+      var d=s.exists()?s.data():{};
+      if(d.addres==null){
+        t.set(ref,{addres:a},{merge:true});        /* يحفظ فقط لو مفيش عنوان قبل كده */
+        return null;
+      }
+      throw{code:'exists',value:d.addres};         /* abort: موجود بالفعل */
+    });
+  }).then(function(){
+    btn.classList.remove('busy');
+    savedAddr=a;
+    renderAddrState();
+    alert('تم ربط عنوان السحب بنجاح');
+  }).catch(function(err){
+    btn.classList.remove('busy');
+    if(err&&err.code==='exists'){
+      var v=err.value;
+      if(v&&isTRC20(v))savedAddr=v;
+      renderAddrState();
+      alert('تم ربط عنوان سحب مسبقًا ولا يمكن تغييره');
+      return;
+    }
+    alert('فشل حفظ العنوان، تحقق من الاتصال وحاول مجددًا');
+  });
 });
-});
+
 if(window.__regCleanup)window.__regCleanup(function(){});
 })();
