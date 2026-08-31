@@ -76,10 +76,13 @@ var CSS='#ctRoot,#ctRoot *{margin:0;padding:0;box-sizing:border-box;font-family:
 +'#ctList .ct-rrow{display:flex;justify-content:space-between;font-size:12.5px;color:#9a9aa5;margin-top:6px}'
 +'#ctList .ct-rrow b{color:#1a1a1a;font-weight:700}'
 +'#ctList .ct-rprof{color:#12b981!important;font-weight:800}'
-+'#ctWin{position:fixed;inset:0;background:#6a4df0;z-index:10000;display:flex;flex-direction:column;align-items:center;justify-content:center;opacity:0;visibility:hidden;transition:.3s}'
++'#ctWin{position:fixed;inset:0;z-index:10002;display:flex;align-items:center;justify-content:center;pointer-events:none;opacity:0;visibility:hidden;transition:opacity .3s}'
 +'#ctWin.ct-on{opacity:1;visibility:visible}'
-+'#ctWin .ct-wc{width:92px;height:92px;border-radius:50%;background:rgba(255,255,255,.18);display:flex;align-items:center;justify-content:center;margin-bottom:20px}'
-+'#ctWin .ct-wt{color:#fff;font-size:20px;font-weight:800}';
++'#ctWin .ct-wt{background:rgba(0,0,0,.78);color:#fff;font-size:16px;font-weight:700;padding:13px 34px;border-radius:12px;letter-spacing:.5px;box-shadow:0 4px 18px rgba(0,0,0,.35)}'
++'#ctBoot{position:fixed;inset:0;z-index:10003;display:flex;align-items:center;justify-content:center;pointer-events:none;opacity:1;visibility:visible;transition:opacity .2s}'
++'#ctBoot.ct-off{opacity:0;visibility:hidden}'
++'#ctBoot .ct-bb{background:rgba(0,0,0,.72);border-radius:14px;padding:16px 18px;display:flex;align-items:center;justify-content:center;box-shadow:0 4px 18px rgba(0,0,0,.3)}'
++'#ctBoot .ct-bb img{width:44px;height:44px;display:block}';
 var st=document.createElement('style');
 st.setAttribute('data-inj-root','copytrading');
 st.textContent=CSS;
@@ -173,13 +176,15 @@ root.innerHTML=[
 '<div class="ct-empty" style="display:block"><img src="https://gulfxdl.com/assets/empty-light-B1A8k_0V.png" alt=""><div>لا يوجد محتوى</div></div>',
 '</div>',
 '<div id="ctWin">',
-'<div class="ct-wc"><svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></div>',
 '<div class="ct-wt">نجاح الاستخدام</div>',
+'</div>',
+'<div id="ctBoot">',
+'<div class="ct-bb"><img src="https://gulfxdl.com/assets/loading-D0BtznxM.gif" alt=""></div>',
 '</div>'
 ].join('');
 document.body.appendChild(root);
 /* ================= Firebase (Auth: email/password only + Cloud Firestore) ================= */
-var FB={ready:false,user:null,fs:null,auth:null,doc:null,getDoc:null,setDoc:null,getDocs:null,collection:null,query:null,limit:null,balance:0,totalProfit:0,dayProfit:0};
+var FB={ready:false,user:null,fs:null,auth:null,doc:null,getDoc:null,setDoc:null,getDocs:null,collection:null,query:null,limit:null,runTx:null,balance:0,totalProfit:0,dayProfit:0};
 var FIREBASE_CONFIG={
 apiKey:"AIzaSyBvzfJOOjRFZnTgTUrwEZQPr8Ba7zKKlNg",
 authDomain:"hhhxh-5ebe4.firebaseapp.com",
@@ -225,6 +230,7 @@ FB.auth=authMod.getAuth(app);
 FB.fs=fsMod.getFirestore(app);
 FB.doc=fsMod.doc;FB.getDoc=fsMod.getDoc;FB.setDoc=fsMod.setDoc;
 FB.getDocs=fsMod.getDocs;FB.collection=fsMod.collection;FB.query=fsMod.query;FB.limit=fsMod.limit;
+FB.runTx=fsMod.runTransaction;
 authMod.onAuthStateChanged(FB.auth,function(u){
 var ok=!!u && !u.isAnonymous && u.providerData && u.providerData.some(function(p){return p.providerId==='password'});
 if(ok){
@@ -238,7 +244,12 @@ if(root&&root.parentNode)root.parentNode.removeChild(root);
 });
 }).catch(function(e){console.error('Firebase init error',e)});
 /* ================= /Firebase ================= */
-var ovl=document.getElementById('ctOvl'),sh=document.getElementById('ctSheet'),amt=document.getElementById('ctAmt'),pg=document.getElementById('ctPage'),pg2=document.getElementById('ctPage2'),spin=document.getElementById('ctSpin'),emp=document.getElementById('ctEmp'),list=document.getElementById('ctList'),win=document.getElementById('ctWin');
+var ovl=document.getElementById('ctOvl'),sh=document.getElementById('ctSheet'),amt=document.getElementById('ctAmt'),pg=document.getElementById('ctPage'),pg2=document.getElementById('ctPage2'),spin=document.getElementById('ctSpin'),emp=document.getElementById('ctEmp'),list=document.getElementById('ctList'),win=document.getElementById('ctWin'),boot=document.getElementById('ctBoot');
+/* ===== شاشة التحميل عند فتح الصفحة: ربع ثانية وتختفي ===== */
+setTimeout(function(){
+boot.classList.add('ct-off');
+setTimeout(function(){if(boot&&boot.parentNode)boot.parentNode.removeChild(boot)},250);
+},250);
 /* ===== إخفاء الشريط السفلي للصفحة الأم أثناء فتح الشيت ===== */
 var ctHidden=[];
 function ctHideBar(){
@@ -265,12 +276,13 @@ if(ctHidden[i][1])ctHidden[i][0].style.display=ctHidden[i][1];
 }
 ctHidden=[];
 }
-/* ===== شاشة "نجاح الاستخدام" فقط ===== */
+/* ===== شريط "نجاح الاستخدام" الشفاف بنص الشاشة (لا يحجب أي شيء) ===== */
+var ctWinT=null;
 function ctWinShow(){
 win.classList.add('ct-on');
-setTimeout(function(){win.classList.remove('ct-on')},2500);
+if(ctWinT)clearTimeout(ctWinT);
+ctWinT=setTimeout(function(){win.classList.remove('ct-on')},2000);
 }
-win.onclick=function(){win.classList.remove('ct-on')};
 function openS(){if(ctBlocked()){alert('يجب تسجيل الدخول بالبريد الإلكتروني وكلمة المرور أولاً');return}ctHideBar();ovl.classList.add('ct-on');sh.classList.add('ct-on');root.style.overflow='hidden'}
 function closeS(){ovl.classList.remove('ct-on');sh.classList.remove('ct-on');root.style.overflow='';ctShowBar()}
 root.querySelectorAll('.ct-sec .ct-head').forEach(function(h){h.onclick=openS});
@@ -285,11 +297,13 @@ document.getElementById('ctOk').onclick=function(){
 if(ctBlocked())return alert('يجب تسجيل الدخول بالبريد الإلكتروني وكلمة المرور أولاً');
 var code=document.getElementById('ctSig').value.trim();
 if(!code)return alert('الرجاء إدخال رمز الإشارة');
-if(!amt.value||+amt.value<=0)return alert('الرجاء إدخال مبلغ النسخ');
+var amtV=+amt.value;
+if(!amt.value||amtV<=0)return alert('الرجاء إدخال مبلغ النسخ');
 if(document.getElementById('ctAgr').classList.contains('ct-off'))return alert('يجب الموافقة على اتفاقية تتبع النسخ');
 var okBtn=document.getElementById('ctOk');
 okBtn.disabled=true;
 var uid=FB.user.uid,now=Date.now();
+var userRef=FB.doc(FB.fs,'users',uid);
 /* 1) التحقق من مجموعة codess، وإنشاء الأكواد الافتراضية تلقائياً إذا كانت فارغة */
 FB.getDocs(FB.query(FB.collection(FB.fs,'codess'),FB.limit(1))).then(function(snap){
 if(snap.empty){
@@ -302,19 +316,21 @@ return Promise.all(ps);
 return FB.getDoc(FB.doc(FB.fs,'codess',code));
 }).then(function(cs){
 if(!cs.exists()){okBtn.disabled=false;return alert('رمز الإشارة غير صحيح أو غير موجود')}
-/* 3) سجل استخدام الرموز والرصيد من مستند المستخدم */
-return FB.getDoc(FB.doc(FB.fs,'users',uid));
-}).then(function(us){
-if(!us)return;
+/* 3) تحقق صارم + تحديث ذرّي عبر Transaction:
+      - الكود يُستخدم مرة واحدة فقط مدى الحياة
+      - بحد أقصى 3 أكواد خلال 24 ساعة
+      - القراءة والكتابة داخل عملية واحدة مستحيل تتداخل أو تتجاوز */
+return FB.runTx(FB.fs,function(tx){
+return tx.get(userRef).then(function(us){
 var ud=us.exists()?us.data():{};
 var log=ud.sigLog||{};
+/* فحص صارم: الكود مُستخدم من قبل — مرفوض فوراً */
+if(log[code]!==undefined&&log[code]!==null)throw 'USED';
+/* فحص صارم: عدد الأكواد خلال آخر 24 ساعة */
 var keys=Object.keys(log),cnt=0,i;
 for(i=0;i<keys.length;i++){if(now-(+log[keys[i]]||0)<CT_DAY_MS)cnt++}
-/* لا يمكن استخدام نفس الكود أكثر من مرة */
-if(log[code]){okBtn.disabled=false;return alert('لا يمكن استخدام نفس الرمز مرتين')}
-/* الحد الأقصى 3 أكواد فقط خلال 24 ساعة */
-if(cnt>=CT_DAILY_LIMIT){okBtn.disabled=false;return alert('لقد استخدمت الحد الأقصى: 3 رموز إشارة خلال 24 ساعة، حاول لاحقاً')}
-/* 4) احتساب الربح 1.6667% من الرصيد وإضافته إلى حقل balance + الربح التراكمي + ربح اليوم */
+if(cnt>=CT_DAILY_LIMIT)throw 'LIMIT';
+/* احتساب الربح 1.6667% من الرصيد */
 var bal=parseFloat(ud.balance)||0;
 var profit=+(bal*CT_RATE).toFixed(2);
 var nb=+(bal+profit).toFixed(2);
@@ -324,19 +340,29 @@ var dp=(ud.dayKey===tk)?(parseFloat(ud.dayProfit)||0):0;
 dp=+(dp+profit).toFixed(2);
 /* تسجيل تفاصيل الكود المستخدم لعرضها في سجلات النسخ - مكتمل */
 var recs=(ud.ctRecs||[]).slice();
-recs.push({code:code,amt:+amt.value,profit:profit,time:now});
+recs.push({code:code,amt:amtV,profit:profit,time:now});
 var upd={balance:nb,totalProfit:tp,dayProfit:dp,dayKey:tk,ctRecs:recs};
 upd['sigLog.'+code]=now;
-return FB.setDoc(FB.doc(FB.fs,'users',uid),upd,{merge:true}).then(function(){
-FB.balance=nb;FB.totalProfit=tp;FB.dayProfit=dp;
+tx.set(userRef,upd,{merge:true});
+return {balance:nb,totalProfit:tp,dayProfit:dp};
+});
+});
+}).then(function(res){
+if(!res)return;
+FB.balance=res.balance;FB.totalProfit=res.totalProfit;FB.dayProfit=res.dayProfit;
 ctShowBalance();
 ctRenderCard();
 okBtn.disabled=false;
 closeS();
-/* شاشة نجاح الاستخدام فقط */
+/* شريط نجاح الاستخدام بنص الشاشة */
 ctWinShow();
+}).catch(function(e){
+okBtn.disabled=false;
+if(e==='USED')return alert('لا يمكن استخدام نفس الرمز مرتين');
+if(e==='LIMIT')return alert('لقد استخدمت الحد الأقصى: 3 رموز إشارة خلال 24 ساعة، حاول لاحقاً');
+console.error(e);
+alert('حدث خطأ أثناء معالجة الطلب، حاول مرة أخرى');
 });
-}).catch(function(e){okBtn.disabled=false;console.error(e);alert('حدث خطأ أثناء معالجة الطلب، حاول مرة أخرى')});
 };
 /* ===== تحميل وعرض سجلات النسخ المكتملة ===== */
 function ctLoadRecs(){
