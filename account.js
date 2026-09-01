@@ -8,7 +8,6 @@ var css=`
 #accountOverlay .ac-header{background:linear-gradient(180deg,#8B7FE8 0%,#9B8FF0 50%,#A99EF5 100%);padding:14px 16px 90px;position:relative;overflow:hidden}
 #accountOverlay .ac-header::before{content:'';position:absolute;width:300px;height:300px;border-radius:50%;background:rgba(255,255,255,.08);top:-100px;right:-80px}
 #accountOverlay .ac-header::after{content:'';position:absolute;width:220px;height:220px;border-radius:50%;background:rgba(255,255,255,.06);bottom:-50px;left:-60px}
-/* الشريط العلوي: هلال + كرة أرضية يسار | إعدادات يمين (مطابق للمرجع) */
 #accountOverlay .ac-top{display:flex;justify-content:space-between;align-items:center;position:relative;z-index:2;margin-bottom:22px;direction:ltr}
 #accountOverlay .ac-top-icons{display:flex;gap:16px;align-items:center}
 #accountOverlay .ac-top-icons svg{width:22px;height:22px;fill:#fff;cursor:pointer}
@@ -20,11 +19,9 @@ var css=`
 #accountOverlay .ac-avatar-wrap img{width:100%;height:100%;border-radius:50%;object-fit:cover;border:3px solid rgba(255,255,255,.4)}
 #accountOverlay .ac-cam{position:absolute;bottom:0;right:50%;transform:translateX(50%);background:rgba(0,0,0,.5);width:100%;height:26px;border-radius:0 0 50% 50%;display:flex;align-items:flex-start;justify-content:center;padding-top:2px;overflow:hidden}
 #accountOverlay .ac-cam svg{width:16px;height:16px;fill:#fff}
-/* الإيميل + VIP 0 على نفس السطر، VIP أصفر على يمين الإيميل */
 #accountOverlay .ac-email{color:#fff;font-size:17px;font-weight:700;display:inline-flex;align-items:center;gap:8px;direction:ltr}
 #accountOverlay .ac-vip{background:transparent;color:#FFD84D;font-size:14px;font-weight:800;letter-spacing:.5px}
 #accountOverlay .ac-card{background:#fff;border-radius:14px;margin:-70px 16px 0;padding:18px;position:relative;z-index:3;box-shadow:0 4px 16px rgba(0,0,0,.06)}
-/* صف واحد: UID يسار | رمز الدعوة يمين */
 #accountOverlay .ac-ids-row{display:flex;justify-content:space-between;align-items:center;direction:ltr}
 #accountOverlay .ac-id-group{display:flex;align-items:center;gap:6px}
 #accountOverlay .ac-id-group.rtl{direction:rtl}
@@ -32,22 +29,18 @@ var css=`
 #accountOverlay .ac-row-val{color:#1A1A1A;font-size:14px;font-weight:700}
 #accountOverlay .ac-copy{width:14px;height:14px;cursor:pointer;opacity:.5}
 #accountOverlay .ac-divider{height:1px;background:#ECEEF4;margin:14px 0}
-/* إجمالي الأصول + العين يسار | معلومات الأصول + سهم يسار في اليمين */
 #accountOverlay .ac-assets-row{display:flex;justify-content:space-between;align-items:center;direction:ltr}
 #accountOverlay .ac-assets-label{display:flex;align-items:center;gap:6px;color:#8A8F9C;font-size:13px}
 #accountOverlay .ac-assets-label svg{width:16px;height:16px;stroke:#8A8F9C;fill:none;stroke-width:1.6;cursor:pointer}
 #accountOverlay .ac-assets-info{color:#8A8F9C;font-size:13px;display:flex;align-items:center;gap:4px;cursor:pointer}
 #accountOverlay .ac-assets-info svg{width:14px;height:14px;fill:none;stroke:#8A8F9C;stroke-width:2}
-/* الرصيد محاذاة لليسار */
 #accountOverlay .ac-balance{color:#7B6FE0;font-size:32px;font-weight:800;margin-top:6px;letter-spacing:.5px;text-align:left}
-/* شبكة الأيقونات: الترتيب البصري من اليسار لليمين مطابق للمرجع */
 #accountOverlay .ac-actions{background:#fff;border-radius:14px;margin:14px 16px 0;padding:18px 10px;display:grid;grid-template-columns:repeat(4,1fr);gap:8px;box-shadow:0 2px 10px rgba(0,0,0,.04);direction:ltr}
 #accountOverlay .ac-action{display:flex;flex-direction:column;align-items:center;gap:8px;cursor:pointer;padding:6px 0}
 #accountOverlay .ac-action-ic{width:50px;height:50px;background:#EEE9FB;border-radius:12px;display:flex;align-items:center;justify-content:center;position:relative;overflow:hidden}
 #accountOverlay .ac-action-ic img{width:100%;height:100%;object-fit:contain}
 #accountOverlay .ac-action-tx{font-size:11.5px;color:#1A1A1A;font-weight:600;text-align:center;line-height:1.3}
 #accountOverlay .ac-menu{background:#fff;border-radius:14px;margin:14px 16px 20px;padding:4px 0;box-shadow:0 2px 10px rgba(0,0,0,.04)}
-/* عناصر القائمة: أيقونة يسار | نص | سهم > يمين */
 #accountOverlay .ac-item{display:flex;align-items:center;padding:16px 18px;cursor:pointer;border-bottom:1px solid #F0F2F7;direction:ltr}
 #accountOverlay .ac-item:last-child{border-bottom:none}
 #accountOverlay .ac-item-ic{width:26px;height:26px;display:flex;align-items:center;justify-content:center;margin-right:14px}
@@ -55,7 +48,6 @@ var css=`
 #accountOverlay .ac-item-tx{flex:1;font-size:14px;color:#1A1A1A;font-weight:600;text-align:left}
 #accountOverlay .ac-item-arr{width:16px;height:16px;fill:none;stroke:#C4C8D1;stroke-width:2;transform:rotate(180deg)}
 
-/* ===== قسم توثيق الهوية (verifyOverlay) — CSS معزول بالكامل تحت #verifyOverlay ===== */
 #verifyOverlay{position:fixed;top:0;left:0;right:0;bottom:0;max-width:480px;margin:0 auto;background:#f4f3fb;z-index:9999;overflow-y:auto;direction:rtl;font-family:'Segoe UI',Tahoma,sans-serif}
 #verifyOverlay *{margin:0;padding:0;box-sizing:border-box;font-family:'Segoe UI',Tahoma,sans-serif;-webkit-tap-highlight-color:transparent;user-select:none}
 #verifyOverlay input{user-select:text}
@@ -111,6 +103,23 @@ var css=`
 #verifyOverlay .au button{width:100%;padding:14px;border:0;border-radius:8px;background:#2f6bff;color:#fff;font-weight:800;font-size:16px;cursor:pointer;margin-bottom:10px;font-family:inherit}
 #verifyOverlay .au .sw{text-align:center;color:#2f6bff;cursor:pointer;font-size:14px;font-weight:600}
 #verifyOverlay .au .er{color:#e53935;font-size:13px;text-align:center;margin-bottom:10px;min-height:18px}
+
+/* ===== صفحة القسيمة (couponOverlay) — نسخة حرفية من الصورة المرجعية — اتجاه أجنبي LTR بالكامل ===== */
+#couponOverlay{position:fixed;top:0;left:0;right:0;bottom:0;max-width:480px;margin:0 auto;background:#F5F6FA;z-index:9999;overflow:hidden;font-family:'Noto Sans Arabic',-apple-system,'Segoe UI',Tahoma,Arial,sans-serif;direction:ltr;display:flex;flex-direction:column}
+#couponOverlay *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+#couponOverlay .cp-hd{position:relative;background:#8B7FE8 url('https://i.ibb.co/hRm446rn/IMG.png') center/cover no-repeat;color:#fff;text-align:center;padding:17px 0;font-size:17px;font-weight:800;flex-shrink:0}
+#couponOverlay .cp-hd .cp-bk{position:absolute;left:14px;top:50%;transform:translateY(-50%);cursor:pointer;display:flex;align-items:center;justify-content:center;width:28px;height:28px}
+#couponOverlay .cp-hd .cp-bk svg{width:22px;height:22px;stroke:#fff;fill:none;stroke-width:2.6;stroke-linecap:round;stroke-linejoin:round}
+#couponOverlay .cp-tabs{display:flex;background:#fff;overflow-x:auto;white-space:nowrap;scrollbar-width:none;flex-shrink:0}
+#couponOverlay .cp-tabs::-webkit-scrollbar{display:none}
+#couponOverlay .cp-tab{padding:14px 16px 12px;font-size:13.5px;color:#9AA0AB;font-weight:600;cursor:pointer;position:relative;flex-shrink:0;line-height:1.4}
+#couponOverlay .cp-tab.on{color:#1A1A1A;font-weight:800}
+#couponOverlay .cp-tab.on::after{content:'';position:absolute;bottom:0;left:10px;right:10px;height:3.5px;border-radius:4px 4px 0 0;background:#7B6FE0}
+#couponOverlay .cp-body{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;padding-bottom:90px}
+#couponOverlay .cp-empty{width:110px;height:110px;object-fit:contain}
+#couponOverlay .cp-empty-tx{margin-top:16px;color:#9AA0AB;font-size:14px;font-weight:600}
+#couponOverlay .cp-lg{position:absolute;inset:0;background:#fff;z-index:100;display:flex;flex-direction:column;align-items:center;justify-content:flex-start;padding-top:30vh}
+#couponOverlay .cp-lg img{width:80px;height:80px}
 `;
 var st=document.createElement('style');st.id='accountOverlayStyle';st.textContent=css;document.head.appendChild(st);
 
@@ -186,7 +195,7 @@ var html=`
     <div class="ac-item-tx">توثيق الهوية</div>
     <svg class="ac-item-arr" viewBox="0 0 24 24"><path d="M15 6l-6 6 6 6" stroke="#C4C8D1" fill="none" stroke-width="2" stroke-linecap="round"/></svg>
   </div>
-  <div class="ac-item">
+  <div class="ac-item" id="acCoupon">
     <div class="ac-item-ic"><img src="`+GH+`Kzkzjjz.png" alt="قسيمة"></div>
     <div class="ac-item-tx">قسيمة</div>
     <svg class="ac-item-arr" viewBox="0 0 24 24"><path d="M15 6l-6 6 6 6" stroke="#C4C8D1" fill="none" stroke-width="2" stroke-linecap="round"/></svg>
@@ -248,11 +257,6 @@ document.querySelectorAll('#accountOverlay .ac-action, #accountOverlay .ac-item'
     b.style.transform='scale(.97)';setTimeout(function(){b.style.transform='';},120);
   });
 });
-
-// ============================================================
-// قسم توثيق الهوية: حقن ديناميكي مدمج (بديل stocks.js بنفس النظام)
-// أول ضغطة تبني الـ verifyOverlay، وأي ضغطة بعدها تعرضه فقط
-// ============================================================
 
 // زرار الرجوع في صفحة التوثيق: يقفل الـ Overlay ويرجع للبروفايل
 window.closeVerify=function(){var vo=document.getElementById('verifyOverlay');if(vo)vo.style.display='none';};
@@ -333,6 +337,63 @@ document.getElementById('acVerify').addEventListener('click',function(){
 // Settings click
 document.getElementById('acSettings').addEventListener('click',function(){
   this.style.transform='scale(.9)';setTimeout(function(){document.getElementById('acSettings').style.transform='';},150);
+});
+
+// ============================================================
+// صفحة القسيمة (couponOverlay): حقن ديناميكي بنفس نظام التوثيق
+// نسخة حرفية من الصورة المرجعية — اتجاه LTR أجنبي بالكامل
+// شاشة تحميل مطابقة لقسم التوثيق ونفس المدة (500ms)
+// زر الرجوع فعّال: يقفل صفحة القسيمة ويرجع المستخدم خطوة للوراء (صفحة الحساب)
+// ============================================================
+
+// زرار الرجوع في صفحة القسيمة: يقفل الـ Overlay ويرجع للبروفايل
+window.closeCoupon=function(){var co=document.getElementById('couponOverlay');if(co)co.style.display='none';};
+
+var couponHtml=`
+<div class="cp-lg" id="cpLg"><img src="https://gulfxdl.com/assets/loading-D0BtznxM.gif"></div>
+<div class="cp-hd"><span class="cp-bk" onclick="closeCoupon()"><svg viewBox="0 0 24 24"><path d="M15 18l-6-6 6-6"/></svg></span><div class="cp-t">قسيمة</div></div>
+<div class="cp-tabs">
+  <div class="cp-tab on">قسيمة خصم متابعة الصفقات</div>
+  <div class="cp-tab">قسيمة خصم الاستثمار التلقائي</div>
+  <div class="cp-tab">رصيد السحب</div>
+</div>
+<div class="cp-body">
+  <img class="cp-empty" src="https://gulfxdl.com/assets/empty-light-B1A8k_0V.png" alt="لا يوجد محتوى">
+  <div class="cp-empty-tx">لا يوجد محتوى</div>
+</div>
+`;
+
+// شاشة التحميل: تظهر عند كل فتح للصفحة وتختفي بعد 500ms (نفس مدة قسم التوثيق)
+function showCouponLoading(){
+  var lg=document.getElementById('cpLg');
+  if(!lg)return;
+  lg.style.display='flex';
+  setTimeout(function(){lg.style.display='none';},500);
+}
+
+function injectCouponOverlay(){
+  var co=document.createElement('div');
+  co.id='couponOverlay';
+  co.innerHTML=couponHtml;
+  document.body.appendChild(co);
+  // تبديل التبويبات: تفعيل التبويب المضغوط مع تمريره للمنتصف
+  document.querySelectorAll('#couponOverlay .cp-tab').forEach(function(t){
+    t.addEventListener('click',function(){
+      document.querySelectorAll('#couponOverlay .cp-tab').forEach(function(x){x.classList.remove('on');});
+      t.classList.add('on');
+      if(t.scrollIntoView){t.scrollIntoView({inline:'center',block:'nearest'});}
+    });
+  });
+}
+
+// قسيمة: حقن الصفحة عند أول ضغطة، وأي ضغطة بعدها تعرضها فقط مع شاشة التحميل
+var acCouponScriptLoaded=false;
+document.getElementById('acCoupon').addEventListener('click',function(){
+  if(document.getElementById('couponOverlay')){document.getElementById('couponOverlay').style.display='flex';showCouponLoading();return;}
+  if(acCouponScriptLoaded){return;}
+  acCouponScriptLoaded=true;
+  injectCouponOverlay();
+  showCouponLoading();
 });
 
 })();
