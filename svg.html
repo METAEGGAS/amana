@@ -1,84 +1,315 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Biquote Live Candles</title>
+<style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+        font-family: -apple-system, 'Segoe UI', Roboto, sans-serif;
+        background: #0a0a0a;
+        color: #fff;
+        min-height: 100vh;
+        padding: 16px;
+    }
+    .header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 12px 16px;
+        background: #1a1a1a;
+        border-radius: 12px;
+        margin-bottom: 12px;
+    }
+    .symbol { font-size: 16px; color: #888; letter-spacing: 1px; }
+    .price {
+        font-size: 32px;
+        font-weight: 700;
+        font-variant-numeric: tabular-nums;
+    }
+    .change { font-size: 14px; font-weight: 600; }
+    .up { color: #00c853; }
+    .down { color: #ff1744; }
+    .chart-container {
+        background: #1a1a1a;
+        border-radius: 12px;
+        padding: 12px;
+        height: 60vh;
+        position: relative;
+    }
+    canvas { display: block; width: 100%; height: 100%; }
+    .status {
+        font-size: 12px;
+        color: #555;
+        margin-top: 8px;
+        text-align: center;
+    }
+    .controls {
+        display: flex;
+        gap: 8px;
+        margin-top: 12px;
+        justify-content: center;
+        flex-wrap: wrap;
+    }
+    .controls button {
+        background: #2a2a2a;
+        color: #fff;
+        border: 1px solid #3a3a3a;
+        padding: 6px 14px;
+        border-radius: 6px;
+        cursor: pointer;
+        font-size: 13px;
+        transition: background 0.15s;
+    }
+    .controls button:hover { background: #3a3a3a; }
+    .controls button.active { background: #0064e0; border-color: #0064e0; }
+</style>
+</head>
+<body>
 
-<svg xmlns="http://www.w3.org/2000/svg" width="512" height="512" viewBox="0 0 512 512">
-  <defs>
-    <linearGradient id="white" x2="1" y2="1">
-      <stop stop-color="#fff"/>
-      <stop offset="1" stop-color="#bdcbea"/>
-    </linearGradient>
-    <linearGradient id="green" x2="0" y2="1">
-      <stop stop-color="#20ffc2"/>
-      <stop offset="1" stop-color="#00b98a"/>
-    </linearGradient>
-    <linearGradient id="red" x2="0" y2="1">
-      <stop stop-color="#ff426b"/>
-      <stop offset="1" stop-color="#e90040"/>
-    </linearGradient>
-    <filter id="glow" x="-40%" y="-40%" width="180%" height="180%">
-      <feGaussianBlur stdDeviation="3" result="blur"/>
-      <feMerge>
-        <feMergeNode in="blur"/>
-        <feMergeNode in="SourceGraphic"/>
-      </feMerge>
-    </filter>
-  </defs>
+<div class="header">
+    <div>
+        <div class="symbol">EUR / USD</div>
+        <div class="change" id="change">0.00%</div>
+    </div>
+    <div class="price" id="price">---.-----</div>
+</div>
 
-  <!-- الإطار السداسي الأصلي -->
-  <path d="M256 82 L389 159 Q400 166 400 181 V326 Q400 341 387 349 L269 418 Q256 426 243 418 L125 349 Q112 341 112 326 V181 Q112 166 125 159 Z"
-    fill="none" stroke="url(#white)" stroke-width="17"
-    stroke-linejoin="round" stroke-linecap="round"
-    stroke-dasharray="1000" stroke-dashoffset="1000"
-    pathLength="1000" filter="url(#glow)">
-    <animate attributeName="stroke-dashoffset"
-      from="1000" to="0" dur="1s" fill="freeze"/>
-  </path>
+<div class="chart-container">
+    <canvas id="chart"></canvas>
+</div>
 
-  <!-- الشموع الخضراء والحمراء المتحركة -->
-  <g filter="url(#glow)">
-    <g>
-      <animateTransform attributeName="transform" type="translate"
-        values="0,-100;0,8;0,-3;0,0"
-        keyTimes="0;0.72;0.9;1" dur=".7s" begin=".65s" fill="freeze"/>
-      <g fill="url(#green)">
-        <rect x="153" y="221" width="8" height="120" rx="4"/>
-        <rect x="141" y="241" width="32" height="94" rx="5"/>
-      </g>
-    </g>
-    <g>
-      <animateTransform attributeName="transform" type="translate"
-        values="0,-130;0,10;0,-3;0,0"
-        keyTimes="0;0.72;0.9;1" dur=".72s" begin=".82s" fill="freeze"/>
-      <g fill="url(#red)">
-        <rect x="197" y="179" width="8" height="159" rx="4"/>
-        <rect x="185" y="207" width="32" height="117" rx="5"/>
-      </g>
-    </g>
-    <g>
-      <animateTransform attributeName="transform" type="translate"
-        values="0,-115;0,9;0,-3;0,0"
-        keyTimes="0;0.72;0.9;1" dur=".7s" begin=".99s" fill="freeze"/>
-      <g fill="url(#green)">
-        <rect x="351" y="221" width="8" height="120" rx="4"/>
-        <rect x="339" y="241" width="32" height="94" rx="5"/>
-      </g>
-    </g>
-    <g>
-      <animateTransform attributeName="transform" type="translate"
-        values="0,-145;0,10;0,-3;0,0"
-        keyTimes="0;0.72;0.9;1" dur=".74s" begin="1.16s" fill="freeze"/>
-      <g fill="url(#red)">
-        <rect x="307" y="179" width="8" height="159" rx="4"/>
-        <rect x="295" y="207" width="32" height="117" rx="5"/>
-      </g>
-    </g>
-  </g>
+<div class="controls">
+    <button data-interval="1m" class="active">1m</button>
+    <button data-interval="5m">5m</button>
+    <button data-interval="15m">15m</button>
+    <button data-interval="1h">1h</button>
+</div>
 
-  <!-- الرمز المركزي -->
-  <path d="M256 139 L276 158 V351 L256 369 L236 351 V158 Z"
-    fill="url(#white)" opacity="0" filter="url(#glow)">
-    <animate attributeName="opacity"
-      values="0;1" dur=".45s" begin="1.45s" fill="freeze"/>
-    <animateTransform attributeName="transform" type="translate"
-      values="0,-45;0,5;0,-2;0,0"
-      keyTimes="0;0.72;0.9;1" dur=".6s" begin="1.45s" fill="freeze"/>
-  </path>
-</svg>
+<div class="status" id="status">Connecting...</div>
+
+<script type="module">
+    import Biquote from 'https://esm.sh/biquote@0.3.0';
+
+    const bq = new Biquote();
+    const canvas = document.getElementById('chart');
+    const ctx = canvas.getContext('2d');
+    const priceEl = document.getElementById('price');
+    const changeEl = document.getElementById('change');
+    const statusEl = document.getElementById('status');
+
+    const SYMBOL = 'EURUSD';
+    let candles = [];        // مصفوفة الشموع {time, open, high, low, close}
+    let livePrice = null;    // السعر اللحظي الحالي
+    let currentInterval = '1m';
+    let lastMid = null;
+
+    // ─── إعداد الـ Canvas ───────────────────────────────────
+    function resizeCanvas() {
+        const rect = canvas.getBoundingClientRect();
+        const dpr = window.devicePixelRatio || 1;
+        canvas.width = rect.width * dpr;
+        canvas.height = rect.height * dpr;
+        ctx.scale(dpr, dpr);
+        draw();
+    }
+    window.addEventListener('resize', resizeCanvas);
+
+    // ─── جلب الشموع التاريخية ───────────────────────────────
+    // ohlc() من Biquote — من الأقدم للأحدث 
+    async function loadCandles(interval) {
+        try {
+            const bars = await bq.ohlc(SYMBOL, { interval, limit: 100 });
+            // bars: [{time, open, high, low, close}, ...]
+            candles = bars.map(b => ({
+                time: b.time,
+                open: b.open,
+                high: b.high,
+                low: b.low,
+                close: b.close
+            }));
+            draw();
+            statusEl.textContent = `Loaded ${candles.length} candles • ${interval}`;
+        } catch (e) {
+            statusEl.textContent = 'Error loading candles: ' + e.message;
+        }
+    }
+
+    // ─── جلب السعر اللحظي ────────────────────────────────────
+    async function fetchPrice() {
+        try {
+            const data = await bq.tick(SYMBOL);
+            livePrice = data.mid;   // mid هو السعر الفعلي 
+            const changePct = data.dayDiffPercent ?? 0;
+
+            priceEl.textContent = livePrice.toFixed(5);
+            const sign = changePct >= 0 ? '+' : '';
+            changeEl.textContent = `${sign}${changePct.toFixed(2)}%`;
+            changeEl.className = 'change ' + (changePct >= 0 ? 'up' : 'down');
+
+            // تحديث الشمعة الأخيرة بالسعر الجديد (مثل أي منصة تداول)
+            updateCurrentCandle(livePrice);
+
+            lastMid = livePrice;
+            draw();
+        } catch (e) {
+            statusEl.textContent = 'Error: ' + e.message;
+        }
+    }
+
+    // ─── تحديث الشمعة الأخيرة ────────────────────────────────
+    function updateCurrentCandle(price) {
+        if (candles.length === 0) return;
+
+        const now = Date.now() / 1000;
+        const intervalSec = intervalToSeconds(currentInterval);
+        const lastCandle = candles[candles.length - 1];
+
+        // إذا انتهت مدة الشمعة الأخيرة، أنشئ شمعة جديدة
+        if (now - lastCandle.time >= intervalSec) {
+            candles.push({
+                time: now,
+                open: price,
+                high: price,
+                low: price,
+                close: price
+            });
+            // احتفظ بـ 100 شمعة فقط
+            if (candles.length > 100) candles.shift();
+        } else {
+            // تحديث الشمعة الحالية
+            lastCandle.close = price;
+            if (price > lastCandle.high) lastCandle.high = price;
+            if (price < lastCandle.low) lastCandle.low = price;
+        }
+    }
+
+    function intervalToSeconds(interval) {
+        const map = { '1m': 60, '5m': 300, '15m': 900, '1h': 3600 };
+        return map[interval] || 60;
+    }
+
+    // ─── رسم الشموع ──────────────────────────────────────────
+    function draw() {
+        const W = canvas.width / (window.devicePixelRatio || 1);
+        const H = canvas.height / (window.devicePixelRatio || 1);
+
+        ctx.clearRect(0, 0, W, H);
+
+        if (candles.length === 0) return;
+
+        // هامش للرسم
+        const padRight = 60;
+        const padTop = 10;
+        const padBottom = 20;
+        const chartW = W - padRight;
+        const chartH = H - padTop - padBottom;
+
+        // نطاق السعر
+        let min = Infinity, max = -Infinity;
+        for (const c of candles) {
+            if (c.low < min) min = c.low;
+            if (c.high > max) max = c.high;
+        }
+        const range = max - min || 1;
+        const pad = range * 0.1;
+        min -= pad;
+        max += pad;
+        const priceRange = max - min;
+
+        // تحويل السعر إلى y
+        const priceToY = (p) => padTop + chartH - ((p - min) / priceRange) * chartH;
+
+        // عرض الشمعة
+        const candleW = chartW / candles.length;
+        const bodyW = Math.max(candleW * 0.7, 2);
+
+        // ─── خطوط الشبكة + الأسعار على اليمين ───
+        ctx.strokeStyle = '#222';
+        ctx.fillStyle = '#666';
+        ctx.font = '11px -apple-system, sans-serif';
+        ctx.textAlign = 'left';
+
+        for (let i = 0; i <= 5; i++) {
+            const y = padTop + (chartH / 5) * i;
+            const price = max - (priceRange / 5) * i;
+
+            ctx.beginPath();
+            ctx.moveTo(0, y);
+            ctx.lineTo(chartW, y);
+            ctx.stroke();
+
+            ctx.fillText(price.toFixed(5), chartW + 6, y + 4);
+        }
+
+        // ─── رسم الشموع ───
+        candles.forEach((c, i) => {
+            const x = i * candleW + candleW / 2;
+            const isUp = c.close >= c.open;
+            const color = isUp ? '#00c853' : '#ff1744';
+
+            // الفتيل (High-Low)
+            ctx.strokeStyle = color;
+            ctx.lineWidth = 1;
+            ctx.beginPath();
+            ctx.moveTo(x, priceToY(c.high));
+            ctx.lineTo(x, priceToY(c.low));
+            ctx.stroke();
+
+            // الجسم (Open-Close)
+            const openY = priceToY(c.open);
+            const closeY = priceToY(c.close);
+            const topY = Math.min(openY, closeY);
+            const bodyH = Math.max(Math.abs(closeY - openY), 1);
+
+            ctx.fillStyle = color;
+            ctx.fillRect(x - bodyW / 2, topY, bodyW, bodyH);
+        });
+
+        // ─── خط السعر اللحظي ───
+        if (livePrice !== null) {
+            const y = priceToY(livePrice);
+            ctx.strokeStyle = '#0064e0';
+            ctx.setLineDash([4, 4]);
+            ctx.lineWidth = 1;
+            ctx.beginPath();
+            ctx.moveTo(0, y);
+            ctx.lineTo(chartW, y);
+            ctx.stroke();
+            ctx.setLineDash([]);
+
+            // شارة السعر
+            ctx.fillStyle = '#0064e0';
+            ctx.fillRect(chartW, y - 9, padRight, 18);
+            ctx.fillStyle = '#fff';
+            ctx.font = 'bold 11px -apple-system, sans-serif';
+            ctx.fillText(livePrice.toFixed(5), chartW + 5, y + 4);
+        }
+    }
+
+    // ─── التحكم في الفواصل الزمنية ───────────────────────────
+    document.querySelectorAll('.controls button').forEach(btn => {
+        btn.addEventListener('click', async () => {
+            document.querySelectorAll('.controls button').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            currentInterval = btn.dataset.interval;
+            await loadCandles(currentInterval);
+        });
+    });
+
+    // ─── التشغيل ──────────────────────────────────────────────
+    resizeCanvas();
+    await loadCandles('1m');
+
+    // السعر اللحظي كل ثانية
+    fetchPrice();
+    setInterval(fetchPrice, 1000);
+
+    // إعادة تحميل الشموع كل 30 ثانية (لتحديث البيانات التاريخية)
+    setInterval(() => loadCandles(currentInterval), 30000);
+
+</script>
+
+</body>
+</html>
