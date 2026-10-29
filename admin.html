@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="color-scheme" content="dark"><title>Marex — إدارة إحصائيات الفريق</title>
+<style>
+*{box-sizing:border-box}body{margin:0;background:#03071c;color:#e7edff;font:15px/1.8 Arial,Tahoma,sans-serif}main{max-width:1000px;margin:auto;padding:28px 18px 60px}header{display:flex;justify-content:space-between;align-items:center;gap:14px;flex-wrap:wrap;margin-bottom:22px}h1{font-size:24px;margin:0}h2{font-size:20px;margin:0 0 16px}p{margin:10px 0}a{color:#71d9ff}.card{background:linear-gradient(140deg,#101b3a,#08142e);border:1px solid #293b60;border-radius:18px;padding:22px;margin:18px 0;box-shadow:0 10px 40px #0002}.muted,small{color:#b6c5df}small{display:block;font-size:12px;overflow-wrap:anywhere}button,input{font:inherit}input{width:100%;min-width:0;padding:12px;border:1px solid #3a5075;background:#050e23;border-radius:10px;color:#fff}input:focus{outline:2px solid #18b9ff;outline-offset:2px}button,.button{padding:10px 18px;border:1px solid #4089b8;border-radius:10px;background:#0878ae;color:#fff;cursor:pointer;text-decoration:none;display:inline-block}button.secondary,.button.secondary{background:#152944;border-color:#3a5075}button:disabled{opacity:.5;cursor:not-allowed}.actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:18px}.grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:18px}.field{display:block}.field span{display:block;margin-bottom:6px}.field small{margin-top:6px}.notice{padding:14px 18px;background:#092937;border:1px solid #1b667b;border-radius:12px;white-space:pre-wrap;overflow-wrap:anywhere}.error{background:#3a1523;border-color:#9a3b55;color:#ffccda}.search{display:flex;gap:10px;align-items:end}.search label{flex:1}#results{display:grid;gap:10px;margin-top:16px}.result{background:#102b49;text-align:right;width:100%;overflow-wrap:anywhere}.result strong{display:block}#selected-user{overflow-wrap:anywhere;padding:12px;background:#041026;border-radius:10px}pre{background:#020917;border:1px solid #263d61;border-radius:10px;padding:16px;white-space:pre;overflow:auto;direction:ltr;text-align:left;font:12px/1.7 monospace;max-height:540px}summary{cursor:pointer;font-weight:bold;color:#92ddff}code{direction:ltr;unicode-bidi:embed;background:#041026;padding:2px 5px;border-radius:4px}[hidden]{display:none!important}@media(max-width:620px){.grid{grid-template-columns:1fr}.search{display:block}.search button{margin-top:12px;width:100%}.card{padding:17px}h1{font-size:21px}}
+</style></head><body><main>
+<header><div><h1>إدارة إحصائيات الفريق</h1><small>Marex · صلاحية الأدمن مطلوبة</small></div><div><a class="button secondary" href="index.html">العودة للموقع</a> <button id="logout" class="secondary" hidden type="button">تسجيل الخروج</button></div></header>
+<p class="muted">الحساب الحالي: <b id="identity" dir="auto">جارٍ التهيئة…</b></p><p id="status" class="notice" role="status" aria-live="polite">جارٍ الاتصال بـ Firebase…</p>
+<section id="login" class="card" hidden><h2>تسجيل دخول الأدمن</h2><form id="login-form"><div class="grid"><label class="field"><span>البريد الإلكتروني</span><input id="email" type="email" dir="ltr" autocomplete="username" required></label><label class="field"><span>كلمة المرور</span><input id="password" type="password" dir="ltr" autocomplete="current-password" required></label></div><div class="actions"><button id="login-button" disabled type="submit">دخول</button></div></form><p class="muted">يمكن أيضًا تسجيل الدخول من الموقع بالطريقة المعتادة ثم فتح هذه الصفحة على نفس النطاق. لا توجد هنا خاصية إنشاء حساب أو منح صلاحية أدمن.</p></section>
+<section id="panel" hidden><div class="card"><h2>البحث عن مستخدم</h2><form id="search-form" class="search"><label class="field"><span>UID أو بريد إلكتروني أو رمز دعوة أو رقم هاتف مطابق</span><input id="query" maxlength="320" autocomplete="off" placeholder="أدخل بيانات المستخدم" required></label><button id="search-button" type="submit">بحث</button></form><div id="results" aria-label="نتائج المستخدمين"></div></div>
+<section id="editor" class="card" hidden><h2>تعديل إحصائيات الإحالة</h2><p id="selected-user" dir="auto"></p><p class="muted">الحقل الفارغ يعيد هذا البند للحساب التلقائي. إدخال 0 يعرض صفرًا. «صالح» في الحساب التلقائي الأصلي هو عدد عمليات إيداع الفريق المعتمدة، وليس عدد الأعضاء الفريدين.</p><form id="editor-form"><div id="fields" class="grid"></div><div class="actions"><button id="save" type="submit">حفظ الإحصائيات</button><button id="reload" type="button" class="secondary">إعادة تحميل</button><button id="automatic" type="button" class="secondary">إعادة كل الحقول للتلقائي</button></div></form><p class="muted">هذه تعديلات لإحصائيات قسم الفريق فقط؛ لا تغيّر رصيد محفظة المستخدم أو سجلات الإيداع والسحب أو آلية إضافة العمولة التلقائية القائمة. تعديل العمولة هنا لا يضيف مالًا للمحفظة. عدد المستوى الأول يتبع حجم الفريق ما لم تضع له قيمة مستقلة.</p></section></section>
+<details class="card"><summary>تعليمات التركيب والحماية — ضرورية قبل الاستخدام</summary>
+<p>ارفع <code>index.html</code> و<code>admin.html</code> في المجلد نفسه على استضافة HTTP/HTTPS. سجّل دخول حسابك، وأضف إلى مستنده <code>users/{UID}</code> الحقل <code>admin</code> من نوع Boolean بالقيمة <code>true</code> من Firebase Console أو خادم موثوق فقط. القيمة <code>false</code> أو النص <code>"true"</code> أو غياب الحقل يمنع الدخول. لا تمنح المستخدمين حق تعديل هذا الحقل.</p>
+<p>تُحفظ التعديلات في <code>teamStats/{UID}</code> وتُعرض للمستخدم مباشرة عند الاتصال. الحقول الفارغة تحفظ كـ null، ويمكن الرجوع للحساب التلقائي دون المساس بالعمليات المالية. تتطلب معاينة القيم التلقائية أن تسمح قواعدك للأدمن بقراءة الإحالات وطلبات الإيداع والسحب الحالية.</p>
+<p class="notice error">حماية واجهة HTML ليست حماية لقاعدة البيانات. القواعد المنشورة حاليًا غير مرفقة ولم يتم تعديلها أو نشرها. ادمج المقطع أدناه داخل قواعد Firestore الحالية، ولا تستبدل قواعد المشروع به. يجب تقييد أي قاعدة عامة متداخلة تسمح بالكتابة، وإضافة منع تعديل admin إلى كل مسار كتابة غير إداري في users؛ قواعد السماح المتداخلة تُجمع بمنطق OR ولا يمكن إلغاؤها بقاعدة منع أخرى.</p>
+<p>المقطع يضيف صلاحيات قراءة المستخدمين للأدمن فقط، ويقصر تعديل إحصائيات الفريق على الأدمن، ويسمح لكل مستخدم بقراءة إحصائياته. حافظ على شروط الأمان الحالية للتسجيل والمكافآت والمحافظ، وأضف لها قيود حماية حقل admin الموضحة في نهاية المقطع. اختبر بحساب غير أدمن أنه لا يستطيع إنشاء admin=true أو تغييره، ولا الكتابة إلى teamStats مباشرة.</p>
+<div class="actions"><button type="button" id="copy-rules" class="secondary">نسخ مقطع قواعد الدمج</button><small id="copy-status" role="status"></small></div><pre id="rules">// Merge INSIDE the existing match /databases/{database}/documents block.
+// This is an integration patch, NOT a replacement for your existing rules.
+function marexTeamAdmin() {
+  return request.auth != null
+    &amp;&amp; exists(/databases/$(database)/documents/users/$(request.auth.uid))
+    &amp;&amp; get(/databases/$(database)/documents/users/$(request.auth.uid)).data.get(&#x27;admin&#x27;, false) == true;
+}
+function marexTeamCount(v) {
+  return v == null || (v is int &amp;&amp; v &gt;= 0 &amp;&amp; v &lt;= 999999999999);
+}
+function marexTeamMoney(v) {
+  return v == null || (v is number &amp;&amp; v &gt;= 0 &amp;&amp; v &lt;= 999999999999);
+}
+function marexTeamStatsValid(uid) {
+  let d = request.resource.data;
+  return d.keys().hasOnly([
+      &#x27;uid&#x27;,&#x27;teamCount&#x27;,&#x27;teamDeposits&#x27;,&#x27;teamWithdrawals&#x27;,&#x27;teamCommission&#x27;,
+      &#x27;level1Count&#x27;,&#x27;level1Valid&#x27;,&#x27;level2Count&#x27;,&#x27;level2Valid&#x27;,&#x27;level3Count&#x27;,&#x27;level3Valid&#x27;,
+      &#x27;revision&#x27;,&#x27;updatedBy&#x27;,&#x27;updatedAt&#x27;])
+    &amp;&amp; d.uid == uid
+    &amp;&amp; exists(/databases/$(database)/documents/users/$(uid))
+    &amp;&amp; d.updatedBy == request.auth.uid
+    &amp;&amp; d.updatedAt == request.time
+    &amp;&amp; d.revision is int
+    &amp;&amp; marexTeamCount(d.teamCount)
+    &amp;&amp; marexTeamMoney(d.teamDeposits)
+    &amp;&amp; marexTeamMoney(d.teamWithdrawals)
+    &amp;&amp; marexTeamMoney(d.teamCommission)
+    &amp;&amp; marexTeamCount(d.level1Count) &amp;&amp; marexTeamCount(d.level1Valid)
+    &amp;&amp; marexTeamCount(d.level2Count) &amp;&amp; marexTeamCount(d.level2Valid)
+    &amp;&amp; marexTeamCount(d.level3Count) &amp;&amp; marexTeamCount(d.level3Valid);
+}
+match /teamStats/{uid} {
+  allow get: if request.auth != null
+    &amp;&amp; (request.auth.uid == uid || marexTeamAdmin());
+  allow list: if marexTeamAdmin();
+  allow create: if marexTeamAdmin() &amp;&amp; marexTeamStatsValid(uid)
+    &amp;&amp; request.resource.data.revision == 1;
+  allow update: if marexTeamAdmin() &amp;&amp; marexTeamStatsValid(uid)
+    &amp;&amp; request.resource.data.revision == resource.data.get(&#x27;revision&#x27;, 0) + 1;
+  allow delete: if marexTeamAdmin();
+}
+// Add these admin read permissions to the existing users match.
+match /users/{uid} {
+  allow get, list: if marexTeamAdmin();
+}
+// IMPORTANT: in EVERY existing non-admin users create condition, require:
+// !request.resource.data.keys().hasAny([&#x27;admin&#x27;])
+// OR require missing/false only:
+// request.resource.data.get(&#x27;admin&#x27;, false) == false
+// In EVERY existing non-admin users update condition, ALSO require:
+// !request.resource.data.diff(resource.data).affectedKeys().hasAny([&#x27;admin&#x27;])
+// Do not add new broad allow rules. Existing allow rules are OR-combined.
+// Remove/narrow any wildcard allow that permits non-admin writes to teamStats
+// or allows users to create/change their own admin field.
+// Create the first admin=true only through a trusted Firebase console/backend.
+</pre>
+<p>راجع <a href="https://console.firebase.google.com/project/hhhxh-5ebe4/firestore/rules" target="_blank" rel="noopener noreferrer">قواعد المشروع في Firebase Console</a>. تعيين أول أدمن وتعديل القواعد يتطلبان صلاحيتك على المشروع، ولا يتمان من هذين الملفين.</p>
+</details><noscript><p class="notice error">يجب تفعيل JavaScript لتشغيل اللوحة.</p></noscript>
+</main><script>(()=>{'use strict';
+const $=id=>document.getElementById(id);
+const fields=[['teamCount','عدد المسجلين / حجم الفريق',true],['teamDeposits','رصيد إيداعات الفريق (USDT)',false],['teamWithdrawals','سحوبات الفريق (USDT)',false],['teamCommission','عمولة الإحالة (USDT)',false],['level1Count','المستوى الأول — عدد',true],['level1Valid','المستوى الأول — صالح',true],['level2Count','المستوى الثاني — عدد',true],['level2Valid','المستوى الثاني — صالح',true],['level3Count','المستوى الثالث — عدد',true],['level3Valid','المستوى الثالث — صالح',true]];
+let auth,db,fs,as,user=null,allowed=false,stopRole=null,generation=0,selection=0,selectedUid='',loadedRevision=0,busy=false;
+function message(text,error=false){$('status').textContent=text;$('status').className=error?'notice error':'notice';}
+function wipeEditor(){selection++;selectedUid='';$('editor').hidden=true;$('editor-form').reset();$('selected-user').textContent='';$('results').replaceChildren();}
+function lock(text){allowed=false;$('panel').hidden=true;wipeEditor();message(text,true);}
+function errorText(e){const code=e?.code||'';if(code.includes('permission-denied'))return 'الصلاحيات مرفوضة من Firestore. راجع القواعد وتعليمات الحماية أدناه.';if(code.includes('unavailable')||code.includes('network'))return 'تعذر الاتصال بالخادم. تحقق من الإنترنت ثم أعد المحاولة.';if(code.includes('invalid-credential')||code.includes('wrong-password')||code.includes('user-not-found'))return 'بيانات تسجيل الدخول غير صحيحة.';if(code.includes('too-many-requests'))return 'محاولات كثيرة؛ انتظر قليلًا ثم أعد المحاولة.';return e?.message||'تعذر تنفيذ العملية.';}
+function normalizeNumber(input,integer){let raw=input.value.trim().replace(/[٠-٩]/g,c=>String('٠١٢٣٤٥٦٧٨٩'.indexOf(c))).replace(/[۰-۹]/g,c=>String('۰۱۲۳۴۵۶۷۸۹'.indexOf(c))).replace(/٫/g,'.');if(!raw)return null;if(!/^\d+(?:\.\d{1,6})?$/.test(raw))throw new Error('أدخل أرقامًا غير سالبة وبحد أقصى 6 خانات عشرية.');const n=Number(raw);if(!Number.isFinite(n)||n<0||n>999999999999||(integer&&!Number.isSafeInteger(n)))throw new Error(integer?'حقول العدد وصالح تقبل أعدادًا صحيحة غير سالبة فقط.':'المبلغ خارج النطاق المسموح.');return n;}
+function valueOf(data,key){const n=data?.[key];return typeof n==='number'&&Number.isFinite(n)&&n>=0?n:null;}
+function setBusy(value){busy=value;$('save').disabled=value;$('reload').disabled=value;$('automatic').disabled=value;$('search-button').disabled=value;$('editor-form').setAttribute('aria-busy',String(value));}
+async function requireAdmin(){const current=auth.currentUser;if(!current||current.uid!==user?.uid||!allowed)throw new Error('الدخول متاح للأدمن فقط.');const snap=await fs.getDocFromServer(fs.doc(db,'users',current.uid));if(auth.currentUser?.uid!==current.uid||user?.uid!==current.uid||!allowed)throw new Error('تغيرت جلسة الدخول.');if(!snap.exists()||snap.data().admin!==true){lock('غير مسموح: يجب أن يكون حقل admin بالقيمة المنطقية true.');throw new Error('تم إلغاء صلاحية الأدمن.');}return current;}
+async function authorize(next){const version=++generation;if(stopRole){stopRole();stopRole=null;}allowed=false;user=next;wipeEditor();$('panel').hidden=true;$('login').hidden=!!next;$('logout').hidden=!next;$('identity').textContent=next?(next.email||next.phoneNumber||next.uid):'غير مسجل';if(!next){message('سجّل دخول حساب الأدمن للمتابعة.');return;}
+message('جارٍ التحقق من حقل admin من الخادم…');
+try{const profile=fs.doc(db,'users',next.uid);const initial=await fs.getDocFromServer(profile);if(version!==generation||auth.currentUser?.uid!==next.uid)return;
+if(!initial.exists()||initial.data().admin!==true){lock('غير مسموح بالدخول: حسابك ليس أدمن. يلزم users/{UID}.admin = true كقيمة منطقية، وليس نصًا.');}
+else{allowed=true;$('panel').hidden=false;message('تم التحقق من صلاحية الأدمن. ابحث عن المستخدم المراد تعديل إحصائياته.');}
+stopRole=fs.onSnapshot(profile,{includeMetadataChanges:true},snap=>{if(version!==generation)return;if(snap.metadata.fromCache||snap.metadata.hasPendingWrites){lock('تعذر تأكيد صلاحية الأدمن من الخادم. اللوحة مقفلة حتى عودة الاتصال.');return;}if(!snap.exists()||snap.data().admin!==true){lock('غير مسموح بالدخول أو تم سحب صلاحية الأدمن.');return;}if(!allowed){allowed=true;$('panel').hidden=false;message('تم التحقق من صلاحية الأدمن.');}},e=>{if(version===generation)lock(errorText(e));});
+}catch(e){if(version===generation)lock(errorText(e));}}
+function addResult(uid,data){const button=document.createElement('button');button.type='button';button.className='result';const label=document.createElement('strong'),id=document.createElement('small');label.textContent=data.email||data.phoneNumber||data.displayName||'مستخدم';id.textContent=uid;id.dir='ltr';button.append(label,id);button.addEventListener('click',()=>{if(!busy)loadUser(uid);});$('results').append(button);}
+async function search(e){e.preventDefault();if(busy)return;const term=$('query').value.trim();if(!term){message('أدخل UID أو البريد أو رمز الدعوة أو رقم الهاتف.',true);return;}
+setBusy(true);wipeEditor();const token=selection,version=generation;message('جارٍ البحث…');
+try{await requireAdmin();const requests=[];if(!term.includes('/')&&term.length<=128)requests.push(fs.getDocFromServer(fs.doc(db,'users',term)).then(s=>s.exists()?[s]:[]));
+for(const [field,value] of [['emailLower',term.toLowerCase()],['email',term],['inviteCode',term.replace(/^MX-/i,'')],['phoneNumber',term]])requests.push(fs.getDocsFromServer(fs.query(fs.collection(db,'users'),fs.where(field,'==',value),fs.limit(10))).then(s=>s.docs));
+const settled=await Promise.allSettled(requests);if(version!==generation||token!==selection||!allowed)return;const matches=new Map();let failures=0;for(const r of settled){if(r.status==='fulfilled')for(const d of r.value)matches.set(d.id,d.data());else failures++;}
+if(!matches.size){if(failures)throw new Error('تعذر البحث ببعض الحقول بسبب الصلاحيات أو الاتصال. جرّب UID وتحقق من قواعد users.');message('لا يوجد مستخدم مطابق.');return;}for(const [uid,data] of matches)addResult(uid,data);message('اختر المستخدم من نتائج البحث.'+(failures?' بعض طرق البحث غير متاحة حسب قواعدك الحالية.':''));
+}catch(err){if(version===generation)message(errorText(err),true);}finally{setBusy(false);}}
+async function automaticTotals(uid,token,version){const same=()=>token===selection&&version===generation&&allowed;const members=await fs.getDocsFromServer(fs.query(fs.collection(db,'users'),fs.where('referredByUid','==',uid)));const ids=members.docs.filter(d=>d.id!==uid).map(d=>d.id);let deposit=0,withdraw=0,valid=0;const jobs=[];
+for(let i=0;i<ids.length;i+=30)for(const kind of ['depositRequests','withdrawalRequests'])jobs.push(fs.getDocsFromServer(fs.query(fs.collection(db,kind),fs.where('uid','in',ids.slice(i,i+30)))).then(s=>{if(!same())return;for(const d of s.docs){const r=d.data(),amount=Number(r.amount);if(!['approved','completed'].includes(String(r.status||'pending').toLowerCase())||!Number.isFinite(amount)||amount<=0)continue;if(kind==='depositRequests'){deposit+=amount;valid++;}else withdraw+=amount;}}));await Promise.all(jobs);return {teamCount:ids.length,teamDeposits:deposit,teamWithdrawals:withdraw,teamCommission:Math.round((deposit*0.07+Number.EPSILON)*100)/100,level1Count:ids.length,level1Valid:valid,level2Count:0,level2Valid:0,level3Count:0,level3Valid:0};}
+async function loadUser(uid){if(busy)return;setBusy(true);const token=++selection,version=generation;selectedUid='';$('editor').hidden=true;message('جارٍ تحميل المستخدم وإحصائياته…');
+try{await requireAdmin();const [p,s]=await Promise.all([fs.getDocFromServer(fs.doc(db,'users',uid)),fs.getDocFromServer(fs.doc(db,'teamStats',uid))]);if(token!==selection||version!==generation||!allowed)return;if(!p.exists())throw new Error('المستخدم غير موجود.');const data=s.exists()?s.data():{};selectedUid=uid;loadedRevision=data.revision??0;if(!Number.isSafeInteger(loadedRevision)||loadedRevision<0)throw new Error('إصدار سجل الإحصائيات غير صالح. راجع السجل في Firestore.');$('selected-user').textContent=(p.data().email||p.data().phoneNumber||'مستخدم')+' — '+uid;
+for(const [key] of fields){const v=valueOf(data,key);$(key).value=v===null?'':String(v);$('base-'+key).textContent='القيمة التلقائية: جارٍ التحميل…';}
+$('editor').hidden=false;message('تم التحميل. الحقل الفارغ يستخدم الحساب التلقائي؛ 0 قيمة تعديل فعلية.');
+automaticTotals(uid,token,version).then(base=>{if(token!==selection||version!==generation||!allowed)return;for(const [key,label,integer] of fields)$('base-'+key).textContent='القيمة التلقائية: '+(integer?String(base[key]):base[key].toFixed(2)+' USDT');}).catch(()=>{if(token===selection&&version===generation&&allowed)for(const [key] of fields)$('base-'+key).textContent='تعذر قراءة القيمة التلقائية؛ لا يمنع ذلك حفظ التعديل.';});
+}catch(e){if(token===selection&&version===generation){selectedUid='';$('editor').hidden=true;message(errorText(e),true);}}finally{setBusy(false);}}
+async function save(e){e.preventDefault();if(busy||!selectedUid)return;const uid=selectedUid,token=selection,version=generation,expected=loadedRevision;let patch;try{patch=Object.fromEntries(fields.map(([key,label,integer])=>[key,normalizeNumber($(key),integer)]));}catch(err){message(errorText(err),true);return;}setBusy(true);message('جارٍ حفظ الإحصائيات…');
+try{const actor=await requireAdmin();const ref=fs.doc(db,'teamStats',uid);
+await fs.runTransaction(db,async tx=>{const role=await tx.get(fs.doc(db,'users',actor.uid));const target=await tx.get(fs.doc(db,'users',uid));const prior=await tx.get(ref);
+if(token!==selection||version!==generation||auth.currentUser?.uid!==actor.uid||!allowed)throw new Error('تغيرت الجلسة؛ لم يتم الحفظ.');if(!role.exists()||role.data().admin!==true)throw new Error('الحساب ليس أدمن.');if(!target.exists())throw new Error('المستخدم غير موجود.');const revision=prior.exists()?(prior.data().revision??0):0;if(revision!==expected)throw new Error('قام أدمن آخر بتعديل السجل. أعد تحميل القيم قبل الحفظ حتى لا تُفقد تعديلاته.');tx.set(ref,{...patch,uid,updatedBy:actor.uid,updatedAt:fs.serverTimestamp(),revision:revision+1},{merge:true});});
+if(token===selection&&version===generation&&allowed){loadedRevision=expected+1;message('تم الحفظ في Firebase. تظهر القيم للمستخدم مباشرة عند الاتصال.');}
+}catch(err){if(version===generation)message(errorText(err),true);}finally{setBusy(false);}}
+for(const [key,label,integer] of fields){const wrapper=document.createElement('label');wrapper.className='field';const title=document.createElement('span');title.textContent=label;const input=document.createElement('input');input.id=key;input.type='text';input.inputMode=integer?'numeric':'decimal';input.dir='ltr';input.autocomplete='off';input.placeholder='تلقائي — اتركه فارغًا';input.maxLength=32;const hint=document.createElement('small');hint.id='base-'+key;wrapper.append(title,input,hint);$('fields').append(wrapper);}
+$('search-form').addEventListener('submit',search);$('editor-form').addEventListener('submit',save);$('reload').onclick=()=>{if(selectedUid&&!busy&&confirm('سيتم إلغاء أي تغييرات غير محفوظة وإعادة تحميل القيم.'))loadUser(selectedUid);};$('automatic').onclick=()=>{if(!busy&&confirm('تفريغ كل الحقول للعودة للحساب التلقائي. لا يطبق ذلك إلا بعد الضغط على حفظ.'))for(const [key] of fields)$(key).value='';};
+$('logout').onclick=async()=>{if(!auth)return;lock('جارٍ تسجيل الخروج…');try{await as.signOut(auth);}catch(e){message(errorText(e),true);}};
+$('login-form').addEventListener('submit',async e=>{e.preventDefault();if(!auth)return;$('login-button').disabled=true;try{await as.signInWithEmailAndPassword(auth,$('email').value.trim(),$('password').value);$('password').value='';}catch(err){message(errorText(err),true);}finally{$('login-button').disabled=false;}});
+$('copy-rules').onclick=async()=>{try{await navigator.clipboard.writeText($('rules').textContent);$('copy-status').textContent='تم النسخ. ادمجها مع القواعد الحالية ولا تستبدل القواعد كاملة.';}catch{$('copy-status').textContent='تعذر النسخ التلقائي؛ حدد النص وانسخه يدويًا.';}};
+window.addEventListener('offline',()=>lock('الاتصال غير متاح. تم قفل اللوحة حتى تأكيد الصلاحية من الخادم.'));
+window.addEventListener('online',()=>{if(auth?.currentUser)authorize(auth.currentUser);});
+(async()=>{try{if(!/^https?:$/.test(location.protocol))throw new Error('ارفع الملفين على نفس استضافة HTTP أو HTTPS. لا تفتح الملف بصيغة file://.');const [appSDK,authSDK,firestoreSDK]=await Promise.all([import('https://www.gstatic.com/firebasejs/13.1.0/firebase-app.js'),import('https://www.gstatic.com/firebasejs/13.1.0/firebase-auth.js'),import('https://www.gstatic.com/firebasejs/13.1.0/firebase-firestore.js')]);as=authSDK;fs=firestoreSDK;const config={apiKey:'AIzaSyBvzfJOOjRFZnTgTUrwEZQPr8Ba7zKKlNg',authDomain:'hhhxh-5ebe4.firebaseapp.com',projectId:'hhhxh-5ebe4',storageBucket:'hhhxh-5ebe4.firebasestorage.app',messagingSenderId:'79243000696',appId:'1:79243000696:web:ee0fb2d2ccce791954e68d',measurementId:'G-08BR6LN6PT'};const app=appSDK.getApps().length?appSDK.getApp():appSDK.initializeApp(config);auth=as.getAuth(app);auth.languageCode='ar';db=fs.getFirestore(app);$('login-button').disabled=false;as.onAuthStateChanged(auth,authorize,e=>lock(errorText(e)));}catch(e){lock(errorText(e));}})();
+})();
+</script></body></html>
